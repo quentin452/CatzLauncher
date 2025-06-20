@@ -1,6 +1,7 @@
 import subprocess
 import sys
 from tkinter import messagebox
+import minecraft_launcher_lib
 
 # Dépendances auto
 def install(package):
@@ -36,4 +37,30 @@ def convert_dropbox_link(url):
             return url
     else:
         print(f"[DEBUG] Pas un lien Dropbox, retourné tel quel")
-        return url 
+        return url
+
+def find_forge_version_for_mc(mc_version, mc_dir):
+    """Trouve une version de Forge installée pour une version de Minecraft donnée."""
+    versions = minecraft_launcher_lib.utils.get_available_versions(mc_dir)
+    found_versions = []
+    for v in versions:
+        if v["id"].startswith(mc_version) and "forge" in v["id"].lower():
+            found_versions.append(v["id"])
+    
+    if found_versions:
+        found_versions.sort(reverse=True)
+        return found_versions[0]
+    return None
+
+def find_fabric_version_for_mc(mc_version, mc_dir):
+    """Trouve une version de Fabric installée pour une version de Minecraft donnée."""
+    versions = minecraft_launcher_lib.utils.get_available_versions(mc_dir)
+    found_versions = []
+    for v in versions:
+        if v["id"].endswith(mc_version) and "fabric-loader" in v["id"].lower():
+            found_versions.append(v["id"])
+
+    if found_versions:
+        found_versions.sort(reverse=True)
+        return found_versions[0]
+    return None 

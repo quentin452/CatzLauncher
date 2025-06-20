@@ -4,8 +4,9 @@ from PIL import Image, ImageTk
 import subprocess
 import minecraft_launcher_lib
 import urllib.request
+import threading
 
-from utils import check_java, convert_dropbox_link
+from utils import check_java, convert_dropbox_link, find_forge_version_for_mc, find_fabric_version_for_mc
 from modpack_manager import install_modpack
 
 
@@ -73,21 +74,35 @@ class MinecraftLauncher(tk.Tk):
         self.resolution.set("1280x720")
         self.resolution.grid(row=3, column=1, pady=5, padx=10)
 
+        # Type de loader
+        tk.Label(frame, text="Loader :", font=("Segoe UI", 12), fg="#F5F6FA", bg="#23272F").grid(row=4, column=0, sticky="e", pady=5, padx=10)
+        self.loader_type_main = ttk.Combobox(frame, values=["Vanilla", "Forge", "Fabric"], font=("Segoe UI", 12), width=15, state="readonly")
+        self.loader_type_main.set("Vanilla")
+        self.loader_type_main.grid(row=4, column=1, pady=5, padx=10)
+
         # Version Minecraft
-        tk.Label(frame, text="Version :", font=("Segoe UI", 12), fg="#F5F6FA", bg="#23272F").grid(row=4, column=0, sticky="e", pady=5, padx=10)
-        mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
-        versions = minecraft_launcher_lib.utils.get_available_versions(mc_dir)
-        self.version_list = [v["id"] for v in versions]
-        self.version = ttk.Combobox(frame, values=self.version_list, font=("Segoe UI", 12), width=15)
+        tk.Label(frame, text="Version :", font=("Segoe UI", 12), fg="#F5F6FA", bg="#23272F").grid(row=5, column=0, sticky="e", pady=5, padx=10)
+        
+        version_frame = tk.Frame(frame, bg="#23272F")
+        version_frame.grid(row=5, column=1, pady=5, padx=10, sticky="w")
+
+        all_versions = minecraft_launcher_lib.utils.get_version_list()
+        self.version_list = [v["id"] for v in all_versions if v["type"] == "release"]
+        self.version = ttk.Combobox(version_frame, values=self.version_list, font=("Segoe UI", 12), width=13)
         if self.version_list:
             self.version.set(self.version_list[0])
-        self.version.grid(row=4, column=1, pady=5, padx=10)
+        self.version.pack(side="left")
+
+        refresh_main_btn = tk.Button(version_frame, text="🔄", font=("Segoe UI", 10),
+                                     bg="#2C2F38", fg="#F5F6FA", relief="flat",
+                                     command=self.refresh_versions, width=3)
+        refresh_main_btn.pack(side="left", padx=(5, 0))
 
         # Bouton Lancer
         launch_btn = tk.Button(frame, text="Lancer Minecraft", font=("Segoe UI", 14, "bold"), bg="#7289DA", fg="#F5F6FA",
                                activebackground="#5B6EAE", activeforeground="#F5F6FA", relief="flat", bd=0, padx=20, pady=8,
                                command=self.launch_minecraft)
-        launch_btn.grid(row=5, column=0, columnspan=2, pady=(25, 10))
+        launch_btn.grid(row=6, column=0, columnspan=2, pady=(25, 10))
 
     def setup_modpack_tab(self):
         frame = tk.Frame(self.modpack_frame, bg="#23272F")
@@ -209,16 +224,75 @@ class MinecraftLauncher(tk.Tk):
             messagebox.showerror("Erreur", f"Erreur lors de l'installation: {str(e)}")
 
     def refresh_versions(self):
-        """Rafraîchir la liste des versions disponibles"""
+        """Rafraîchir les listes de versions disponibles pour tous les onglets."""
         try:
             mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
-            versions = minecraft_launcher_lib.utils.get_available_versions(mc_dir)
-            self.modpack_version_list = [v["id"] for v in versions]
+
+            # Pour l'onglet principal (uniquement les versions "release")
+            all_versions_list = minecraft_launcher_lib.utils.get_version_list()
+            self.version_list = [v["id"] for v in all_versions_list if v["type"] == "release"]
+            self.version['values'] = self.version_list
+            current_main_version = self.version.get()
+            if current_main_version not in self.version_list and self.version_list:
+                self.version.set(self.version_list[0])
+
+            # Pour l'onglet modpacks (toutes les versions installées)
+            available_versions = minecraft_launcher_lib.utils.get_available_versions(mc_dir)
+            self.modpack_version_list = [v["id"] for v in available_versions]
             self.modpack_version['values'] = self.modpack_version_list
-            if self.modpack_version_list:
+            current_modpack_version = self.modpack_version.get()
+            if current_modpack_version not in self.modpack_version_list and self.modpack_version_list:
                 self.modpack_version.set(self.modpack_version_list[0])
+            
+            messagebox.showinfo("Succès", "La liste des versions a été rafraîchie.")
         except Exception as e:
             messagebox.showerror("Erreur", f"Impossible de charger les versions: {str(e)}")
+
+    def install_loader(self, loader_name, mc_version):
+        """Installe un loader (Forge/Fabric) dans un thread avec une fenêtre de progression."""
+        mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
+
+        progress_window = tk.Toplevel(self)
+        progress_window.title(f"Installation de {loader_name}")
+        progress_window.geometry("350x100")
+        progress_window.resizable(False, False)
+        progress_window.transient(self)
+        progress_window.grab_set()
+        
+        label = tk.Label(progress_window, text=f"Installation de {loader_name} pour {mc_version}...\nCela peut prendre quelques instants.", font=("Segoe UI", 12))
+        label.pack(pady=20, padx=10)
+        
+        def do_install():
+            try:
+                if loader_name == "Forge":
+                    minecraft_launcher_lib.forge.install_forge_version(mc_version, mc_dir)
+                elif loader_name == "Fabric":
+                    minecraft_launcher_lib.fabric.install_fabric(mc_version, mc_dir)
+                
+                progress_window.destroy()
+                messagebox.showinfo("Installation terminée", f"{loader_name} a été installé avec succès.\nVeuillez cliquer à nouveau sur 'Lancer Minecraft'.")
+                # Rafraîchir les listes de versions automatiquement
+                self.refresh_versions()
+
+            except Exception as e:
+                progress_window.destroy()
+                
+                # Détecter si l'erreur est une version non trouvée
+                if "was not found" in str(e):
+                    error_msg = f"Il n'existe probablement pas encore de version de {loader_name} compatible avec Minecraft {mc_version}.\n\nVeuillez essayer avec une version de Minecraft plus ancienne et populaire pour les mods (ex: 1.20.1, 1.20.4)."
+                    messagebox.showwarning("Version non supportée", error_msg)
+                else:
+                    print(f"--- ERREUR LORS DE L'INSTALLATION DE {loader_name.upper()} ---")
+                    print(f"Version de Minecraft: {mc_version}")
+                    print(f"Erreur: {e}")
+                    print("--- TRACEBACK COMPLET ---")
+                    import traceback
+                    traceback.print_exc()
+                    print("--------------------------")
+                    messagebox.showerror("Erreur d'installation", f"Échec de l'installation de {loader_name}.\n\n{e}\n\nDes détails techniques ont été imprimés dans la console.")
+
+        install_thread = threading.Thread(target=do_install)
+        install_thread.start()
 
     def launch_minecraft(self):
         self.launch_game()
@@ -233,12 +307,8 @@ class MinecraftLauncher(tk.Tk):
         username = self.username.get()
         ram = self.ram.get()
         res = self.resolution.get()
-        version = self.version.get()
         mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
         
-        # Téléchargement version si besoin
-        minecraft_launcher_lib.install.install_minecraft_version(version, mc_dir)
-
         # Options de lancement
         width, height = res.split('x')
         options = {
@@ -251,18 +321,50 @@ class MinecraftLauncher(tk.Tk):
             "resolutionHeight": height
         }
 
-        # Pour les modpacks, utiliser la version spécifique du loader
+        version_to_launch = ""
+
         if with_modpack:
             loader = self.loader_type.get()
+            mc_version = self.modpack_version.get()
             if loader == "Forge":
-                version = f"{self.modpack_version.get()}-forge-{self.get_forge_version()}"
+                version_to_launch = f"{mc_version}-forge-{self.get_forge_version()}"
             elif loader == "Fabric":
-                version = f"fabric-loader-{self.get_fabric_version()}-{self.modpack_version.get()}"
+                version_to_launch = f"fabric-loader-{self.get_fabric_version()}-{mc_version}"
+            else: # Aucun loader
+                version_to_launch = mc_version
+        else: # Lancement depuis l'onglet "Jouer"
+            loader = self.loader_type_main.get()
+            mc_version = self.version.get()
+            
+            # Installer la version vanilla si besoin
+            minecraft_launcher_lib.install.install_minecraft_version(mc_version, mc_dir)
+
+            if loader == "Vanilla":
+                version_to_launch = mc_version
+            elif loader == "Forge":
+                forge_version = find_forge_version_for_mc(mc_version, mc_dir)
+                if not forge_version:
+                    if messagebox.askyesno("Forge non trouvé", f"Aucune version de Forge n'a été trouvée pour Minecraft {mc_version}.\nSouhaitez-vous installer la dernière version recommandée ?"):
+                        self.install_loader("Forge", mc_version)
+                    return
+                version_to_launch = forge_version
+            elif loader == "Fabric":
+                fabric_version = find_fabric_version_for_mc(mc_version, mc_dir)
+                if not fabric_version:
+                    if messagebox.askyesno("Fabric non trouvé", f"Aucune version de Fabric n'a été trouvée pour Minecraft {mc_version}.\nSouhaitez-vous installer la dernière version ?"):
+                        self.install_loader("Fabric", mc_version)
+                    return
+                version_to_launch = fabric_version
+        
+        if not version_to_launch:
+            messagebox.showerror("Erreur", "Impossible de déterminer la version à lancer.")
+            return
 
         # Commande de lancement
         try:
-            mc_cmd = minecraft_launcher_lib.command.get_minecraft_command(version, mc_dir, options)
-            subprocess.run(mc_cmd)
+            mc_cmd = minecraft_launcher_lib.command.get_minecraft_command(version_to_launch, mc_dir, options)
+            # Lancer Minecraft en tant que processus séparé pour ne pas bloquer le launcher
+            subprocess.Popen(mc_cmd)
         except Exception as e:
             messagebox.showerror("Erreur", f"Impossible de lancer Minecraft: {str(e)}")
 
