@@ -5,7 +5,7 @@ import subprocess
 import minecraft_launcher_lib
 import threading
 
-from utils import check_java, convert_dropbox_link
+from utils import check_java, convert_dropbox_link, find_forge_version_for_mc, find_fabric_version_for_mc, test_forge_connection
 from modpack_manager import install_modpack
 
 class MinecraftLauncher(tk.Tk):
@@ -96,6 +96,10 @@ class MinecraftLauncher(tk.Tk):
                 bg=self.BTN_BG, fg=self.FG_COLOR, relief="flat", padx=20, pady=8,
                 command=self.launch_game).grid(row=6, column=0, columnspan=2, pady=20)
 
+        tk.Button(content, text="Diagnostic Réseau", font=self.FONT_LABEL,
+                bg=self.WIDGET_BG, fg=self.FG_COLOR, relief="flat", padx=15, pady=5,
+                command=self.run_network_diagnostic).grid(row=7, column=0, columnspan=2)
+
     def create_modpack_tab(self):
         frame = ttk.Frame(self.notebook)
         self.notebook.add(frame, text="Modpacks")
@@ -133,6 +137,11 @@ class MinecraftLauncher(tk.Tk):
                 fg=self.FG_COLOR, bg=self.BG_COLOR).pack(side="left", padx=(20, 0))
         
         self.modpack_version = ttk.Combobox(loader_frame, width=15, font=self.FONT_LABEL)
+        mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
+        modpack_versions = [v["id"] for v in minecraft_launcher_lib.utils.get_available_versions(mc_dir)]
+        self.modpack_version['values'] = modpack_versions
+        if modpack_versions:
+            self.modpack_version.set(modpack_versions[0])
         self.modpack_version.pack(side="left", padx=5)
         
         # Boutons d'action
@@ -165,10 +174,70 @@ class MinecraftLauncher(tk.Tk):
                 if v["type"] == "release"]
 
     def refresh_versions(self):
-        self.version_list = self.get_versions()
-        self.entries["version :"]['values'] = self.version_list
-        if self.version_list and not self.entries["version :"].get():
-            self.entries["version :"].set(self.version_list[0])
+        """Rafraîchir les listes de versions."""
+        try:
+            # Main tab
+            self.version_list = self.get_versions()
+            self.entries["version"]['values'] = self.version_list
+            if self.version_list and not self.entries["version"].get():
+                self.entries["version"].set(self.version_list[0])
+
+            # Modpack tab
+            mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
+            modpack_versions = [v["id"] for v in minecraft_launcher_lib.utils.get_available_versions(mc_dir)]
+            self.modpack_version['values'] = modpack_versions
+            if modpack_versions and not self.modpack_version.get():
+                self.modpack_version.set(modpack_versions[0])
+            
+            messagebox.showinfo("Succès", "Liste des versions rafraîchie.")
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Impossible de rafraîchir les versions : {e}")
+
+    def install_loader(self, loader_name, mc_version):
+        """Installe un loader (Forge/Fabric) dans un thread."""
+        mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
+        
+        progress_window = tk.Toplevel(self)
+        progress_window.title(f"Installation de {loader_name}")
+        progress_window.geometry("350x100")
+        progress_window.transient(self)
+        progress_window.grab_set()
+        
+        tk.Label(progress_window, text=f"Installation de {loader_name} pour {mc_version}...", font=self.FONT_LABEL).pack(pady=20, padx=10)
+        
+        def do_install():
+            try:
+                if loader_name == "Forge":
+                    minecraft_launcher_lib.forge.install_forge_version(mc_version, mc_dir)
+                elif loader_name == "Fabric":
+                    minecraft_launcher_lib.fabric.install_fabric(mc_version, mc_dir)
+                
+                progress_window.destroy()
+                messagebox.showinfo("Succès", f"{loader_name} installé. Veuillez rafraîchir la liste des versions.")
+                self.refresh_versions()
+            except Exception as e:
+                progress_window.destroy()
+
+                # Message personnalisé pour l'erreur "Version not found"
+                if "was not found" in str(e).lower():
+                    error_msg = (
+                        f"Impossible de trouver une version de {loader_name} pour Minecraft {mc_version}.\n\n"
+                        "Cela peut arriver si :\n"
+                        "1. Les serveurs de Forge/Fabric sont temporairement indisponibles.\n"
+                        "2. Votre connexion internet ou un antivirus bloque l'accès.\n"
+                        "3. La version de Minecraft est trop récente.\n\n"
+                        "Veuillez réessayer plus tard ou vérifier votre connexion."
+                    )
+                    print(f"--- ERREUR 'VERSION NOT FOUND' ---")
+                    print(f"Loader: {loader_name}, MC Version: {mc_version}")
+                    import traceback
+                    traceback.print_exc()
+                    print("-----------------------------------")
+                    messagebox.showwarning("Version non trouvée", error_msg)
+                else:
+                    messagebox.showerror("Erreur", f"Échec de l'installation de {loader_name}:\n{e}")
+
+        threading.Thread(target=do_install).start()
 
     # Fonctions principales
     def install_modpack(self):
@@ -211,8 +280,42 @@ class MinecraftLauncher(tk.Tk):
             "resolutionHeight": height
         }
 
-        version_to_launch = self.entries["version"].get() if with_modpack else self.entries["version"].get()
+        version_to_launch = None
         
+        if with_modpack:
+            version_to_launch = self.modpack_version.get()
+            if not version_to_launch:
+                messagebox.showerror("Erreur", "Veuillez sélectionner une version dans l'onglet Modpacks.")
+                return
+        else: # Lancement depuis l'onglet "Jouer"
+            loader = self.entries["loader"].get()
+            mc_version = self.entries["version"].get()
+            
+            if not mc_version:
+                messagebox.showerror("Erreur", "Veuillez sélectionner une version Minecraft.")
+                return
+
+            try:
+                minecraft_launcher_lib.install.install_minecraft_version(mc_version, mc_dir)
+            except Exception as e:
+                messagebox.showerror("Erreur", f"Impossible d'installer Minecraft {mc_version}.\n{e}")
+                return
+
+            if loader == "Vanilla":
+                version_to_launch = mc_version
+            elif loader == "Forge":
+                version_to_launch = find_forge_version_for_mc(mc_version, mc_dir)
+                if not version_to_launch:
+                    if messagebox.askyesno("Forge non trouvé", f"Forge n'est pas installé pour {mc_version}.\nL'installer maintenant ?"):
+                        self.install_loader("Forge", mc_version)
+                    return
+            elif loader == "Fabric":
+                version_to_launch = find_fabric_version_for_mc(mc_version, mc_dir)
+                if not version_to_launch:
+                    if messagebox.askyesno("Fabric non trouvé", f"Fabric n'est pas installé pour {mc_version}.\nL'installer maintenant ?"):
+                        self.install_loader("Fabric", mc_version)
+                    return
+
         if not version_to_launch:
             return
 
@@ -222,7 +325,26 @@ class MinecraftLauncher(tk.Tk):
             # Lancer Minecraft en tant que processus séparé pour ne pas bloquer le launcher
             subprocess.Popen(mc_cmd)
         except Exception as e:
-            messagebox.showerror("Erreur", f"Impossible de lancer Minecraft: {str(e)}")
+            messagebox.showerror("Erreur", f"Impossible de lancer Minecraft: {str(e)}\n\nVersion: {version_to_launch}")
             
+    def run_network_diagnostic(self):
+        """Lance le test de connexion dans un thread et affiche le résultat."""
+        diag_window = tk.Toplevel(self)
+        diag_window.title("Diagnostic en cours")
+        diag_window.geometry("350x100")
+        diag_window.transient(self)
+        diag_window.grab_set()
+        tk.Label(diag_window, text="Test de la connexion aux serveurs de Forge...\nCela peut prendre jusqu'à 15 secondes.", font=self.FONT_LABEL).pack(pady=20, padx=10)
+
+        def do_diag():
+            success, message = test_forge_connection()
+            diag_window.destroy()
+            if success:
+                messagebox.showinfo("Diagnostic Réseau Réussi", message + "\n\nLa connexion semble fonctionner. Veuillez réessayer d'installer Forge.")
+            else:
+                messagebox.showerror("Diagnostic Réseau Échoué", message)
+
+        threading.Thread(target=do_diag).start()
+
 if __name__ == "__main__":
     MinecraftLauncher().mainloop()

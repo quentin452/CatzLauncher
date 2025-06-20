@@ -2,6 +2,7 @@ import subprocess
 import sys
 from tkinter import messagebox
 import minecraft_launcher_lib
+import urllib.request
 
 # Dépendances auto
 def install(package):
@@ -38,6 +39,27 @@ def convert_dropbox_link(url):
     else:
         print(f"[DEBUG] Pas un lien Dropbox, retourné tel quel")
         return url
+
+FORGE_MAVEN_URL = "https://files.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml"
+
+def test_forge_connection():
+    """Tente de se connecter au Maven de Forge pour diagnostiquer les problèmes réseau."""
+    try:
+        print(f"[DIAGNOSTIC] Tentative de connexion à {FORGE_MAVEN_URL}")
+        with urllib.request.urlopen(FORGE_MAVEN_URL, timeout=15) as response:
+            if response.getcode() == 200:
+                print("[DIAGNOSTIC] Connexion réussie, code 200.")
+                return True, "La connexion aux serveurs de Forge a réussi."
+            else:
+                msg = f"Connexion établie, mais le serveur a répondu avec un code inattendu : {response.getcode()}"
+                print(f"[DIAGNOSTIC] {msg}")
+                return False, msg
+    except Exception as e:
+        error_msg = f"ÉCHEC de la connexion aux serveurs de Forge.\n\nErreur: {e}\n\nCeci est très probablement dû à un antivirus, un pare-feu ou un problème de réseau local. Veuillez vérifier ces points."
+        print(f"[DIAGNOSTIC] Échec de la connexion : {e}")
+        import traceback
+        traceback.print_exc()
+        return False, error_msg
 
 def find_forge_version_for_mc(mc_version, mc_dir):
     """Trouve une version de Forge installée pour une version de Minecraft donnée."""
