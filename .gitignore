@@ -51,3 +51,4 @@ venv.bak/
 .DS_Store
 Thumbs.db
 launcher_config.json
+installed_modpacks.json

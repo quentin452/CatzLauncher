@@ -12,6 +12,20 @@ from utils import download_file_with_progress, install_modpack, check_update, ch
 
 # --- Début des nouvelles fonctions de connexion ---
 
+def refresh_ms_token(refresh_token):
+    """Rafraîchit le token d'accès Microsoft en utilisant un refresh token."""
+    url = "https://login.live.com/oauth20_token.srf"
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    data = {
+        "client_id": "00000000402b5328",
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+        "redirect_uri": "https://login.live.com/oauth20_desktop.srf",
+    }
+    response = requests.post(url, headers=headers, data=data)
+    response.raise_for_status()
+    return response.json()
+
 def exchange_code_for_token(auth_code):
     """Échange le code d'authentification contre des tokens Microsoft."""
     url = "https://login.live.com/oauth20_token.srf"
@@ -95,6 +109,9 @@ class MinecraftLauncher(tk.Tk):
         # UI Setup
         self.create_widgets()
         
+        # Essayer de se reconnecter automatiquement au démarrage
+        self.try_refresh_login()
+        
         # Vérifier les mises à jour au démarrage
         self.check_modpack_updates()
 
@@ -103,8 +120,8 @@ class MinecraftLauncher(tk.Tk):
             "java_path": "",
             "java_args": "-Xmx4G -Xms2G",
             "modpack_url": "https://raw.githubusercontent.com/quentin452/CatzLauncher/refs/heads/main/modpacks.json",
-            "last_update_check": "",
-            "auto_check_updates": True
+            "auto_check_updates": True,
+            "account_info": {}  # Stocke les infos de connexion persistantes
         }
         
         if os.path.exists(self.config_file):
@@ -196,10 +213,15 @@ class MinecraftLauncher(tk.Tk):
         
         # Widgets Compte
         self.login_btn = ttk.Button(account_tab, text="Login Microsoft", command=self.microsoft_login)
-        self.login_btn.pack(pady=20)
+        self.login_btn.pack(pady=10)
+
+        self.logout_btn = ttk.Button(account_tab, text="Se déconnecter", command=self.logout)
+        self.logout_btn.pack(pady=5)
         
         self.account_info = tk.StringVar(value="Non connecté")
         ttk.Label(account_tab, textvariable=self.account_info).pack(pady=10)
+
+        self.update_login_button_states()
 
     def browse_java(self):
         path = filedialog.askopenfilename(
@@ -272,9 +294,14 @@ class MinecraftLauncher(tk.Tk):
                     "access_token": mc_access_token,
                     "name": profile['name'],
                     "id": profile['id'],
-                    # On pourrait aussi stocker le refresh_token pour une reconnexion auto
-                    "refresh_token": ms_token_data.get('refresh_token') 
                 }
+
+                # Sauvegarder les infos pour la reconnexion
+                self.config['account_info'] = {
+                    'name': profile['name'],
+                    'refresh_token': ms_token_data.get('refresh_token')
+                }
+                self.save_config()
 
                 self.account_info.set(f"Connecté: {profile['name']}")
                 self.status_var.set("Prêt")
@@ -285,9 +312,89 @@ class MinecraftLauncher(tk.Tk):
                 messagebox.showerror("Erreur de connexion", f"Le processus a échoué:\n\n{error_body}")
                 self.status_var.set("Erreur de connexion")
             finally:
-                self.login_btn.config(state=tk.NORMAL)
+                self.update_login_button_states()
         
         threading.Thread(target=login_flow_thread, daemon=True).start()
+
+    def logout(self):
+        """Déconnecte l'utilisateur et efface les données de session."""
+        self.auth_data = None
+        self.config['account_info'] = {}
+        self.save_config()
+        self.account_info.set("Non connecté")
+        self.update_login_button_states()
+        messagebox.showinfo("Déconnexion", "Vous avez été déconnecté.")
+
+    def try_refresh_login(self):
+        """Essaie de se reconnecter au démarrage en utilisant le refresh token."""
+        account_info = self.config.get('account_info', {})
+        refresh_token = account_info.get('refresh_token')
+
+        if not refresh_token:
+            return  # Pas de token, on ne fait rien
+
+        def refresh_flow_thread():
+            """Exécute tout le flux de rafraîchissement en arrière-plan."""
+            try:
+                self.status_var.set("Reconnexion en cours...")
+                self.update_login_button_states()
+
+                # Étape 1: Rafraîchir le token Microsoft
+                ms_token_data = refresh_ms_token(refresh_token)
+                new_access_token = ms_token_data['access_token']
+                new_refresh_token = ms_token_data['refresh_token']
+
+                # Étape 2: S'authentifier auprès de Xbox Live
+                xbl_data = authenticate_with_xbox(new_access_token)
+                xbl_token = xbl_data['Token']
+                user_hash = xbl_data['DisplayClaims']['xui'][0]['uhs']
+
+                # Étape 3: Obtenir le token XSTS
+                xsts_data = authenticate_with_xsts(xbl_token)
+                xsts_token = xsts_data['Token']
+
+                # Étape 4: Se connecter à Minecraft
+                mc_token_data = login_with_minecraft(user_hash, xsts_token)
+                mc_access_token = mc_token_data['access_token']
+
+                # Étape 5: Récupérer le profil du joueur
+                profile = get_minecraft_profile(mc_access_token)
+                
+                # Stocker les informations de session
+                self.auth_data = {
+                    "access_token": mc_access_token,
+                    "name": profile['name'],
+                    "id": profile['id'],
+                }
+                
+                # Mettre à jour et sauvegarder le nouveau refresh_token
+                self.config['account_info'] = {
+                    'name': profile['name'],
+                    'refresh_token': new_refresh_token
+                }
+                self.save_config()
+
+                self.account_info.set(f"Connecté: {profile['name']}")
+                self.status_var.set("Prêt")
+
+            except Exception as e:
+                # La reconnexion a échoué, probablement un token invalide
+                print(f"La reconnexion automatique a échoué: {e}")
+                self.logout() # On déconnecte l'utilisateur pour qu'il se reconnecte manuellement
+                self.status_var.set("Échec de la reconnexion. Veuillez vous connecter.")
+            finally:
+                self.update_login_button_states()
+
+        threading.Thread(target=refresh_flow_thread, daemon=True).start()
+
+    def update_login_button_states(self):
+        """Met à jour l'état des boutons de connexion/déconnexion."""
+        if self.auth_data:
+            self.login_btn.config(state=tk.DISABLED)
+            self.logout_btn.config(state=tk.NORMAL)
+        else:
+            self.login_btn.config(state=tk.NORMAL)
+            self.logout_btn.config(state=tk.DISABLED)
 
     def check_modpack_updates(self):
         """Vérification automatique des mises à jour au démarrage"""
@@ -456,6 +563,7 @@ class MinecraftLauncher(tk.Tk):
                 install_modpack(
                     modpack_data["url"],
                     install_path,
+                    modpack_data["name"],
                     backup_dir,
                     progress_callback
                 )
@@ -501,22 +609,31 @@ class MinecraftLauncher(tk.Tk):
                 modpacks = json.load(f)
         modpack = modpacks[index]
         
+        # Le chemin d'installation est maintenant le profil du modpack
+        modpack_profile_dir = os.path.join(get_minecraft_directory(), "modpacks", modpack["name"])
+        
         # Vérifier l'installation
-        install_path = os.path.join(get_minecraft_directory(), "modpacks", modpack["name"])
-        if not os.path.exists(install_path):
+        if not os.path.exists(modpack_profile_dir):
+            messagebox.showinfo("Installation", f"Le modpack {modpack['name']} va être installé.")
             self.install_modpack(modpack)
             return
         
-        # Lancer le jeu
+        # Lancer le jeu avec le bon profil
+        # NOTE: Assurez-vous que le nom du jar Forge est correct.
+        # Vous pourriez avoir besoin de le rendre configurable dans modpacks.json
+        forge_jar_path = os.path.join(modpack_profile_dir, "forge.jar") 
+        
         launch_cmd = [
             self.config["java_path"] or "java",
-            self.config["java_args"],
+            *self.config["java_args"].split(),
             "-jar",
-            os.path.join(install_path, "forge.jar")
+            forge_jar_path,
+            "--gameDir",
+            modpack_profile_dir # C'est la clé pour des profils séparés
         ]
         
         import subprocess
-        subprocess.Popen(launch_cmd)
+        subprocess.Popen(launch_cmd, cwd=modpack_profile_dir) # Définir le répertoire de travail
 
 if __name__ == "__main__":
     app = MinecraftLauncher()

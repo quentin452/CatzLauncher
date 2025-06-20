@@ -22,24 +22,24 @@ def download_file_with_progress(url, destination, callback=None):
                 if callback:
                     callback(downloaded, total_size)
 
-def install_modpack(url, install_dir, backup_dir, progress_callback=None):
+def install_modpack(url, install_dir, modpack_name, backup_dir, progress_callback=None):
     # Créer un nom de fichier temporaire
     temp_zip = os.path.join(install_dir, "temp_modpack.zip")
     
     # Télécharger le modpack
     download_file_with_progress(url, temp_zip, progress_callback)
     
-    # Sauvegarder l'ancienne version
-    modpack_name = os.path.basename(url).split(".")[0]
+    # Le nom du dossier est maintenant basé sur le nom du modpack, pas l'URL
     old_dir = os.path.join(install_dir, modpack_name)
     
     if os.path.exists(old_dir):
         backup_name = f"{modpack_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         shutil.move(old_dir, os.path.join(backup_dir, backup_name))
     
-    # Extraire le nouveau modpack
+    # Extraire le nouveau modpack dans son propre dossier
+    extract_path = os.path.join(install_dir, modpack_name)
     with ZipFile(temp_zip, 'r') as zip_ref:
-        zip_ref.extractall(os.path.join(install_dir, modpack_name))
+        zip_ref.extractall(extract_path)
     
     # Mettre à jour les informations d'installation
     update_installed_info(url, datetime.now().isoformat())
