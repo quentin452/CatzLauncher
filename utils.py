@@ -1,88 +1,183 @@
-import subprocess
-import sys
-from tkinter import messagebox
-import minecraft_launcher_lib
-import urllib.request
+# utils.py
+import os
+import json
+import shutil
+import requests
+import hashlib
+from datetime import datetime
+from zipfile import ZipFile
 
-# Dépendances auto
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+INSTALLED_FILE = "installed_modpacks.json"
 
-# Vérification Java
-def check_java():
-    try:
-        subprocess.check_output(["java", "-version"], stderr=subprocess.STDOUT)
-        return True
-    except Exception:
-        messagebox.showerror("Erreur", "Java n'est pas installé. Installez-le depuis https://www.java.com/fr/download/")
-        return False
-
-# Conversion des liens Dropbox
-def convert_dropbox_link(url):
-    """Convertit un lien Dropbox en lien de téléchargement direct"""
-    print(f"[DEBUG] Conversion du lien Dropbox: {url}")
+def download_file_with_progress(url, destination, callback=None):
+    response = requests.get(url, stream=True)
+    total_size = int(response.headers.get('content-length', 0))
     
-    if "dropbox.com" in url:
-        # Remplacer dl=0 par dl=1 pour forcer le téléchargement
-        if "dl=0" in url:
-            converted_url = url.replace("dl=0", "dl=1")
-            print(f"[DEBUG] Lien converti (dl=0 -> dl=1): {converted_url}")
-            return converted_url
-        # Si pas de paramètre dl, l'ajouter
-        elif "dl=" not in url:
-            converted_url = url + ("&dl=1" if "?" in url else "?dl=1")
-            print(f"[DEBUG] Lien converti (ajout dl=1): {converted_url}")
-            return converted_url
-        else:
-            print(f"[DEBUG] Lien Dropbox déjà configuré pour le téléchargement")
-            return url
-    else:
-        print(f"[DEBUG] Pas un lien Dropbox, retourné tel quel")
-        return url
+    with open(destination, 'wb') as f:
+        downloaded = 0
+        for chunk in response.iter_content(chunk_size=8192):
+            if chunk:
+                f.write(chunk)
+                downloaded += len(chunk)
+                if callback:
+                    callback(downloaded, total_size)
 
-FORGE_MAVEN_URL = "https://files.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml"
+def install_modpack(url, install_dir, backup_dir, progress_callback=None):
+    # Créer un nom de fichier temporaire
+    temp_zip = os.path.join(install_dir, "temp_modpack.zip")
+    
+    # Télécharger le modpack
+    download_file_with_progress(url, temp_zip, progress_callback)
+    
+    # Sauvegarder l'ancienne version
+    modpack_name = os.path.basename(url).split(".")[0]
+    old_dir = os.path.join(install_dir, modpack_name)
+    
+    if os.path.exists(old_dir):
+        backup_name = f"{modpack_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        shutil.move(old_dir, os.path.join(backup_dir, backup_name))
+    
+    # Extraire le nouveau modpack
+    with ZipFile(temp_zip, 'r') as zip_ref:
+        zip_ref.extractall(os.path.join(install_dir, modpack_name))
+    
+    # Mettre à jour les informations d'installation
+    update_installed_info(url, datetime.now().isoformat())
+    
+    # Nettoyer
+    os.remove(temp_zip)
 
-def test_forge_connection():
-    """Tente de se connecter au Maven de Forge pour diagnostiquer les problèmes réseau."""
+def check_update(url, last_modified):
+    """
+    Vérifie si une mise à jour est disponible pour un modpack.
+    Utilise plusieurs méthodes de vérification pour plus de fiabilité.
+    """
     try:
-        print(f"[DIAGNOSTIC] Tentative de connexion à {FORGE_MAVEN_URL}")
-        with urllib.request.urlopen(FORGE_MAVEN_URL, timeout=15) as response:
-            if response.getcode() == 200:
-                print("[DIAGNOSTIC] Connexion réussie, code 200.")
-                return True, "La connexion aux serveurs de Forge a réussi."
-            else:
-                msg = f"Connexion établie, mais le serveur a répondu avec un code inattendu : {response.getcode()}"
-                print(f"[DIAGNOSTIC] {msg}")
-                return False, msg
+        # Faire une requête HEAD pour obtenir les métadonnées
+        response = requests.head(url, timeout=10)
+        response.raise_for_status()
+        
+        # Méthode 1: Vérifier Last-Modified header
+        if 'Last-Modified' in response.headers:
+            try:
+                server_modified = response.headers['Last-Modified']
+                server_dt = datetime.strptime(server_modified, '%a, %d %b %Y %H:%M:%S GMT')
+                local_dt = datetime.fromisoformat(last_modified)
+                if server_dt > local_dt:
+                    return True, f"Last-Modified: {server_modified}"
+            except (ValueError, TypeError) as e:
+                print(f"Erreur parsing Last-Modified: {e}")
+        
+        # Méthode 2: Vérifier ETag header
+        if 'ETag' in response.headers:
+            etag = response.headers['ETag'].strip('"')
+            # Comparer avec l'ETag stocké localement
+            local_etag = get_local_etag(url)
+            if local_etag and etag != local_etag:
+                return True, f"ETag changed: {etag}"
+        
+        # Méthode 3: Vérifier la taille du fichier
+        if 'Content-Length' in response.headers:
+            server_size = int(response.headers['Content-Length'])
+            local_size = get_local_file_size(url)
+            if local_size and server_size != local_size:
+                return True, f"File size changed: {server_size} bytes"
+        
+        return False, "No update available"
+        
+    except requests.RequestException as e:
+        print(f"Erreur lors de la vérification de mise à jour: {e}")
+        return False, f"Erreur de connexion: {e}"
+
+def get_local_etag(url):
+    """Récupère l'ETag stocké localement pour une URL"""
+    installed_data = {}
+    if os.path.exists(INSTALLED_FILE):
+        with open(INSTALLED_FILE, 'r') as f:
+            installed_data = json.load(f)
+    
+    return installed_data.get(url, {}).get('etag')
+
+def get_local_file_size(url):
+    """Récupère la taille du fichier stockée localement"""
+    installed_data = {}
+    if os.path.exists(INSTALLED_FILE):
+        with open(INSTALLED_FILE, 'r') as f:
+            installed_data = json.load(f)
+    
+    return installed_data.get(url, {}).get('file_size')
+
+def update_installed_info(url, timestamp, etag=None, file_size=None):
+    """Met à jour les informations d'installation avec plus de détails"""
+    installed_data = {}
+    if os.path.exists(INSTALLED_FILE):
+        with open(INSTALLED_FILE, 'r') as f:
+            installed_data = json.load(f)
+    
+    installed_data[url] = {
+        'timestamp': timestamp,
+        'etag': etag,
+        'file_size': file_size
+    }
+    
+    with open(INSTALLED_FILE, 'w') as f:
+        json.dump(installed_data, f, indent=4)
+
+def check_all_modpack_updates(modpacks_url):
+    """
+    Vérifie automatiquement les mises à jour pour tous les modpacks.
+    Retourne une liste des modpacks qui ont des mises à jour.
+    """
+    try:
+        # Charger la liste des modpacks
+        response = requests.get(modpacks_url, timeout=10)
+        response.raise_for_status()
+        modpacks = response.json()
+        
+        updates_available = []
+        
+        for modpack in modpacks:
+            url = modpack['url']
+            last_modified = modpack.get('last_modified', '')
+            
+            has_update, reason = check_update(url, last_modified)
+            
+            if has_update:
+                updates_available.append({
+                    'modpack': modpack,
+                    'reason': reason
+                })
+        
+        return updates_available
+        
+    except requests.RequestException as e:
+        print(f"Erreur lors du chargement des modpacks: {e}")
+        return []
+
+def update_modpack_info(modpack, new_timestamp):
+    """Met à jour les informations d'un modpack dans modpacks.json"""
+    try:
+        # Charger le fichier modpacks.json
+        with open('modpacks.json', 'r') as f:
+            modpacks = json.load(f)
+        
+        # Trouver et mettre à jour le modpack
+        for pack in modpacks:
+            if pack['url'] == modpack['url']:
+                pack['last_modified'] = new_timestamp
+                break
+        
+        # Sauvegarder
+        with open('modpacks.json', 'w') as f:
+            json.dump(modpacks, f, indent=4)
+            
     except Exception as e:
-        error_msg = f"ÉCHEC de la connexion aux serveurs de Forge.\n\nErreur: {e}\n\nCeci est très probablement dû à un antivirus, un pare-feu ou un problème de réseau local. Veuillez vérifier ces points."
-        print(f"[DIAGNOSTIC] Échec de la connexion : {e}")
-        import traceback
-        traceback.print_exc()
-        return False, error_msg
+        print(f"Erreur lors de la mise à jour de modpacks.json: {e}")
 
-def find_forge_version_for_mc(mc_version, mc_dir):
-    """Trouve une version de Forge installée pour une version de Minecraft donnée."""
-    versions = minecraft_launcher_lib.utils.get_available_versions(mc_dir)
-    found_versions = []
-    for v in versions:
-        if v["id"].startswith(mc_version) and "forge" in v["id"].lower():
-            found_versions.append(v["id"])
-    
-    if found_versions:
-        found_versions.sort(reverse=True)
-        return found_versions[0]
-    return None
-
-def find_fabric_version_for_mc(mc_version, mc_dir):
-    """Trouve une version de Fabric installée pour une version de Minecraft donnée."""
-    versions = minecraft_launcher_lib.utils.get_available_versions(mc_dir)
-    found_versions = []
-    for v in versions:
-        if v["id"].endswith(mc_version) and "fabric-loader" in v["id"].lower():
-            found_versions.append(v["id"])
-
-    if found_versions:
-        found_versions.sort(reverse=True)
-        return found_versions[0]
-    return None 
+def get_file_hash(file_path):
+    """Calcule le hash SHA256 d'un fichier"""
+    hash_sha256 = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_sha256.update(chunk)
+    return hash_sha256.hexdigest()
