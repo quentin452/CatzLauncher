@@ -1,173 +1,273 @@
-[![justforfunnoreally.dev badge](https://img.shields.io/badge/justforfunnoreally-dev-9ff)](https://justforfunnoreally.dev)
+<p align="center">
+  <img width="100px" src="data/img/creeper.ico" align="center" alt="OpenLauncher" />
+  <h2 align="center">OpenLauncher</h2>
+  <p align="center">An open-source Minecraft launcher for Windows and Linux.</p>
+</p>
 
-## Stargazers over time
-[![Stargazers over time](https://starchart.cc/shasankp000/PyCraft.svg?variant=adaptive)](https://starchart.cc/shasankp000/PyCraft)
+<p align="center">
+    <img alt="Python" src="https://img.shields.io/badge/Python-0078d4?style=flat&logo=python&logoColor=white" />
+    <img alt="Windows" src="https://img.shields.io/badge/Windows-0078d4?style=flat&logo=data:image/svg+xml;base64,PCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4KDTwhLS0gVXBsb2FkZWQgdG86IFNWRyBSZXBvLCB3d3cuc3ZncmVwby5jb20sIFRyYW5zZm9ybWVkIGJ5OiBTVkcgUmVwbyBNaXhlciBUb29scyAtLT4KPHN2ZyB3aWR0aD0iNjRweCIgaGVpZ2h0PSI2NHB4IiB2aWV3Qm94PSIwIDAgMjAgMjAiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgZmlsbD0iIzAwMDAwMCI+Cg08ZyBpZD0iU1ZHUmVwb19iZ0NhcnJpZXIiIHN0cm9rZS13aWR0aD0iMCIvPgoNPGcgaWQ9IlNWR1JlcG9fdHJhY2VyQ2FycmllciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cg08ZyBpZD0iU1ZHUmVwb19pY29uQ2FycmllciI+IDx0aXRsZT53aW5kb3dzIFsjZmZmZmZmXTwvdGl0bGU+IDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPiA8ZGVmcz4gPC9kZWZzPiA8ZyBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4gPGcgaWQ9IkRyaWJiYmxlLUxpZ2h0LVByZXZpZXciIHRyYW5zZm9ybT0idHJhbnNsYXRlKC02MC4wMDAwMDAsIC03NDM5LjAwMDAwMCkiIGZpbGw9IiNmZmZmZmYiPiA8ZyBpZD0iaWNvbnMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDU2LjAwMDAwMCwgMTYwLjAwMDAwMCkiPiA8cGF0aCBkPSJNMTMuMTQ1ODY0Nyw3Mjg5LjQzNDI2IEMxMy4xNTA4NzcyLDcyOTEuNDMzMTYgMTMuMTU2ODkyMiw3Mjk0LjgyOTI5IDEzLjE2MTkwNDgsNzI5Ny40Njg4NCBDMTYuNzc1OTM5OCw3Mjk3Ljk1NzU3IDIwLjM4OTk3NDksNzI5OC40NjEzIDIzLjk5Nzk5NSw3Mjk5IEMyMy45OTc5OTUsNzI5NS44NDg3MyAyNC4wMDIwMDUsNzI5Mi43MTE0NiAyMy45OTc5OTUsNzI4OS43MTMxMSBDMjAuMzgwOTUyNCw3Mjg5LjcxMzExIDE2Ljc2NDkxMjMsNzI4OS40MzQyNiAxMy4xNDU4NjQ3LDcyODkuNDM0MjYgTTQsNzI4OS40MzUyNiBMNCw3Mjk2LjIyMTUzIEM2LjcyNTgxNDU0LDcyOTYuNTg5MzMgOS40NTE2MjkwNyw3Mjk2Ljk0MTEzIDEyLjE3MjQzMTEsNzI5Ny4zNDI5MSBDMTIuMTc3NDQzNiw3Mjk0LjcxNzM2IDEyLjE3MDQyNjEsNzI5Mi4wOTA4IDEyLjE3MDQyNjEsNzI4OS40NjUyNCBDOS40NDY2MTY1NCw3Mjg5LjQ3MDI0IDYuNzIzODA5NTIsNzI4OS40MjYyNyA0LDcyODkuNDM1MjYgTTQsNzI4MS44NDM0NCBMNCw3Mjg4LjYxMDcxIEM2LjcyNTgxNDU0LDcyODguNjE3NzEgOS40NTE2MjkwNyw3Mjg4LjU3NjczIDEyLjE3NzQ0MzYsNzI4OC41Nzk3MyBDMTIuMTc1NDM4Niw3Mjg1Ljk2MDE3IDEyLjE3NTQzODYsNzI4My4zNDM2MSAxMi4xNzI0MzExLDcyODAuNzI0MDUgQzkuNDQ0NjExNTMsNzI4MS4wNjQ4NiA2LjcxNjc5MTk4LDcyODEuNDI1NjcgNCw3MjgxLjg0MzQ0IE0yNCw3Mjg4LjQ3MTc5IEMyMC4zODc5Njk5LDcyODguNDg1NzggMTYuNzc1OTM5OCw3Mjg4LjU0MDc1IDEzLjE2MTkwNDgsNzI4OC41NTE3NSBDMTMuMTU5ODk5Nyw3Mjg1Ljg4OTIxIDEzLjE1OTg5OTcsNzI4My4yMjk2NyAxMy4xNjE5MDQ4LDcyODAuNTY5MTQgQzE2Ljc2ODkyMjMsNzI4MC4wMTg0NCAyMC4zODM5NTk5LDcyNzkuNTAwNzIgMjMuOTk3OTk1LDcyNzkgQzI0LDcyODIuMTU4MjYgMjMuOTk3OTk1LDcyODUuMzEzNTMgMjQsNzI4OC40NzE3OSIgaWQ9IndpbmRvd3MtWyNmZmZmZmZdIj4gPC9wYXRoPiA8L2c+IDwvZz4gPC9nPiA8L2c+Cg08L3N2Zz4=" />
+    <img alt="Linux" src="https://img.shields.io/badge/Linux-0078d4?style=flat&logo=linux&logoColor=white" />
+    <img alt="GitHub Stars" src="https://img.shields.io/github/stars/CesarGarza55/OpenLauncher?style=flat&logo=github&labelColor=0078d4&color=0078d4" />
+</p>
+<br>
 
----
+**Note**: Currently, OpenLauncher is designed only for Windows and Linux.
 
-# Project restarted 
-  > Contributors to this project will really be appreciated.
-  
-  > Update: 30/10/22. This launcher is being rewritten in rust at the moment, will make up for all that this launcher lacks.
-  
-  > However this launcher will still have support if anyone wants to keep using it.
+## ⚠️ Warning for Windows Users
 
-  > Update 13/6/22. Updated version of this launcher : 
-https://github.com/v-pun215/eClient
+**Warning**: On Windows, the launcher may be flagged as a false positive by antivirus software due to the absence of a valid certificate. Please be assured that this is a false alarm and the software is safe to use.
 
-# Like my work? Buy me a coffee
+If you encounter issues downloading the [installer](https://github.com/CesarGarza55/OpenLauncher/releases/latest/download/OpenLauncher.exe), consider using the [portable](https://github.com/CesarGarza55/OpenLauncher/releases/latest/download/OpenLauncher-Portable-Windows.zip) version as an alternative.
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/shasankp000)
+I have scanned the launcher with VirusTotal, and it was not detected by any antivirus engine. You can view the scan results below.
 
-So that I don't have to ask my mom for pocket money
+![VirusTotal Scan](https://github.com/user-attachments/assets/5685f609-36d1-432f-b628-a25cb916312b)
 
-# New subreddit!
-  > The project has now a dedicated subreddit! https://www.reddit.com/r/PyCraftLauncher
+The installed executable of the launcher has also been scanned with VirusTotal and shows no issues.
 
-# Project Info
-  >A Minecraft launcher made in python.
-
-  >This Launcher aims to be the best free minecraft launcher for Linux primarily. Porting to other platforms will be done later.
-
-  >This launcher is not illegal as all files are downloaded from libraries.minecraft.net.
-
-  >Piracy concerned rich people feel free to press the back button on the browser :)
-  
-
-# Changelog
-
-  ![Home Tab](img/pycraft1.png)
-  ![Installations Tab](img/pycraft2.png)
-  ![Settings Tab](img/pycraft3.png)
-  ![Additional Settings Tab](img/pycraft4.png)
+![VirusTotal Scan](https://github.com/user-attachments/assets/7b7aa152-5f54-4457-9273-7c955cf85a4e)
 
 
-  >v1.04-beta-3 
-  
-  > To use the latest version, it's best to clone the project and then run it, since I fail to keep the releases updated in the release section in tandem with 
-  the main code folders in the .git
-  >
-  > Added a modinstaller where users will have to enter the modname(in lowercase), modloader(in lowercase) and gameversion
-  >
-  > This modinstaller only downloads "stable" version of the mods from modrinth. If the stable version doesn't exist then the mod won't be downloaded( non stable versions can be added manually in the mods folder)
-  >
-  > Yes, minecraft 1.19 and all subsequent updates are supported.
-  >
-  > Fixed issue of being unable to play downloaded versions offline without internet.
-  >
-  > Fixed all bugs on Windows.
-  >
-  > Rewritten the ram allocation alogrithm, jvm no longer assigns ram by rounding off to the nearest GB. What you select on the slider is what you get.
-  >
-  > Fixed issue of cracked login in Fabric. Players using cracked mode will now have a permanent UUID generated by the launcher.
-  >
-  > Changed GUI totally.
-  >
-  > Ely_by login mode is now optional if customskinloader is used.
-  > 
-  > GUI changes(Merged all 3 files into one main launcher).
-  > 
-  > Added a new download mode named (fps clients). This mode will detect custom clients by placing them in the versions folder. I have chosen Ares     client as the candidate for now. This is not fully implemented yet so work in progress
-  > 
-  > Fps boost is still(sadly) in beta testing mode.
-  > 
-  > Fixed the download window.
-  > 
-  > There is a font folder now containing all fonts the launcher uses. There is no copyright on these fonts, and can be used anywhere. Users are needed
-  > to install these fonts or else the launcher will not look as it is intended to look.
-  > 
-  > Added a "Bypass Ram limiter" option which will override Pycraft's defualt settings to allocate only upto 50% of system ram to minecraft. With this
-  > option enabled people can set ram more than 50% of the total ram, if needed. 
+## ⚠️ Warning for Linux Users
 
-# Planned Updates
+**Warning**: On Linux, you may need to install all the dependencies first. You can use the script `dependencies.sh` to install them, or run `compile-linux.sh` and select "Install dependencies only" to install them.
 
-  >Deal with the GUI once and for all
-  >
-  >Add a new news page on the launcher
-  >
-  >Add a modinstaller
-  >
-  >Make a few fps boosting modpacks(tested on my pc gives around 1200 fps without shaders)
-  >
-  >Rename cracked mode to something better
+If you want to install the dependencies and download the compiled version from the releases, use [this file](https://github.com/CesarGarza55/OpenLauncher/blob/main/dependencies.sh). 
+If you are going to compile it yourself, the process is included in `compile-linux.sh`.
 
-# Installation script changes
+## 🚀 Features
 
-  > Added installation support for java 17 (windows and debian based linux). The launcher only supports this variant of java 17 now. 
-  > 
-  > Added python installation support (windows and debian based linux. Use this only if you don't    
-    have python installed by defualt). 
+- **Microsoft Account Login**: Supports logging in with an official Microsoft account.
+- **Discord Rich Presence**: Displays fun messages while you play.
+- **Customizable Interface**: Utilizes PyQt5 for a modern and customizable look.
+- **Minecraft Compatibility**: Manages Minecraft versions using the `minecraft_launcher_lib` library.
+- **Open Source**: Easily extendable and modifiable by the community.
+- **Multiplatform**: Available for Windows and Linux operating systems.
+- **Official Themes**: Download and install themes to personalize your launcher.
+- **Theme Creator**: Design your own themes using the [theme creator tool](https://openlauncher.codevbox.com/create).
+- **Multilanguage Support**: Supports multiple languages for a better user experience.
 
-  
-# Privacy updates
+## 📋 Requirements
 
-  > Passwords are no longer stored in the launcher. Only player uuid, accessToken from auth servers  
-    and clientToken is randomly generated on each run, for ely_by logins.
+- Python 3.12 or higher
+- Java
+- pip (Python package manager)
+
+## 🛠️ Installation
+
+### Windows
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/CesarGarza55/OpenLauncher.git
+    cd OpenLauncher
+    ```
+
+2. Create a virtual environment (optional but recommended):
+    ```bash
+    python -m venv venv
+    source venv/Scripts/activate
+    ```
+
+3. Compile:
+   
+    1. Run the `compile-windows.bat` script to compile the project.
+
+    ```bash
+    compile-windows.bat
+    ```
+
+    2. Make installer (optional)
+        1. Ensure NSIS is installed on your system. You can download NSIS from [nsis.sourceforge.io](https://nsis.sourceforge.io/Download).
+        2. Open NSIS and click on "Compile NSI scripts":
+
+        ![NSIS Compile](https://github.com/user-attachments/assets/daba00d4-e5ee-46e6-9f41-14f60e8e3b7d)
+
+        3. Click on "Load Script..." to load the `script/compile.nsi` script file.
+
+        Alternatively, use the `compile-compress.nsi` script to reduce installer size by ~30 MB, though it will increase build time.
+
+        ![NSIS Load Script](https://github.com/user-attachments/assets/22c5b691-51f9-4fcf-a25c-563705402200)
+        
+        4. Once the compilation is successful, open the output file OpenLauncher.exe to begin the installation.
+
+4. You need to install Java to be able to play:
+
+    [https://www.java.com/es/download/](https://www.java.com/es/download/)
+
+### Linux
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/CesarGarza55/OpenLauncher.git
+    cd OpenLauncher
+    ```
     
-  > Players using cracked mode will now have a permanent UUID generated by the launcher on first run in cracked mode
+2. Compile:
+    
+    Execute the script to start the compilation process:
+
+    ```bash
+    ./compile-linux.sh
+    ```
+
+3. Mark the file as an executable (For Generic Linux systems)
+
+![Executable](https://github.com/CesarGarza55/OpenLauncher/assets/168610828/37588648-144d-4b0f-83c8-3dde1d683786)
+
+Or run:
+
+   ```bash
+   chmod +x OpenLauncher.bin
+   ```
+
+4. Execute
+
+   1. For Generic Linux systems
+   ```bash
+   ./OpenLauncher.bin
+   ```
+
+   2. For Debian based systems
+   ```bash
+   openlauncher
+   ```
+
+## 📥 Download options
+
+- Windows Installer: .exe
+- Linux Installer (Debian/Ubuntu): .deb
+- Linux Generic (compiled): .bin
 
 
+## 🕹️ Usage
 
-# Features
-  >This launcher is based on the Tkinter and minecraft_launcher_lib. It offers mojang login and cracked login.
-  
-  >Includes a special FPS boost option(old releases).
-  
-  >Includes an in-built toggleable vpn, running through torsocks(Linux) (old releases)
-  
-  >To run Tor on windows as a service : https://deepdarkweb.github.io/how-to-install-tor-on-windows-without-the-tor-browser-running-tutorial/
+When you open the application, a welcome window greets you. You can disable this feature using a checkbox.
 
-  >**Fps boost has been shifted to beta testing mode. That is , it has been tested with java 16.It is still being tested. Feedback would be most graciously appreciated.**
+![imagen](https://github.com/user-attachments/assets/e7ba3a65-a446-4dae-b535-8ee740d75a46)
 
-  
-# Installation
-  >Run python install.py or python3 install.py(if on linux)
- 
+The main interface shows different sections:
 
-  >Then run python pycraft_gui.py or python3 pycraft_gui.py
+![imagen](https://github.com/user-attachments/assets/f4f33292-6cae-4b15-835e-1f92992c2922)
 
-  >Before starting minecraft, do increase or decrease the ram in the settings, so as to update it in the settings file. Or else an error will pop concerning the         JVM.
+To install a version, use the following interface where you select the version and click install:
 
-  > I will patch this in future releases.
-
-**IMPORTANT**
-  >After stopping a download, please press CTRL+C twice. (This will close the launcher as well.)
-  >For people who have worked with python, it's an issue where i am unable to close the download thread directly at once by raising the KeyboardInterrupt exception.
-
-  >If download fails, you may need to use a vpn(windows) or enable tor in settings(linux)
-
-  >**Any changes in the settings (be it tor, fps boost, ram change, directory change) will require a launcher reboot(not to be confused with system reboot),        to take effect.**
-
-# Pycraft skins system
-  > Pycraft has 3 accounts mode. The mojang account mode(microsoft accounts support coming soon),     
-    cracked mode and ely_by login system. For the majority of the people who don't know what that is, 
-    it is an alternative minecraft service used by Tlauncher as well, only that their security is better. For this mode, you need to create an account at https://ely.by (2 factor authentication not yet supported), and then enter your username and password and start. Supported for all modes, vanilla, forge and fabric.
-
-   > Ely_by skins are not viewable on all servers, only in singleplayer mode and those servers which  
-     use it's services. However to view your skin on all servers you can use a client side mod, https://www.curseforge.com/minecraft/mc-mods/customskinloader/ , usage instructions are given on the page. Officially supported till 1.16.5 but there are release versions for the mod for 1.17 in the files section. Just run this mod one time, close minecraft, go to .minecraft/CustomSkinLoader/CustomSkinLoader.json, open it with any text editor
-
-   from the webiste : "- Q: How can I modify configurations of CustomSkinLoader?
-
-   A: The config file is .minecraft/CustomSkinLoader/CustomSkinLoader.json . Unfortunately, there is no way to modify the CustomSkinLoader configuration file in    
-   the game currently, so you need to manually modify it by using a code editor (e.g. VSCode). However, we have a website to modify the configuration file online, 
-   you only need to import and modify your current configuration file."
-
-   This mod supports: LittleSkin, BlessingSkin, Elyby, SkinMe, GlitchlessGames skins. Since ely_by is the most popular choice, you can go ahead with this mod.
-
-   And yea this mod has no impact on physical resources, like ram and cpu(I used it a lot of times).
-
-# Why the whole vpn thingy?
-  >Sometimes mojang's server, libraries.minecraft.net is not available on some systems (especially for those living in Egypt). To fix this a vpn is used. Now the 
-   governement of Egypt has kinda cracked down on openvpn (thanks to one of my testers, i wouldn't have known about it otherwise.), so Tor is the best solution to      that.
-
-# Coming soon:
-  >FunMc (my minecraft server's website).
-  
-  >New microsoft account login system as per the latest changes according to mojang in Minecraft: Java Edition
+![imagen](https://github.com/user-attachments/assets/f1913ea9-c1e0-427e-8ede-aff783be42d4)
 
 
-Below is a video stating how to use PyCraft Launcher(rip my trash pc -- i am still working on the fps boost)
+By default the following JVM arguments are used:
 
-https://youtu.be/8TiDc-Z2MA0
+   ```bash
+   -Xmx2G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M
+   ```
+
+If you want to change something you need to do it from the settings window.
+
+![imagen](https://github.com/user-attachments/assets/a8cee494-e248-4dc2-827f-52640e0f0291)
+
+## 🔑 Sign in with Microsoft Account
+To log in with your official Microsoft account, follow these steps:
+
+1. Open the launcher.
+2. Click on "Login with Microsoft"
+3. Enter your Microsoft account with Minecraft purchased
+4. Once the authentication process is complete, you will see your account appear in the launcher
+
+![imagen](https://github.com/user-attachments/assets/c7d15cf5-a397-4004-aa2a-0380dd39b35b)
+
+## 🎨 Themes
+
+OpenLauncher allows you to customize the appearance of the launcher with themes. You can choose from official and community themes, as well as create your own.
+
+### Official themes
+Official themes are provided by me, and you can find them at [https://openlauncher.codevbox.com/themes](https://openlauncher.codevbox.com/themes).
+
+### Theme Creator
+
+If you want to create a custom theme, use the theme creator tool available on [https://openlauncher.codevbox.com/create](https://openlauncher.codevbox.com/create).
+
+### Guide
+
+For a detailed guide on how to install themes, visit [https://openlauncher.codevbox.com/docs](https://openlauncher.codevbox.com/docs).
+
+## Mod Manager
+
+You can install, activate and deactivate mods with the new mod manager:
+
+![imagen](https://github.com/user-attachments/assets/d24ed07a-85da-4d91-a081-2f43597d4eae)
 
 
+## 🧪 Testing
+My PC Specs:
+- CPU: AMD Ryzen 5 3450U 4-Core 2.1GHz
+- GPU: Radeon Vega 8 Graphics
+- RAM: 16GB DDR4 SODIMM 2400MHz
+- Operating System: Debian 12 (bookworm) x86_64 
+
+Tested Minecraft Version:
+- Launcher version: Beta - 1.5.7
+- RAM Allocated: 2GB (Default JVM Arguments)
+- Minecraft Version: 1.21.4
+- Fabric: 0.16.10
+- Shaders: [MakeUp-UltraFast-9.1b](https://modrinth.com/shader/makeup-ultra-fast-shaders)
+
+![imagen](https://github.com/user-attachments/assets/cc7a5693-7cbe-41d2-abb2-2e8a74dec321)
+
+## 🐞 Bugs
+
+There was previously a minor bug that caused the launcher to close when installing versions or running the game. This was due to how subprocesses are managed, and IN THEORY, this issue has been fixed as of beta-1.5.1. However, if the error persists, please report it in the issues section, and I will continue working to resolve it.
+
+Keeping the software bug-free is challenging since it’s designed to work with both Windows and Linux. With so many Linux distributions out there, it’s especially complex to manage compatibility across such a wide variety of systems.
+
+## 🐧 Linux errors
+
+In some distributions, errors may occur due to the wide variety of systems available. If the executable does not open or fails to display anything when you run it, this may be due to an incompatibility or missing dependencies. To help identify the error and provide a possible solution in the future, you can run the application directly from the terminal using './OpenLauncher.bin' or 'openlauncher' if you installed the .deb package.
+
+For example, in Debian 12, when you try to open the application, no error message may appear, but the application does not launch. This issue is caused by the version of Python being used. The easiest way to resolve this is by compiling the package yourself. See [compilation on Linux](#linux).
+
+Example of the error:
+
+![imagen](https://github.com/user-attachments/assets/d5e56835-95a8-457a-a45c-cc6a11e56d03)
+
+Also, for example on fedora, you can get this error:
+
+![imagen](https://github.com/user-attachments/assets/c67d8fc3-c61b-4ec9-b084-c98d2ab1bc39)
+
+**It's recommended to compile the launcher on your own to avoid issues.**
+
+## 🤝 Contributing
+Contributions are welcome! Follow these steps to contribute:
+
+- Fork the repository.
+- Create a new branch (git checkout -b feature/new-feature).
+- Make the necessary changes and commit (git commit -am 'Add new feature').
+- Push the changes to your repository (git push origin feature/new-feature).
+- Open a Pull Request on GitHub.
+
+## 📜 License
+This project is licensed under the GPL-2.0 License. For more details, see the [LICENSE](https://github.com/CesarGarza55/OpenLauncher/blob/main/LICENSE) file.
+
+## 🙏 Credits
+OpenLauncher uses the following libraries and tools:
+
+- cx_Freeze
+- minecraft_launcher_lib
+- PyQt5
+- Tkinter
+- pypresence
+- requests
+
+The initial concept of this project was inspired by [this project](https://github.com/Irr22/Minecraft-launcher). However, no original code from that project is used in the current version of OpenLauncher.
+
+## ⚠️ Disclaimer
+
+This project is in no way related to or associated with Mojang AB or Microsoft. Minecraft is a registered trademark of Mojang AB and Microsoft. All trademarks and intellectual property rights mentioned in this project are the exclusive property of their respective owners. No files belonging to Mojang AB or Microsoft are hosted on servers owned by us.
+
+You can review the Terms and Conditions and the Privacy Policy regarding the use of the application at the following link:
+
+- [Terms and Conditions and Privacy Policy](https://openlauncher.codevbox.com/terms_app)
+
+By using OpenLauncher, you agree to comply with these terms and acknowledge that you have read and understood my privacy practices. I am committed to protecting your personal information and ensuring transparency in how I handle your data. For any questions or concerns, please contact me at [support@codevbox.com](mailto:support@codevbox.com?subject=OpenLauncher%20Terms%20of%20Service).
+
+Thank you for using OpenLauncher!
