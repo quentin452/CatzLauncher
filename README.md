@@ -1,30 +1,69 @@
-# Système de Mise à Jour Automatique des Modpacks
+# CatzLauncher
 
-Ce système permet de détecter et installer automatiquement les mises à jour des modpacks Minecraft.
+CatzLauncher est un launcher de modpacks Minecraft personnalisé, conçu pour être simple et efficace.
 
-## Fonctionnalités
+Il permet de gérer et de lancer facilement des modpacks à partir d'une liste centralisée, tout en s'occupant automatiquement de l'installation et des mises à jour.
 
-### 1. Détection Intelligente des Mises à Jour
+## Fonctionnalités Principales
 
-Le système utilise plusieurs méthodes pour détecter les mises à jour :
+- **Authentification Microsoft** : Connexion sécurisée avec votre compte Microsoft.
+- **Gestion de Modpacks** : Installe les modpacks depuis une liste définie dans un fichier `modpacks.json`.
+- **Profils Isolés** : Chaque modpack est installé dans son propre dossier dans `.minecraft/modpacks/` pour éviter les conflits de sauvegardes ou de configurations.
+- **Installation Automatique de Forge** : Le launcher télécharge et installe la version de Forge requise par le modpack si elle n'est pas déjà présente.
+- **Mises à Jour Intelligentes** : Détecte les mises à jour des modpacks en se basant sur la date de modification, l'ETag ou la taille du fichier distant.
 
-- **Headers HTTP Last-Modified** : Compare la date de modification du fichier sur le serveur
-- **ETag** : Vérifie si le contenu du fichier a changé
-- **Taille du fichier** : Compare la taille du fichier pour détecter les changements
-- **Gestion d'erreurs robuste** : Continue même si une méthode échoue
+## Fichiers du Projet
 
-### 2. Vérification Automatique
+- `main.py` : Le script principal du launcher. C'est le fichier que vous exécutez pour démarrer l'interface graphique.
+- `utils.py` : Contient toutes les fonctions utilitaires pour le téléchargement, l'installation des modpacks, l'installation de Forge, etc.
+- `auto_updater.py` : Un script séparé conçu pour vérifier les mises à jour en arrière-plan.
+- `modpacks.json` : **Le fichier le plus important.** C'est ici que vous définissez la liste de vos modpacks.
 
-- **Au démarrage du launcher** : Vérifie automatiquement les mises à jour
-- **Vérification manuelle** : Bouton pour vérifier manuellement
-- **Mise à jour automatique** : Option pour installer automatiquement les mises à jour
+## Comment Utiliser
 
-### 3. Script de Vérification en Arrière-plan
+### 1. Configurer `modpacks.json`
 
-Le script `auto_updater.py` peut être exécuté :
-- **Une seule fois** : `python auto_updater.py --once`
-- **En continu** : `python auto_updater.py --continuous`
-- **Via cron job** : Programmer des vérifications régulières
+Modifiez ce fichier pour lister les modpacks que vous souhaitez rendre disponibles dans le launcher.
+
+```json
+[
+  {
+    "name": "Nom de mon Modpack",
+    "version": "1.19.2",
+    "forge_version": "43.2.0",
+    "url": "https://lien_vers_le_zip_du_modpack.com/modpack.zip",
+    "last_modified": ""
+  }
+]
+```
+
+- `name`: Le nom qui sera affiché dans le launcher.
+- `version`: La version de Minecraft.
+- `forge_version`: La version de Forge requise.
+- `url`: Le lien de téléchargement direct vers le fichier `.zip` du modpack.
+- `last_modified`: Peut être laissé vide. Le launcher le mettra à jour automatiquement.
+
+### 2. Lancer le Launcher
+
+Exécutez `main.py`.
+
+- **Première fois** : Vous devrez vous connecter à votre compte Microsoft. Votre session sera ensuite sauvegardée pour les lancements futurs.
+- **Jouer** : Sélectionnez un modpack dans la liste et cliquez sur "Jouer". Le launcher s'occupera de tout (téléchargement, installation de Forge, etc.).
+
+### 3. Mises à Jour en Arrière-Plan (Optionnel)
+
+Le script `auto_updater.py` peut être utilisé pour vérifier les mises à jour sans que le launcher principal soit ouvert. Il est conçu pour être exécuté par un planificateur de tâches (comme les "Tâches planifiées" sur Windows).
+
+Quand il détecte une mise à jour, il crée un fichier `update_notification.json`. Au prochain démarrage du launcher principal, une notification vous proposera d'installer les mises à jour trouvées.
+
+### Fichiers Générés Automatiquement
+
+Ces fichiers sont créés par le launcher et ne doivent pas être modifiés manuellement :
+
+- `launcher_config.json` : Sauvegarde votre session Microsoft et la configuration du launcher (chemin Java, etc.).
+- `installed_modpacks.json` : Un cache interne pour suivre l'état des modpacks installés et vérifier les mises à jour.
+- `auto_updater.log` : Le fichier de log pour le script de mise à jour en arrière-plan.
+- `update_notification.json` : Créé par `auto_updater.py` quand une mise à jour est disponible.
 
 ## Configuration
 
@@ -34,66 +73,6 @@ Le script `auto_updater.py` peut être exécuté :
    - Activer/désactiver la vérification automatique
    - Définir l'intervalle de vérification (en heures)
    - Configurer le chemin Java et les arguments JVM
-
-2. **Fichier de configuration** (`launcher_config.json`) :
-```json
-{
-    "auto_check_updates": true,
-    "auto_install_updates": false,
-    "modpack_url": "https://raw.githubusercontent.com/votreuser/votrerepo/main/modpacks.json"
-}
-```
-
-### Script Auto-Updater
-
-Options disponibles :
-- `--once` : Vérifier une seule fois
-- `--continuous` : Vérifier en continu
-- `--config` : Spécifier un fichier de configuration personnalisé
-
-## Utilisation
-
-### 1. Vérification Manuelle
-
-1. Ouvrir le launcher
-2. Cliquer sur "Vérifier les mises à jour"
-3. Si des mises à jour sont disponibles, choisir d'installer ou non
-
-### 2. Mise à Jour Automatique
-
-1. Cliquer sur "Mise à jour automatique"
-2. Le système télécharge et installe toutes les mises à jour disponibles
-3. Les anciennes versions sont sauvegardées dans le dossier `backups`
-
-### 3. Vérification en Arrière-plan
-
-```bash
-# Vérifier une seule fois
-python auto_updater.py --once
-
-# Vérifier en continu
-python auto_updater.py --continuous
-
-# Avec un fichier de configuration personnalisé
-python auto_updater.py --config my_config.json --once
-```
-
-### 4. Programmation avec Cron (Linux/Mac)
-
-```bash
-# Vérifier toutes les 6 heures
-0 */6 * * * cd /chemin/vers/launcher && python auto_updater.py --once
-
-# Vérifier tous les jours à 8h00
-0 8 * * * cd /chemin/vers/launcher && python auto_updater.py --once
-```
-
-### 5. Tâche Planifiée Windows
-
-1. Ouvrir le Planificateur de tâches
-2. Créer une tâche de base
-3. Programmer l'exécution de `python auto_updater.py --once`
-4. Définir la fréquence souhaitée
 
 ## Fichiers de Données
 
