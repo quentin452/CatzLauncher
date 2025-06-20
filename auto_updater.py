@@ -34,7 +34,6 @@ class AutoUpdater:
         default_config = {
             "modpack_url": "https://raw.githubusercontent.com/votreuser/votrerepo/main/modpacks.json",
             "auto_check_updates": True,
-            "check_interval_hours": 24,
             "auto_install_updates": False,  # Nouvelle option
             "notification_enabled": True
         }
@@ -49,41 +48,10 @@ class AutoUpdater:
         
         return default_config
     
-    def should_check_updates(self):
-        """Vérifie si il est temps de vérifier les mises à jour"""
-        last_check_file = "last_update_check.txt"
-        
-        if not os.path.exists(last_check_file):
-            return True
-        
-        try:
-            with open(last_check_file, 'r') as f:
-                last_check_str = f.read().strip()
-                last_check = datetime.fromisoformat(last_check_str)
-                
-            interval = timedelta(hours=self.config.get("check_interval_hours", 24))
-            return datetime.now() - last_check >= interval
-            
-        except Exception as e:
-            logging.error(f"Erreur lors de la vérification de la dernière mise à jour: {e}")
-            return True
-    
-    def update_last_check_time(self):
-        """Met à jour le timestamp de la dernière vérification"""
-        try:
-            with open("last_update_check.txt", 'w') as f:
-                f.write(datetime.now().isoformat())
-        except Exception as e:
-            logging.error(f"Erreur lors de la mise à jour du timestamp: {e}")
-    
     def check_and_update(self):
         """Vérifie et met à jour les modpacks si nécessaire"""
         if not self.config.get("auto_check_updates", True):
             logging.info("Vérification automatique désactivée")
-            return
-        
-        if not self.should_check_updates():
-            logging.info("Pas encore le moment de vérifier les mises à jour")
             return
         
         logging.info("Début de la vérification des mises à jour...")
@@ -94,7 +62,6 @@ class AutoUpdater:
             
             if not updates_available:
                 logging.info("Aucune mise à jour disponible")
-                self.update_last_check_time()
                 return
             
             logging.info(f"{len(updates_available)} mise(s) à jour disponible(s)")
@@ -111,8 +78,6 @@ class AutoUpdater:
             else:
                 # Créer un fichier de notification pour le launcher
                 self.create_update_notification(updates_available)
-            
-            self.update_last_check_time()
             
         except Exception as e:
             logging.error(f"Erreur lors de la vérification des mises à jour: {e}")
@@ -168,25 +133,6 @@ class AutoUpdater:
             logging.info("Notification de mise à jour créée")
         except Exception as e:
             logging.error(f"Erreur lors de la création de la notification: {e}")
-    
-    def run_continuous(self):
-        """Exécute la vérification en continu"""
-        logging.info("Démarrage du vérificateur automatique en continu...")
-        
-        while True:
-            try:
-                self.check_and_update()
-                
-                # Attendre l'intervalle configuré
-                interval_hours = self.config.get("check_interval_hours", 24)
-                time.sleep(interval_hours * 3600)  # Convertir en secondes
-                
-            except KeyboardInterrupt:
-                logging.info("Arrêt du vérificateur automatique")
-                break
-            except Exception as e:
-                logging.error(f"Erreur dans la boucle principale: {e}")
-                time.sleep(3600)  # Attendre 1 heure en cas d'erreur
 
 def main():
     """Fonction principale"""
@@ -200,14 +146,8 @@ def main():
     args = parser.parse_args()
     
     updater = AutoUpdater(args.config)
+        
+    updater.check_and_update()
     
-    if args.once:
-        updater.check_and_update()
-    elif args.continuous:
-        updater.run_continuous()
-    else:
-        # Par défaut, vérifier une seule fois
-        updater.check_and_update()
-
 if __name__ == "__main__":
     main() 

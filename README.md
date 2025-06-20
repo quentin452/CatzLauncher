@@ -39,7 +39,6 @@ Le script `auto_updater.py` peut être exécuté :
 ```json
 {
     "auto_check_updates": true,
-    "check_interval_hours": 24,
     "auto_install_updates": false,
     "modpack_url": "https://raw.githubusercontent.com/votreuser/votrerepo/main/modpacks.json"
 }
@@ -158,15 +157,6 @@ if 'X-Content-Hash' in response.headers:
         return True, f"Content hash changed: {server_hash}"
 ```
 
-### Modifier l'Intervalle de Vérification
-
-Dans la configuration :
-```json
-{
-    "check_interval_hours": 6  // Vérifier toutes les 6 heures
-}
-```
-
 ### Activer l'Installation Automatique
 
 ```json
@@ -190,7 +180,6 @@ Dans la configuration :
    - Consulter les sauvegardes dans le dossier `backups`
 
 3. **Vérifications trop fréquentes** :
-   - Ajuster `check_interval_hours` dans la configuration
    - Vérifier le fichier `last_update_check.txt`
 
 ### Logs
