@@ -6,8 +6,27 @@ import requests
 import hashlib
 from datetime import datetime
 from zipfile import ZipFile
+from minecraft_launcher_lib.forge import install_forge_version
 
 INSTALLED_FILE = "installed_modpacks.json"
+
+def install_forge_if_needed(version_id, minecraft_directory):
+    """
+    Installe la version de Forge spécifiée si elle n'est pas déjà présente.
+    """
+    version_path = os.path.join(minecraft_directory, "versions", version_id)
+    if os.path.exists(version_path):
+        print(f"Forge version {version_id} est déjà installée.")
+        return
+
+    print(f"Installation de la version de Forge : {version_id}...")
+    try:
+        install_forge_version(version_id, minecraft_directory)
+        print(f"Forge {version_id} installé avec succès.")
+    except Exception as e:
+        print(f"Erreur lors de l'installation de Forge : {e}")
+        # Remonter l'erreur pour que l'interface puisse l'afficher
+        raise e
 
 def download_file_with_progress(url, destination, callback=None):
     response = requests.get(url, stream=True)
@@ -30,17 +49,34 @@ def install_modpack(url, install_dir, modpack_name, backup_dir, progress_callbac
     download_file_with_progress(url, temp_zip, progress_callback)
     
     # Le nom du dossier est maintenant basé sur le nom du modpack, pas l'URL
-    old_dir = os.path.join(install_dir, modpack_name)
+    modpack_profile_dir = os.path.join(install_dir, modpack_name)
     
-    if os.path.exists(old_dir):
+    if os.path.exists(modpack_profile_dir):
         backup_name = f"{modpack_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        shutil.move(old_dir, os.path.join(backup_dir, backup_name))
+        shutil.move(modpack_profile_dir, os.path.join(backup_dir, backup_name))
     
-    # Extraire le nouveau modpack dans son propre dossier
-    extract_path = os.path.join(install_dir, modpack_name)
+    # Créer le dossier du profil avant l'extraction
+    os.makedirs(modpack_profile_dir, exist_ok=True)
+    
+    # Extraire le nouveau modpack
     with ZipFile(temp_zip, 'r') as zip_ref:
-        zip_ref.extractall(extract_path)
-    
+        zip_ref.extractall(modpack_profile_dir)
+
+    # --- Début de la correction pour les .zip avec un dossier racine ---
+    # Vérifier si l'extraction a créé un unique sous-dossier
+    extracted_items = os.listdir(modpack_profile_dir)
+    if len(extracted_items) == 1 and os.path.isdir(os.path.join(modpack_profile_dir, extracted_items[0])):
+        root_folder = os.path.join(modpack_profile_dir, extracted_items[0])
+        
+        # Déplacer tout le contenu du sous-dossier vers le dossier parent
+        for item in os.listdir(root_folder):
+            shutil.move(os.path.join(root_folder, item), modpack_profile_dir)
+            
+        # Supprimer le dossier racine vide
+        os.rmdir(root_folder)
+        print(f"La structure du .zip a été corrigée pour le modpack '{modpack_name}'.")
+    # --- Fin de la correction ---
+
     # Mettre à jour les informations d'installation
     update_installed_info(url, datetime.now().isoformat())
     

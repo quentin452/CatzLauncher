@@ -8,7 +8,8 @@ from tkinter import ttk, messagebox, filedialog, simpledialog
 from datetime import datetime
 import requests
 from minecraft_launcher_lib.utils import get_minecraft_directory
-from utils import download_file_with_progress, install_modpack, check_update, check_all_modpack_updates, update_modpack_info, update_installed_info
+from utils import download_file_with_progress, install_modpack, check_update, check_all_modpack_updates, update_modpack_info, install_forge_if_needed, update_installed_info
+from minecraft_launcher_lib.command import get_minecraft_command
 
 # --- Début des nouvelles fonctions de connexion ---
 
@@ -91,7 +92,46 @@ def get_minecraft_profile(minecraft_token):
     response.raise_for_status()
     return response.json()
 
-# --- Fin des nouvelles fonctions de connexion ---
+# --- Nouvelle fonction utilitaire pour trouver le .jar ---
+def find_main_jar(directory):
+    """
+    Trouve le .jar principal de manière intelligente :
+    1. Cherche un .jar de loader (forge/fabric) à la racine.
+    2. Sinon, prend le .jar le plus volumineux à la racine.
+    3. En dernier recours, cherche le plus gros .jar partout, sauf dans le dossier 'mods'.
+    """
+    # Étape 1 & 2: Chercher à la racine du profil
+    root_jars = []
+    # On cherche d'abord un loader à la racine
+    for filename in os.listdir(directory):
+        if filename.endswith('.jar'):
+            # Si on trouve un loader, on le retourne immédiatement
+            if 'forge' in filename.lower() or 'fabric' in filename.lower():
+                return os.path.join(directory, filename)
+            root_jars.append((os.path.join(directory, filename), os.path.getsize(os.path.join(directory, filename))))
+    
+    # Si on a trouvé des .jar à la racine (mais pas de loader), on retourne le plus gros
+    if root_jars:
+        return max(root_jars, key=lambda x: x[1])[0]
+
+    # Étape 3: Si aucun .jar n'est à la racine, on cherche partout en ignorant les mods
+    all_jar_files = []
+    for root, dirs, files in os.walk(directory):
+        # Exclure le dossier 'mods' de la recherche
+        if 'mods' in dirs:
+            dirs.remove('mods')
+            
+        for file in files:
+            if file.endswith('.jar'):
+                full_path = os.path.join(root, file)
+                all_jar_files.append((full_path, os.path.getsize(full_path)))
+    
+    if not all_jar_files:
+        return None
+        
+    return max(all_jar_files, key=lambda x: x[1])[0]
+
+# --- Fin des nouvelles fonctions ---
 
 class MinecraftLauncher(tk.Tk):
     def __init__(self):
@@ -590,50 +630,69 @@ class MinecraftLauncher(tk.Tk):
 
     def launch_game(self):
         if not self.auth_data:
-            messagebox.showwarning("Connexion", "Veuillez vous connecter d'abord!")
+            messagebox.showwarning("Connexion", "Veuillez vous connecter d'abord !")
             return
         
         selected = self.modpack_listbox.curselection()
         if not selected:
-            messagebox.showwarning("Sélection", "Veuillez sélectionner un modpack!")
+            messagebox.showwarning("Sélection", "Veuillez sélectionner un modpack !")
             return
         
         # Récupérer les données du modpack
-        index = selected[0]
         try:
-            response = requests.get(self.config["modpack_url"])
-            modpacks = response.json()
-        except Exception as e:
-            print(f"Erreur avec le fichier distant, utilisation du fichier local: {e}")
-            with open("modpacks.json", 'r') as f:
+            # On charge toujours depuis le fichier local pour la robustesse
+            with open("modpacks.json", 'r', encoding='utf-8') as f:
                 modpacks = json.load(f)
-        modpack = modpacks[index]
+            modpack = modpacks[selected[0]]
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Impossible de charger les modpacks : {e}")
+            return
         
-        # Le chemin d'installation est maintenant le profil du modpack
         modpack_profile_dir = os.path.join(get_minecraft_directory(), "modpacks", modpack["name"])
         
-        # Vérifier l'installation
         if not os.path.exists(modpack_profile_dir):
             messagebox.showinfo("Installation", f"Le modpack {modpack['name']} va être installé.")
             self.install_modpack(modpack)
             return
-        
-        # Lancer le jeu avec le bon profil
-        # NOTE: Assurez-vous que le nom du jar Forge est correct.
-        # Vous pourriez avoir besoin de le rendre configurable dans modpacks.json
-        forge_jar_path = os.path.join(modpack_profile_dir, "forge.jar") 
-        
-        launch_cmd = [
-            self.config["java_path"] or "java",
-            *self.config["java_args"].split(),
-            "-jar",
-            forge_jar_path,
-            "--gameDir",
-            modpack_profile_dir # C'est la clé pour des profils séparés
-        ]
-        
-        import subprocess
-        subprocess.Popen(launch_cmd, cwd=modpack_profile_dir) # Définir le répertoire de travail
+
+        def launch_thread():
+            try:
+                self.status_var.set("Préparation du lancement...")
+
+                # Étape 1: Construire l'ID de la version Forge (ex: "1.16.5-forge-36.2.42")
+                forge_version_id = f"{modpack['version']}-forge-{modpack['forge_version']}"
+
+                # Étape 2: Installer Forge si nécessaire
+                self.status_var.set(f"Vérification de Forge {forge_version_id}...")
+                minecraft_dir = get_minecraft_directory()
+                install_forge_if_needed(forge_version_id, minecraft_dir)
+
+                # Étape 3: Construire les options de lancement
+                options = {
+                    "username": self.auth_data['name'],
+                    "uuid": self.auth_data['id'],
+                    "token": self.auth_data['access_token'],
+                    "executablePath": self.config.get("java_path", "javaw.exe"),
+                    "jvmArguments": self.config["java_args"].split() if self.config.get("java_args") else [],
+                    "gameDirectory": modpack_profile_dir
+                }
+
+                # Étape 4: Obtenir la commande de lancement de la bibliothèque
+                self.status_var.set("Génération de la commande...")
+                minecraft_command = get_minecraft_command(forge_version_id, minecraft_dir, options)
+
+                # Étape 5: Lancer le jeu
+                self.status_var.set("Lancement de Minecraft...")
+                import subprocess
+                subprocess.run(minecraft_command, cwd=modpack_profile_dir) # Utiliser run et spécifier le CWD
+                self.status_var.set("Prêt")
+
+            except Exception as e:
+                self.status_var.set("Erreur lors du lancement.")
+                messagebox.showerror("Erreur de Lancement", str(e))
+
+        # Lancer le processus dans un thread pour ne pas geler l'interface
+        threading.Thread(target=launch_thread, daemon=True).start()
 
 if __name__ == "__main__":
     app = MinecraftLauncher()
