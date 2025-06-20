@@ -1,14 +1,83 @@
 # main.py
 import os
 import json
+import uuid
 import threading
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, messagebox, filedialog, simpledialog
 from datetime import datetime
 import requests
-from minecraft_launcher_lib.microsoft_account import complete_login, complete_refresh
 from minecraft_launcher_lib.utils import get_minecraft_directory
 from utils import download_file_with_progress, install_modpack, check_update, check_all_modpack_updates, update_modpack_info, update_installed_info
+
+# --- Début des nouvelles fonctions de connexion ---
+
+def exchange_code_for_token(auth_code):
+    """Échange le code d'authentification contre des tokens Microsoft."""
+    url = "https://login.live.com/oauth20_token.srf"
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    data = {
+        "client_id": "00000000402b5328",
+        "grant_type": "authorization_code",
+        "code": auth_code,
+        "redirect_uri": "https://login.live.com/oauth20_desktop.srf",
+        "scope": "XboxLive.signin offline_access"
+    }
+    response = requests.post(url, headers=headers, data=data)
+    response.raise_for_status()
+    return response.json()
+
+def authenticate_with_xbox(access_token):
+    """S'authentifie auprès de Xbox Live."""
+    url = "https://user.auth.xboxlive.com/user/authenticate"
+    headers = {"Content-Type": "application/json", "Accept": "application/json"}
+    data = {
+        "Properties": {
+            "AuthMethod": "RPS",
+            "SiteName": "user.auth.xboxlive.com",
+            "RpsTicket": f"d={access_token}"
+        },
+        "RelyingParty": "http://auth.xboxlive.com",
+        "TokenType": "JWT"
+    }
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+def authenticate_with_xsts(xbl_token):
+    """Obtient un token XSTS pour accéder aux services Minecraft."""
+    url = "https://xsts.auth.xboxlive.com/xsts/authorize"
+    headers = {"Content-Type": "application/json", "Accept": "application/json"}
+    data = {
+        "Properties": {
+            "SandboxId": "RETAIL",
+            "UserTokens": [xbl_token]
+        },
+        "RelyingParty": "rp://api.minecraftservices.com/",
+        "TokenType": "JWT"
+    }
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+def login_with_minecraft(user_hash, xsts_token):
+    """Se connecte à Minecraft avec le token XSTS."""
+    url = "https://api.minecraftservices.com/authentication/login_with_xbox"
+    headers = {"Content-Type": "application/json"}
+    data = {"identityToken": f"XBL3.0 x={user_hash};{xsts_token}"}
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+def get_minecraft_profile(minecraft_token):
+    """Récupère le profil du joueur (nom, UUID)."""
+    url = "https://api.minecraftservices.com/minecraft/profile"
+    headers = {"Authorization": f"Bearer {minecraft_token}"}
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()
+
+# --- Fin des nouvelles fonctions de connexion ---
 
 class MinecraftLauncher(tk.Tk):
     def __init__(self):
@@ -33,10 +102,9 @@ class MinecraftLauncher(tk.Tk):
         self.config = {
             "java_path": "",
             "java_args": "-Xmx4G -Xms2G",
-            "modpack_url": "https://raw.githubusercontent.com/votreuser/votrerepo/main/modpacks.json",
+            "modpack_url": "https://raw.githubusercontent.com/quentin452/CatzLauncher/refs/heads/main/modpacks.json",
             "last_update_check": "",
-            "auto_check_updates": True,
-            "check_interval_hours": 24
+            "auto_check_updates": True
         }
         
         if os.path.exists(self.config_file):
@@ -124,11 +192,6 @@ class MinecraftLauncher(tk.Tk):
         auto_check_cb = ttk.Checkbutton(config_tab, text="Activer", variable=self.auto_check_var)
         auto_check_cb.grid(row=2, column=1, padx=5, pady=5, sticky='w')
         
-        ttk.Label(config_tab, text="Intervalle (heures):").grid(row=3, column=0, padx=10, pady=5, sticky='w')
-        self.check_interval_var = tk.StringVar(value=str(self.config.get("check_interval_hours", 24)))
-        interval_entry = ttk.Entry(config_tab, textvariable=self.check_interval_var, width=10)
-        interval_entry.grid(row=3, column=1, padx=5, pady=5, sticky='w')
-        
         ttk.Button(config_tab, text="Sauvegarder", command=self.save_settings).grid(row=4, column=1, pady=10)
         
         # Widgets Compte
@@ -150,59 +213,86 @@ class MinecraftLauncher(tk.Tk):
         self.config["java_path"] = self.java_path_var.get()
         self.config["java_args"] = self.java_args_var.get()
         self.config["auto_check_updates"] = self.auto_check_var.get()
-        self.config["check_interval_hours"] = int(self.check_interval_var.get())
         self.save_config()
         messagebox.showinfo("Succès", "Configuration sauvegardée!")
 
     def microsoft_login(self):
-        def login_thread():
+        # Cette fonction s'exécute sur le thread principal
+        client_id = "00000000402b5328"
+        redirect_uri = "https://login.live.com/oauth20_desktop.srf"
+        scope = "XboxLive.signin offline_access"
+        
+        # Étape 1: Créer et ouvrir l'URL de connexion
+        login_url = f"https://login.live.com/oauth20_authorize.srf?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&scope={scope}"
+        import webbrowser
+        webbrowser.open(login_url)
+
+        # Étape 2: Récupérer l'URL via une boîte de dialogue
+        full_redirect_url = simpledialog.askstring("Code d'authentification", "Après la connexion, copiez-collez ici l'URL complète de la page blanche :")
+
+        if not full_redirect_url or "code=" not in full_redirect_url:
+            messagebox.showwarning("Annulé", "L'authentification a été annulée ou l'URL est invalide.")
+            return
+
+        # Étape 3: Extraire le code
+        auth_code = full_redirect_url.split("code=")[1].split("&")[0]
+
+        def login_flow_thread():
+            """Exécute tout le flux d'authentification en arrière-plan."""
             try:
                 self.login_btn.config(state=tk.DISABLED)
-                login_url, state = complete_login(
-                    client_id="YOUR_CLIENT_ID",
-                    redirect_url="http://localhost:1919"
-                )
+                self.status_var.set("Connexion: Échange du code...")
                 
-                # Ouvrir le navigateur pour l'authentification
-                import webbrowser
-                webbrowser.open(login_url)
+                # Étape 4: Échanger le code contre un token Microsoft
+                ms_token_data = exchange_code_for_token(auth_code)
+                access_token = ms_token_data['access_token']
+
+                self.status_var.set("Connexion: Authentification Xbox...")
+                # Étape 5: S'authentifier auprès de Xbox Live
+                xbl_data = authenticate_with_xbox(access_token)
+                xbl_token = xbl_data['Token']
+                user_hash = xbl_data['DisplayClaims']['xui'][0]['uhs']
+
+                self.status_var.set("Connexion: Récupération du token XSTS...")
+                # Étape 6: Obtenir le token XSTS
+                xsts_data = authenticate_with_xsts(xbl_token)
+                xsts_token = xsts_data['Token']
+
+                self.status_var.set("Connexion: Connexion à Minecraft...")
+                # Étape 7: Se connecter à Minecraft
+                mc_token_data = login_with_minecraft(user_hash, xsts_token)
+                mc_access_token = mc_token_data['access_token']
+
+                self.status_var.set("Connexion: Récupération du profil...")
+                # Étape 8: Récupérer le profil du joueur
+                profile = get_minecraft_profile(mc_access_token)
                 
-                # Récupérer le code après authentification
-                auth_code = self.wait_for_auth_code()
-                
-                self.auth_data = complete_refresh(
-                    client_id="YOUR_CLIENT_ID",
-                    refresh_token=auth_code["refresh_token"]
-                )
-                self.account_info.set(f"Connecté: {self.auth_data['name']}")
+                # Stocker les informations essentielles
+                self.auth_data = {
+                    "access_token": mc_access_token,
+                    "name": profile['name'],
+                    "id": profile['id'],
+                    # On pourrait aussi stocker le refresh_token pour une reconnexion auto
+                    "refresh_token": ms_token_data.get('refresh_token') 
+                }
+
+                self.account_info.set(f"Connecté: {profile['name']}")
+                self.status_var.set("Prêt")
+
             except Exception as e:
-                messagebox.showerror("Erreur", str(e))
+                # Afficher une erreur claire
+                error_body = str(e.response.text) if hasattr(e, 'response') else str(e)
+                messagebox.showerror("Erreur de connexion", f"Le processus a échoué:\n\n{error_body}")
+                self.status_var.set("Erreur de connexion")
             finally:
                 self.login_btn.config(state=tk.NORMAL)
         
-        threading.Thread(target=login_thread, daemon=True).start()
-
-    def wait_for_auth_code(self):
-        # Implémenter un serveur HTTP temporaire pour récupérer le code
-        # (solution simplifiée pour l'exemple)
-        from http.server import HTTPServer, BaseHTTPRequestHandler
-        class AuthHandler(BaseHTTPRequestHandler):
-            def do_GET(self):
-                if "code" in self.path:
-                    self.send_response(200)
-                    self.end_headers()
-                    self.wfile.write(b"Authentification reussie! Vous pouvez fermer cette fenetre.")
-                    self.server.auth_code = self.path.split("code=")[1].split("&")[0]
-        
-        server = HTTPServer(('localhost', 1919), AuthHandler)
-        server.auth_code = None
-        server.handle_request()
-        return {"refresh_token": server.auth_code}
+        threading.Thread(target=login_flow_thread, daemon=True).start()
 
     def check_modpack_updates(self):
         """Vérification automatique des mises à jour au démarrage"""
-        if self.config.get("auto_check_updates", True):
-            threading.Thread(target=self._check_updates, daemon=True).start()
+        # Vérifier les mises à jour à chaque lancement
+        threading.Thread(target=self._check_updates, daemon=True).start()
         
         # Vérifier s'il y a des notifications de mise à jour
         self.check_update_notifications()
@@ -240,8 +330,23 @@ class MinecraftLauncher(tk.Tk):
         try:
             self.status_var.set("Vérification des mises à jour...")
             
-            # Utiliser la nouvelle fonction de vérification automatique
-            updates_available = check_all_modpack_updates(self.config["modpack_url"])
+            # Essayer d'abord le fichier distant
+            try:
+                updates_available = check_all_modpack_updates(self.config["modpack_url"])
+            except Exception as e:
+                print(f"Erreur avec le fichier distant, utilisation du fichier local: {e}")
+                # Utiliser le fichier local en cas d'erreur
+                with open("modpacks.json", 'r') as f:
+                    modpacks = json.load(f)
+                
+                updates_available = []
+                for modpack in modpacks:
+                    has_update, reason = check_update(modpack["url"], modpack.get("last_modified", ""))
+                    if has_update:
+                        updates_available.append({
+                            'modpack': modpack,
+                            'reason': reason
+                        })
             
             if updates_available:
                 # Afficher les mises à jour disponibles
@@ -272,7 +377,22 @@ class MinecraftLauncher(tk.Tk):
                 self.status_var.set("Mise à jour automatique en cours...")
                 
                 # Vérifier les mises à jour
-                updates_available = check_all_modpack_updates(self.config["modpack_url"])
+                try:
+                    updates_available = check_all_modpack_updates(self.config["modpack_url"])
+                except Exception as e:
+                    print(f"Erreur avec le fichier distant, utilisation du fichier local: {e}")
+                    # Utiliser le fichier local en cas d'erreur
+                    with open("modpacks.json", 'r') as f:
+                        modpacks = json.load(f)
+                    
+                    updates_available = []
+                    for modpack in modpacks:
+                        has_update, reason = check_update(modpack["url"], modpack.get("last_modified", ""))
+                        if has_update:
+                            updates_available.append({
+                                'modpack': modpack,
+                                'reason': reason
+                            })
                 
                 if not updates_available:
                     self.status_var.set("Aucune mise à jour nécessaire")
@@ -305,15 +425,18 @@ class MinecraftLauncher(tk.Tk):
     def refresh_modpack_list(self):
         """Rafraîchit la liste des modpacks dans l'interface"""
         try:
+            # Essayer d'abord le fichier distant
             response = requests.get(self.config["modpack_url"])
             modpacks = response.json()
-            
-            self.modpack_listbox.delete(0, tk.END)
-            for pack in modpacks:
-                self.modpack_listbox.insert(tk.END, f"{pack['name']} - {pack['version']}")
-                
         except Exception as e:
-            print(f"Erreur lors du rafraîchissement de la liste: {e}")
+            print(f"Erreur avec le fichier distant, utilisation du fichier local: {e}")
+            # Utiliser le fichier local en cas d'erreur
+            with open("modpacks.json", 'r') as f:
+                modpacks = json.load(f)
+        
+        self.modpack_listbox.delete(0, tk.END)
+        for pack in modpacks:
+            self.modpack_listbox.insert(tk.END, f"{pack['name']} - {pack['version']}")
 
     def install_modpack(self, modpack_data):
         def install_thread():
@@ -369,8 +492,13 @@ class MinecraftLauncher(tk.Tk):
         
         # Récupérer les données du modpack
         index = selected[0]
-        response = requests.get(self.config["modpack_url"])
-        modpacks = response.json()
+        try:
+            response = requests.get(self.config["modpack_url"])
+            modpacks = response.json()
+        except Exception as e:
+            print(f"Erreur avec le fichier distant, utilisation du fichier local: {e}")
+            with open("modpacks.json", 'r') as f:
+                modpacks = json.load(f)
         modpack = modpacks[index]
         
         # Vérifier l'installation
