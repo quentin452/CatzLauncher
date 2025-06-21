@@ -26,6 +26,7 @@ def get_preserved_items():
         "resourcepacks",  # Packs de ressources personnalisés
         "shaderpacks",    # Shaders personnalisés
         "backups"         # Sauvegardes manuelles
+        "local"         # Sauvegardes manuelles
     ]
 
 def preserve_player_data(modpack_profile_dir, temp_backup_dir):
