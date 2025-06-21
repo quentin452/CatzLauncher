@@ -25,8 +25,8 @@ def get_preserved_items():
         "crash-reports",  # Rapports de crash
         "resourcepacks",  # Packs de ressources personnalisés
         "shaderpacks",    # Shaders personnalisés
-        "backups"         # Sauvegardes manuelles
-        "local"         # Sauvegardes manuelles
+        "backups",        # Sauvegardes manuelles
+        "local"           # Données locales du joueur
     ]
 
 def preserve_player_data(modpack_profile_dir, temp_backup_dir):
