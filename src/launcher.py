@@ -952,7 +952,7 @@ class MinecraftLauncher(QMainWindow):
                 modpack_data["url"],
                 install_dir,
                 modpack_data["name"],
-                backup_dir,
+                modpack_data.get("estimated_mb", 200), 
                 lambda cur, tot: self.signals.progress.emit(int(cur / tot * 100) if tot > 0 else 0)
             )
 

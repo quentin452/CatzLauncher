@@ -128,10 +128,10 @@ def install_forge_if_needed(version_id, minecraft_directory):
         traceback.print_exc()
         raise e
 
-def download_file_with_progress(url, destination, callback=None):
+def download_file_with_progress(url, destination, callback=None, estimated_mb=200):
     """
     Télécharge un fichier depuis une URL HTTP/S ou Mega.nz.
-    Version ultra-simple : aucun header personnalisé.
+    Version avec User-Agent pour GitHub et taille estimée pour la progression.
     """
     if 'mega.nz' in url:
         print("Lien Mega.nz détecté. Utilisation du client Mega.")
@@ -141,38 +141,69 @@ def download_file_with_progress(url, destination, callback=None):
         return
 
     try:
-        # Requête SANS AUCUN HEADER personnalisé
-        with urllib.request.urlopen(url) as response:
-            final_url = response.geturl()
-            if url != final_url:
-                print(f"Redirigé vers : {final_url}")
+        print(f"Début du téléchargement depuis: {url}")
+        
+        # User-Agent spécifique pour GitHub
+        headers = {}
+        if 'github.com' in url:
+            headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            print("User-Agent ajouté pour GitHub")
+        
+        if headers:
+            req = urllib.request.Request(url, headers=headers)
+            response = urllib.request.urlopen(req)
+        else:
+            response = urllib.request.urlopen(url)
+            
+        final_url = response.geturl()
+        if url != final_url:
+            print(f"Redirigé vers : {final_url}")
 
-            content_type = response.info().get('Content-Type', '').lower()
-            if 'text/html' in content_type:
-                raise ValueError(f"Le lien a renvoyé une page HTML au lieu d'un fichier. L'URL est probablement incorrecte ou protégée. URL: {final_url}")
+        print("Vérification du type de contenu...")
+        content_type = response.info().get('Content-Type', '').lower()
+        print(f"Content-Type: {content_type}")
+        
+        if 'text/html' in content_type:
+            raise ValueError(f"Le lien a renvoyé une page HTML au lieu d'un fichier. L'URL est probablement incorrecte ou protégée. URL: {final_url}")
 
-            total_size = int(response.getheader('Content-Length', 0))
-            bytes_so_far = 0
-            with open(destination, 'wb') as f:
-                while True:
-                    buffer = response.read(8192)
-                    if not buffer:
-                        break
-                    f.write(buffer)
-                    bytes_so_far += len(buffer)
-                    if callback and total_size > 0:
-                        progress = (bytes_so_far / total_size) * 100
-                        callback(progress)
-            if callback:
-                callback(100)
+        total_size = int(response.getheader('Content-Length', 0))
+        print(f"Taille totale: {total_size} bytes")
+        
+        # Si pas de taille, utiliser l'estimation
+        if total_size == 0:
+            total_size = estimated_mb * 1024 * 1024  # Convertir MB en bytes
+            print(f"Utilisation de la taille estimée: {estimated_mb} MB ({total_size} bytes)")
+        
+        bytes_so_far = 0
+        
+        print("Début de l'écriture du fichier...")
+        with open(destination, 'wb') as f:
+            while True:
+                buffer = response.read(8192)
+                if not buffer:
+                    break
+                f.write(buffer)
+                bytes_so_far += len(buffer)
+                if callback:
+                    progress = (bytes_so_far / total_size) * 100
+                    mb_downloaded = bytes_so_far / (1024 * 1024)
+                    print(f"Progression: {progress:.1f}% ({mb_downloaded:.1f} MB / {estimated_mb} MB)")
+                    callback(bytes_so_far, total_size)
+        
+        print(f"Téléchargement terminé. {bytes_so_far} bytes écrits.")
+        if callback:
+            callback(bytes_so_far, bytes_so_far)  # 100% terminé
+            
     except urllib.error.URLError as e:
         print(f"Erreur de réseau ou d'URL lors du téléchargement de {url}: {e.reason}")
         raise e
     except Exception as e:
         print(f"Une erreur inattendue est survenue : {e}")
+        import traceback
+        traceback.print_exc()
         raise e
 
-def install_modpack_files(url, install_dir, modpack_name, backup_dir, progress_callback=None):
+def install_modpack_files(url, install_dir, modpack_name, estimated_mb, progress_callback=None):
     """
     Télécharge et installe les fichiers du modpack avec la nouvelle logique simplifiée.
     """
@@ -200,7 +231,7 @@ def install_modpack_files(url, install_dir, modpack_name, backup_dir, progress_c
             print(f"URL Dropbox convertie pour téléchargement direct : {final_url}")
         
         print(f"Téléchargement de '{modpack_name}' depuis {final_url}...")
-        download_file_with_progress(final_url, temp_zip, progress_callback)
+        download_file_with_progress(final_url, temp_zip, progress_callback, estimated_mb)
 
         print("Vérification de l'intégrité du fichier téléchargé...")
         if not zipfile.is_zipfile(temp_zip):
@@ -212,6 +243,22 @@ def install_modpack_files(url, install_dir, modpack_name, backup_dir, progress_c
         with zipfile.ZipFile(temp_zip, 'r') as zip_ref:
             zip_ref.extractall(modpack_profile_dir)
         print("Extraction terminée.")
+
+        # Correction de la structure : déplacer le contenu du sous-dossier si nécessaire
+        extracted_items = os.listdir(modpack_profile_dir)
+        if len(extracted_items) == 1 and os.path.isdir(os.path.join(modpack_profile_dir, extracted_items[0])):
+            subfolder = os.path.join(modpack_profile_dir, extracted_items[0])
+            print(f"Correction de la structure : déplacement du contenu de '{extracted_items[0]}'...")
+            
+            # Déplacer tous les fichiers du sous-dossier vers le dossier principal
+            for item in os.listdir(subfolder):
+                src = os.path.join(subfolder, item)
+                dst = os.path.join(modpack_profile_dir, item)
+                shutil.move(src, dst)
+            
+            # Supprimer le sous-dossier vide
+            os.rmdir(subfolder)
+            print("Structure corrigée.")
 
         timestamp = datetime.now().isoformat()
         add_to_installed_log(modpack_name, "1.0.0", timestamp, modpack_profile_dir)
