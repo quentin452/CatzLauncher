@@ -14,6 +14,7 @@ import sys
 import subprocess
 import importlib
 import functools
+from urllib.parse import urlparse, parse_qs
 
 ensure_requirements()
 
@@ -236,82 +237,62 @@ class MinecraftLauncher(tk.Tk):
         messagebox.showinfo("Succès", "Configuration sauvegardée!")
 
     def microsoft_login(self):
-        # Cette fonction s'exécute sur le thread principal
         client_id = "00000000402b5328"
         redirect_uri = "https://login.live.com/oauth20_desktop.srf"
         scope = "XboxLive.signin offline_access"
-        
-        # Étape 1: Créer et ouvrir l'URL de connexion
         login_url = f"https://login.live.com/oauth20_authorize.srf?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&scope={scope}"
         import webbrowser
         webbrowser.open(login_url)
-
-        # Étape 2: Récupérer l'URL via une boîte de dialogue
         full_redirect_url = simpledialog.askstring("Code d'authentification", "Après la connexion, copiez-collez ici l'URL complète de la page blanche :")
-
-        if not full_redirect_url or "code=" not in full_redirect_url:
+        if not full_redirect_url:
             messagebox.showwarning("Annulé", "L'authentification a été annulée ou l'URL est invalide.")
             return
-
-        # Étape 3: Extraire le code
-        auth_code = full_redirect_url.split("code=")[1].split("&")[0]
-
-        def login_flow_thread():
-            """Exécute tout le flux d'authentification en arrière-plan."""
+        try:
+            parsed = urlparse(full_redirect_url)
+            code = parse_qs(parsed.query).get("code", [None])[0]
+        except Exception:
+            code = None
+        if not code:
+            messagebox.showwarning("Annulé", "Impossible d'extraire le code d'authentification.")
+            return
+        @run_in_thread
+        def login_flow():
             try:
                 self.login_btn.config(state=tk.DISABLED)
                 self.status_var.set("Connexion: Échange du code...")
-                
-                # Étape 4: Échanger le code contre un token Microsoft
-                ms_token_data = exchange_code_for_token(auth_code)
+                ms_token_data = exchange_code_for_token(code)
                 access_token = ms_token_data['access_token']
-
                 self.status_var.set("Connexion: Authentification Xbox...")
-                # Étape 5: S'authentifier auprès de Xbox Live
                 xbl_data = authenticate_with_xbox(access_token)
                 xbl_token = xbl_data['Token']
                 user_hash = xbl_data['DisplayClaims']['xui'][0]['uhs']
-
                 self.status_var.set("Connexion: Récupération du token XSTS...")
-                # Étape 6: Obtenir le token XSTS
                 xsts_data = authenticate_with_xsts(xbl_token)
                 xsts_token = xsts_data['Token']
-
                 self.status_var.set("Connexion: Connexion à Minecraft...")
-                # Étape 7: Se connecter à Minecraft
                 mc_token_data = login_with_minecraft(user_hash, xsts_token)
                 mc_access_token = mc_token_data['access_token']
-
                 self.status_var.set("Connexion: Récupération du profil...")
-                # Étape 8: Récupérer le profil du joueur
                 profile = get_minecraft_profile(mc_access_token)
-                
-                # Stocker les informations essentielles
                 self.auth_data = {
                     "access_token": mc_access_token,
                     "name": profile['name'],
                     "id": profile['id'],
                 }
-
-                # Sauvegarder les infos pour la reconnexion
                 self.config['account_info'] = {
                     'name': profile['name'],
                     'refresh_token': ms_token_data.get('refresh_token')
                 }
                 self.save_config()
-
                 self.account_info.set(f"Connecté: {profile['name']}")
                 self.status_var.set("Prêt")
-
             except Exception as e:
-                # Afficher une erreur claire
                 error_body = str(e.response.text) if hasattr(e, 'response') else str(e)
                 messagebox.showerror("Erreur de connexion", f"Le processus a échoué:\n\n{error_body}")
                 self.status_var.set("Erreur de connexion")
             finally:
                 self.update_login_button_states()
-        
-        threading.Thread(target=login_flow_thread, daemon=True).start()
+        login_flow()
 
     def logout(self):
         """Déconnecte l'utilisateur et efface les données de session."""
