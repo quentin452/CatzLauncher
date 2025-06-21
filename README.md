@@ -76,18 +76,3 @@ Stocke les informations d'installation :
     }
 }
 ```
-
-### `update_notification.json`
-Notification de mise à jour créée par le script :
-```json
-{
-    "timestamp": "2023-12-01T10:30:00",
-    "updates": [
-        {
-            "name": "Mon Modpack",
-            "version": "1.16.5",
-            "reason": "Last-Modified: Thu, 01 Dec 2023 10:30:00 GMT"
-        }
-    ]
-}
-```

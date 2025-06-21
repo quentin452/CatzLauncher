@@ -133,6 +133,31 @@ def find_main_jar(directory):
 
 # --- Fin des nouvelles fonctions ---
 
+def load_modpacks(modpack_url):
+    """
+    Charge les modpacks depuis une URL ou un fichier local.
+    Gère automatiquement les deux cas.
+    """
+    try:
+        # Si c'est une URL HTTP/HTTPS, faire une requête
+        if modpack_url.startswith(('http://', 'https://')):
+            response = requests.get(modpack_url, timeout=10)
+            response.raise_for_status()
+            return response.json()
+        else:
+            # Sinon, c'est un fichier local
+            with open(modpack_url, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Erreur lors du chargement des modpacks depuis {modpack_url}: {e}")
+        # En cas d'erreur, essayer le fichier local modpacks.json
+        try:
+            with open("modpacks.json", 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e2:
+            print(f"Erreur lors du chargement du fichier local modpacks.json: {e2}")
+            return []
+
 class MinecraftLauncher(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -159,9 +184,9 @@ class MinecraftLauncher(tk.Tk):
         self.config = {
             "java_path": "",
             "java_args": "-Xmx4G -Xms2G",
-            "modpack_url": "https://raw.githubusercontent.com/quentin452/CatzLauncher/refs/heads/main/modpacks.json",
+            "modpack_url": "modpacks.json", 
             "auto_check_updates": True,
-            "account_info": {}  # Stocke les infos de connexion persistantes
+            "account_info": {}
         }
         
         if os.path.exists(self.config_file):
@@ -477,23 +502,22 @@ class MinecraftLauncher(tk.Tk):
         try:
             self.status_var.set("Vérification des mises à jour...")
             
-            # Essayer d'abord le fichier distant
-            try:
-                updates_available = check_all_modpack_updates(self.config["modpack_url"])
-            except Exception as e:
-                print(f"Erreur avec le fichier distant, utilisation du fichier local: {e}")
-                # Utiliser le fichier local en cas d'erreur
-                with open("modpacks.json", 'r') as f:
-                    modpacks = json.load(f)
-                
-                updates_available = []
-                for modpack in modpacks:
-                    has_update, reason = check_update(modpack["url"], modpack.get("last_modified", ""))
-                    if has_update:
-                        updates_available.append({
-                            'modpack': modpack,
-                            'reason': reason
-                        })
+            # Charger les modpacks
+            modpacks = load_modpacks(self.config["modpack_url"])
+            
+            if not modpacks:
+                self.status_var.set("Aucun modpack trouvé")
+                return
+            
+            # Vérifier les mises à jour pour chaque modpack
+            updates_available = []
+            for modpack in modpacks:
+                has_update, reason = check_update(modpack["url"], modpack.get("last_modified", ""))
+                if has_update:
+                    updates_available.append({
+                        'modpack': modpack,
+                        'reason': reason
+                    })
             
             if updates_available:
                 # Afficher les mises à jour disponibles
@@ -523,23 +547,22 @@ class MinecraftLauncher(tk.Tk):
             try:
                 self.status_var.set("Mise à jour automatique en cours...")
                 
-                # Vérifier les mises à jour
-                try:
-                    updates_available = check_all_modpack_updates(self.config["modpack_url"])
-                except Exception as e:
-                    print(f"Erreur avec le fichier distant, utilisation du fichier local: {e}")
-                    # Utiliser le fichier local en cas d'erreur
-                    with open("modpacks.json", 'r') as f:
-                        modpacks = json.load(f)
-                    
-                    updates_available = []
-                    for modpack in modpacks:
-                        has_update, reason = check_update(modpack["url"], modpack.get("last_modified", ""))
-                        if has_update:
-                            updates_available.append({
-                                'modpack': modpack,
-                                'reason': reason
-                            })
+                # Charger les modpacks
+                modpacks = load_modpacks(self.config["modpack_url"])
+                
+                if not modpacks:
+                    self.status_var.set("Aucun modpack trouvé")
+                    return
+                
+                # Vérifier les mises à jour pour chaque modpack
+                updates_available = []
+                for modpack in modpacks:
+                    has_update, reason = check_update(modpack["url"], modpack.get("last_modified", ""))
+                    if has_update:
+                        updates_available.append({
+                            'modpack': modpack,
+                            'reason': reason
+                        })
                 
                 if not updates_available:
                     self.status_var.set("Aucune mise à jour nécessaire")
@@ -572,23 +595,22 @@ class MinecraftLauncher(tk.Tk):
     def refresh_modpack_list(self):
         """Rafraîchit la liste des modpacks dans l'interface"""
         try:
-            # Essayer d'abord le fichier distant
-            response = requests.get(self.config["modpack_url"])
-            modpacks = response.json()
+            # Charger les modpacks
+            modpacks = load_modpacks(self.config["modpack_url"])
+            
+            self.modpack_listbox.delete(0, tk.END)
+            for pack in modpacks:
+                self.modpack_listbox.insert(tk.END, f"{pack['name']} - {pack['version']}")
         except Exception as e:
-            print(f"Erreur avec le fichier distant, utilisation du fichier local: {e}")
-            # Utiliser le fichier local en cas d'erreur
-            with open("modpacks.json", 'r') as f:
-                modpacks = json.load(f)
-        
-        self.modpack_listbox.delete(0, tk.END)
-        for pack in modpacks:
-            self.modpack_listbox.insert(tk.END, f"{pack['name']} - {pack['version']}")
+            print(f"Erreur lors du rafraîchissement de la liste: {e}")
+            messagebox.showerror("Erreur", f"Impossible de charger les modpacks: {str(e)}")
 
     def install_modpack(self, modpack_data):
         def install_thread():
             try:
                 self.status_var.set("Téléchargement en cours...")
+                self.progress["value"] = 0 # Réinitialiser la barre
+                
                 install_path = os.path.join(get_minecraft_directory(), "modpacks")
                 os.makedirs(install_path, exist_ok=True)
                 
@@ -598,7 +620,12 @@ class MinecraftLauncher(tk.Tk):
                 
                 # Télécharger et installer
                 def progress_callback(current, total):
-                    self.progress["value"] = (current / total) * 100
+                    if total > 0:
+                        self.progress["value"] = (current / total) * 100
+                    else:
+                        # Si la taille est inconnue, on ne fait rien pour éviter le crash.
+                        # La barre restera à 0, mais le téléchargement se poursuit.
+                        pass
                 
                 install_modpack(
                     modpack_data["url"],
@@ -608,10 +635,13 @@ class MinecraftLauncher(tk.Tk):
                     progress_callback
                 )
                 
+                # S'assurer que la barre de progression est à 100% à la fin
+                self.progress["value"] = 100
+                
                 # Mettre à jour les informations d'installation avec plus de détails
                 new_timestamp = datetime.now().isoformat()
                 
-                # Récupérer l'ETag et la taille du fichier
+                # Récupérer l'ETag et la taille du fichier (non bloquant si ça échoue)
                 try:
                     response = requests.head(modpack_data["url"])
                     etag = response.headers.get('ETag', '').strip('"')
@@ -625,6 +655,8 @@ class MinecraftLauncher(tk.Tk):
                 self.status_var.set("Installation terminée!")
             except Exception as e:
                 messagebox.showerror("Erreur", str(e))
+                self.status_var.set("Prêt") # Réinitialiser le statut
+                self.progress["value"] = 0   # Réinitialiser la barre
         
         threading.Thread(target=install_thread, daemon=True).start()
 
