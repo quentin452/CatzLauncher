@@ -1,27 +1,47 @@
 import os
 import json
 import threading
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog, simpledialog
-from datetime import datetime
-import requests
-from minecraft_launcher_lib.utils import get_minecraft_directory
-from src.utils import (
-    ensure_requirements, install_modpack_files, check_update, update_modpack_info,
-    install_forge_if_needed, update_installed_info, refresh_ms_token, exchange_code_for_token,
-    authenticate_with_xbox, authenticate_with_xsts, login_with_minecraft, get_minecraft_profile
-)
-from minecraft_launcher_lib.command import get_minecraft_command
-import subprocess
 import functools
+import requests
+import subprocess
+import webbrowser
 from urllib.parse import urlparse, parse_qs
-from PIL import Image, ImageTk
+from datetime import datetime
+
+from PyQt5.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
+    QProgressBar, QListWidget, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
+    QInputDialog, QTabWidget
+)
+from PyQt5.QtCore import Qt, pyqtSignal, QObject
+from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon
+
+from minecraft_launcher_lib.utils import get_minecraft_directory
+from minecraft_launcher_lib.command import get_minecraft_command
+from src.utils import (
+    ensure_requirements, install_modpack_files, check_update,
+    install_forge_if_needed, update_installed_info, refresh_ms_token,
+    exchange_code_for_token, authenticate_with_xbox, authenticate_with_xsts,
+    login_with_minecraft, get_minecraft_profile
+)
+
+# --- Signals for thread-safe UI updates ---
+class WorkerSignals(QObject):
+    progress = pyqtSignal(int)
+    status = pyqtSignal(str)
+    account_info = pyqtSignal(str)
+    login_complete = pyqtSignal(dict)
+    login_error = pyqtSignal(str)
+    updates_found = pyqtSignal(list)
+    installation_finished = pyqtSignal()
+    modpack_list_refreshed = pyqtSignal(list)
 
 def run_in_thread(fn):
-    """Decorator to run a function in a daemon thread."""
     @functools.wraps(fn)
-    def wrapper(*args, **kwargs):
-        threading.Thread(target=lambda: fn(*args, **kwargs), daemon=True).start()
+    def wrapper(self, *args, **kwargs):
+        thread = threading.Thread(target=fn, args=(self, *args), kwargs=kwargs, daemon=True)
+        thread.start()
+        return thread
     return wrapper
 
 def load_json_file(path, fallback=None):
@@ -35,10 +55,7 @@ def save_json_file(path, data):
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
 
-def show_error(title, msg):
-    messagebox.showerror(title, msg)
-
-class MinecraftLauncher(tk.Tk):
+class MinecraftLauncher(QMainWindow):
     SAVE_DIR = os.path.join(os.getcwd(), "saves")
     CONFIG_FILE = os.path.join(SAVE_DIR, "launcher_config.json")
 
@@ -46,15 +63,218 @@ class MinecraftLauncher(tk.Tk):
         super().__init__()
         ensure_requirements()
         os.makedirs(self.SAVE_DIR, exist_ok=True)
-        self.title("Modpack Launcher")
-        self.geometry("800x600")
-        self.config_path = self.CONFIG_FILE
+
+        self.setWindowTitle("Modpack Launcher")
+        self.setWindowIcon(QIcon('assets/logo.png'))
+        self.setMinimumSize(850, 650)
+
+        self.signals = WorkerSignals()
         self.config = self.load_config()
         self.auth_data = None
-        self._build_ui()
+
+        self._setup_ui()
+        self._connect_signals()
+        self._apply_styles()
+
+        self.refresh_modpack_list()
         self.try_refresh_login()
-        self.check_modpack_updates()
-        self._set_background('assets/background.png')
+        if self.config.get("auto_check_updates", True):
+            self.check_modpack_updates()
+
+    def _setup_ui(self):
+        self.tabs = QTabWidget()
+        self.setCentralWidget(self.tabs)
+
+        self.main_tab = self._create_main_tab()
+        self.config_tab = self._create_config_tab()
+        self.account_tab = self._create_account_tab()
+
+        self.tabs.addTab(self.main_tab, "Jouer")
+        self.tabs.addTab(self.config_tab, "Configuration")
+        self.tabs.addTab(self.account_tab, "Compte")
+
+        self.update_login_button_states()
+
+    def _create_main_tab(self):
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
+
+        layout.addWidget(QLabel("Modpacks Disponibles:"))
+        self.modpack_list = QListWidget()
+        self.modpack_list.setMinimumHeight(200)
+        layout.addWidget(self.modpack_list)
+
+        self.progress = QProgressBar()
+        self.progress.setRange(0, 100)
+        self.progress.setTextVisible(True)
+        layout.addWidget(self.progress)
+
+        self.status_label = QLabel("Prêt")
+        self.status_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.status_label)
+
+        btn_layout = QHBoxLayout()
+        self.play_btn = QPushButton("Jouer")
+        self.play_btn.setFixedHeight(40)
+        btn_layout.addWidget(self.play_btn)
+
+        self.check_updates_btn = QPushButton("Vérifier les mises à jour")
+        self.check_updates_btn.setFixedHeight(40)
+        btn_layout.addWidget(self.check_updates_btn)
+        layout.addLayout(btn_layout)
+
+        return tab
+
+    def _create_config_tab(self):
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
+
+        # Java Path
+        java_layout = QHBoxLayout()
+        java_layout.addWidget(QLabel("Chemin Java:"))
+        self.java_path_edit = QLineEdit(self.config.get("java_path", ""))
+        java_layout.addWidget(self.java_path_edit)
+        self.browse_java_btn = QPushButton("Parcourir")
+        java_layout.addWidget(self.browse_java_btn)
+        layout.addLayout(java_layout)
+
+        # JVM Arguments
+        args_layout = QHBoxLayout()
+        args_layout.addWidget(QLabel("Arguments JVM:"))
+        self.java_args_edit = QLineEdit(self.config.get("java_args", ""))
+        args_layout.addWidget(self.java_args_edit)
+        layout.addLayout(args_layout)
+
+        # Auto-update checkbox
+        self.auto_check_cb = QCheckBox("Vérifier automatiquement les mises à jour au démarrage")
+        self.auto_check_cb.setChecked(self.config.get("auto_check_updates", True))
+        layout.addWidget(self.auto_check_cb)
+
+        layout.addStretch()
+        self.save_settings_btn = QPushButton("Sauvegarder la Configuration")
+        self.save_settings_btn.setFixedHeight(40)
+        layout.addWidget(self.save_settings_btn)
+
+        return tab
+
+    def _create_account_tab(self):
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+
+        self.account_info_label = QLabel("Non connecté")
+        layout.addWidget(self.account_info_label, alignment=Qt.AlignCenter)
+
+        self.login_btn = QPushButton("Login avec Microsoft")
+        self.login_btn.setFixedSize(250, 40)
+        layout.addWidget(self.login_btn, alignment=Qt.AlignCenter)
+
+        self.logout_btn = QPushButton("Se déconnecter")
+        self.logout_btn.setFixedSize(250, 40)
+        layout.addWidget(self.logout_btn, alignment=Qt.AlignCenter)
+
+        return tab
+
+    def _connect_signals(self):
+        # Button clicks
+        self.play_btn.clicked.connect(self.launch_game)
+        self.check_updates_btn.clicked.connect(self.manual_check_updates)
+        self.browse_java_btn.clicked.connect(self.browse_java)
+        self.save_settings_btn.clicked.connect(self.save_settings)
+        self.login_btn.clicked.connect(self.microsoft_login)
+        self.logout_btn.clicked.connect(self.logout)
+
+        # Worker signals
+        self.signals.progress.connect(self.progress.setValue)
+        self.signals.status.connect(self.status_label.setText)
+        self.signals.account_info.connect(self.account_info_label.setText)
+        self.signals.login_complete.connect(self.handle_login_complete)
+        self.signals.login_error.connect(self.handle_login_error)
+        self.signals.updates_found.connect(self.prompt_for_updates)
+        self.signals.installation_finished.connect(self.refresh_modpack_list)
+        self.signals.modpack_list_refreshed.connect(self.update_modpack_list_ui)
+
+    def _apply_styles(self):
+        self.setStyleSheet("""
+            QMainWindow, QWidget {
+                font-family: Segoe UI;
+                font-size: 10pt;
+            }
+            QMainWindow {
+                border-image: url(assets/background.png) 0 0 0 0 stretch stretch;
+            }
+            QTabWidget::pane {
+                border: 1px solid #444;
+                border-top: 0px;
+                background: rgba(45, 45, 45, 0.95);
+            }
+            QTabBar::tab {
+                background: #333;
+                color: white;
+                padding: 10px;
+                border: 1px solid #444;
+                border-bottom: none;
+                min-width: 100px;
+            }
+            QTabBar::tab:selected {
+                background: #555;
+            }
+            QTabBar::tab:hover {
+                background: #444;
+            }
+            QLabel {
+                color: white;
+                background: transparent;
+            }
+            QPushButton {
+                background-color: #5A9BDB;
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #7AC0DE;
+            }
+            QPushButton:pressed {
+                background-color: #4A89C8;
+            }
+            QPushButton:disabled {
+                background-color: #555;
+                color: #999;
+            }
+            QListWidget {
+                background-color: #3C3F41;
+                color: white;
+                border: 1px solid #555;
+                border-radius: 5px;
+            }
+            QProgressBar {
+                border: 1px solid #555;
+                border-radius: 5px;
+                text-align: center;
+                color: white;
+            }
+            QProgressBar::chunk {
+                background-color: #5A9BDB;
+                width: 20px;
+            }
+            QLineEdit {
+                background-color: #3C3F41;
+                color: white;
+                border: 1px solid #555;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QCheckBox {
+                color: white;
+            }
+        """)
 
     def load_config(self):
         default = {
@@ -64,418 +284,266 @@ class MinecraftLauncher(tk.Tk):
             "auto_check_updates": True,
             "account_info": {}
         }
-        if os.path.exists(self.config_path):
+        if os.path.exists(self.CONFIG_FILE):
             try:
-                loaded = load_json_file(self.config_path, fallback={})
-                if isinstance(loaded, list) and loaded:
-                    save_json_file(self.config_path, default)
-                    return default
+                loaded = load_json_file(self.CONFIG_FILE, fallback={})
                 default.update(loaded)
             except Exception:
-                save_json_file(self.config_path, default)
-        else:
-            save_json_file(self.config_path, default)
+                pass
+        save_json_file(self.CONFIG_FILE, default)
         return default
 
     def save_config(self):
-        save_json_file(self.config_path, self.config)
-
-    def _add_tab(self, label, attr_name):
-        frame = ttk.Frame(self.notebook)
-        self.notebook.add(frame, text=label)
-        setattr(self, attr_name, frame)
-        return frame
-
-    def _build_ui(self):
-        self._build_notebook()
-        self._build_main_tab()
-        self._build_config_tab()
-        self._build_account_tab()
-        self.update_login_button_states()
-
-    def _build_notebook(self):
-        self.notebook = ttk.Notebook(self)
-        self.notebook.pack(fill='both', expand=True, padx=10, pady=10)
-        self._add_tab("Jouer", "main_tab")
-        self._add_tab("Configuration", "config_tab")
-        self._add_tab("Compte", "account_tab")
-
-    def _build_main_tab(self):
-        self._set_tab_background(self.main_tab, 'assets/background.png')
-        ttk.Label(self.main_tab, text="Modpacks Disponibles:").pack(pady=5)
-        self.modpack_canvas = tk.Canvas(self.main_tab, highlightthickness=0, bd=0)
-        self.modpack_canvas.pack(fill='x', padx=20, pady=5)
-        self._modpack_bg_img_raw = Image.open('assets/background.png')
-        width = self.modpack_canvas.winfo_reqwidth() or 600
-        height = 200
-        self._modpack_bg_img = ImageTk.PhotoImage(self._modpack_bg_img_raw.resize((width, height)))
-        self._modpack_bg_img_id = self.modpack_canvas.create_image(0, 0, anchor='nw', image=self._modpack_bg_img)
-        self.modpack_listbox = tk.Listbox(self.modpack_canvas, height=10, bg='#f0f0f0', highlightthickness=1)
-        self.modpack_listbox.place(relx=0, rely=0, relwidth=1, relheight=1)
-        def on_canvas_resize(event):
-            new_img = ImageTk.PhotoImage(self._modpack_bg_img_raw.resize((event.width, event.height)))
-            self.modpack_canvas.itemconfig(self._modpack_bg_img_id, image=new_img)
-            self._modpack_bg_img = new_img
-        self.modpack_canvas.bind('<Configure>', on_canvas_resize)
-        self.progress = ttk.Progressbar(self.main_tab, mode='determinate')
-        self.progress.pack(fill='x', padx=20, pady=5)
-        self.status_var = tk.StringVar(value="Prêt")
-        ttk.Label(self.main_tab, textvariable=self.status_var).pack(pady=5)
-        update_frame = ttk.Frame(self.main_tab)
-        update_frame.pack(pady=5)
-        self.play_btn = ttk.Button(self.main_tab, text="Jouer", command=self.launch_game)
-        self.play_btn.pack(pady=5)
-        self.check_updates_btn = ttk.Button(update_frame, text="Vérifier les mises à jour", command=self.manual_check_updates)
-        self.check_updates_btn.pack(side='left', padx=5)
-
-    def _build_config_tab(self):
-        self._set_tab_background(self.config_tab, 'assets/background.png')
-        ttk.Label(self.config_tab, text="Chemin Java:").grid(row=0, column=0, padx=10, pady=5, sticky='w')
-        self.java_path_var = tk.StringVar(value=self.config["java_path"])
-        java_entry = ttk.Entry(self.config_tab, textvariable=self.java_path_var, width=50)
-        java_entry.grid(row=0, column=1, padx=5, pady=5)
-        ttk.Button(self.config_tab, text="Parcourir", command=self.browse_java).grid(row=0, column=2, padx=5, pady=5)
-        ttk.Label(self.config_tab, text="Arguments JVM:").grid(row=1, column=0, padx=10, pady=5, sticky='w')
-        self.java_args_var = tk.StringVar(value=self.config["java_args"])
-        java_args_entry = ttk.Entry(self.config_tab, textvariable=self.java_args_var, width=50)
-        java_args_entry.grid(row=1, column=1, columnspan=2, padx=5, pady=5, sticky='we')
-        ttk.Label(self.config_tab, text="Vérification automatique:").grid(row=2, column=0, padx=10, pady=5, sticky='w')
-        self.auto_check_var = tk.BooleanVar(value=self.config.get("auto_check_updates", True))
-        auto_check_cb = ttk.Checkbutton(self.config_tab, text="Activer", variable=self.auto_check_var)
-        auto_check_cb.grid(row=2, column=1, padx=5, pady=5, sticky='w')
-        ttk.Button(self.config_tab, text="Sauvegarder", command=self.save_settings).grid(row=4, column=1, pady=10)
-
-    def _build_account_tab(self):
-        self._set_tab_background(self.account_tab, 'assets/background.png')
-        self.login_btn = ttk.Button(self.account_tab, text="Login Microsoft", command=self.microsoft_login)
-        self.login_btn.pack(pady=10)
-        self.logout_btn = ttk.Button(self.account_tab, text="Se déconnecter", command=self.logout)
-        self.logout_btn.pack(pady=5)
-        self.account_info = tk.StringVar(value="Non connecté")
-        ttk.Label(self.account_tab, textvariable=self.account_info).pack(pady=10)
+        save_json_file(self.CONFIG_FILE, self.config)
 
     def browse_java(self):
-        path = filedialog.askopenfilename(
-            title="Sélectionnez l'exécutable Java",
-            filetypes=[("Exécutable Java", "java.exe javaw.exe")]
-        )
+        path, _ = QFileDialog.getOpenFileName(self, "Sélectionnez l'exécutable Java", "", "Java Executable (javaw.exe)")
         if path:
-            self.java_path_var.set(path)
+            self.java_path_edit.setText(path)
 
     def save_settings(self):
-        self.config["java_path"] = self.java_path_var.get()
-        self.config["java_args"] = self.java_args_var.get()
-        self.config["auto_check_updates"] = self.auto_check_var.get()
+        self.config["java_path"] = self.java_path_edit.text()
+        self.config["java_args"] = self.java_args_edit.text()
+        self.config["auto_check_updates"] = self.auto_check_cb.isChecked()
         self.save_config()
-        messagebox.showinfo("Succès", "Configuration sauvegardée!")
+        QMessageBox.information(self, "Succès", "Configuration sauvegardée!")
 
     def update_login_button_states(self):
-        if self.auth_data:
-            self.login_btn.config(state=tk.DISABLED)
-            self.logout_btn.config(state=tk.NORMAL)
-        else:
-            self.login_btn.config(state=tk.NORMAL)
-            self.logout_btn.config(state=tk.DISABLED)
+        enabled = self.auth_data is None
+        self.login_btn.setEnabled(enabled)
+        self.logout_btn.setEnabled(not enabled)
 
     def microsoft_login(self):
         client_id = "00000000402b5328"
         redirect_uri = "https://login.live.com/oauth20_desktop.srf"
         scope = "XboxLive.signin offline_access"
         login_url = f"https://login.live.com/oauth20_authorize.srf?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&scope={scope}"
-        import webbrowser
         webbrowser.open(login_url)
-        full_redirect_url = simpledialog.askstring("Code d'authentification", "Après la connexion, copiez-collez ici l'URL complète de la page blanche :")
-        if not full_redirect_url:
-            messagebox.showwarning("Annulé", "L'authentification a été annulée ou l'URL est invalide.")
+
+        full_redirect_url, ok = QInputDialog.getText(self, "Code d'authentification", "Après la connexion, copiez-collez ici l'URL complète de la page blanche :")
+        if not (ok and full_redirect_url):
+            QMessageBox.warning(self, "Annulé", "L'authentification a été annulée ou l'URL est invalide.")
             return
+
         try:
             parsed = urlparse(full_redirect_url)
             code = parse_qs(parsed.query).get("code", [None])[0]
         except Exception:
             code = None
+
         if not code:
-            messagebox.showwarning("Annulé", "Impossible d'extraire le code d'authentification.")
+            QMessageBox.warning(self, "Annulé", "Impossible d'extraire le code d'authentification.")
             return
+
         self._do_microsoft_auth_flow(auth_code=code)
 
     def try_refresh_login(self):
-        account_info = self.config.get('account_info', {})
-        refresh_token = account_info.get('refresh_token')
-        if not refresh_token:
-            return
-        self._do_microsoft_auth_flow(refresh_token=refresh_token)
+        refresh_token = self.config.get('account_info', {}).get('refresh_token')
+        if refresh_token:
+            self._do_microsoft_auth_flow(refresh_token=refresh_token)
 
     @run_in_thread
     def _do_microsoft_auth_flow(self, auth_code=None, refresh_token=None):
-        """
-        Handles both Microsoft login (auth_code) and refresh (refresh_token) flows.
-        Updates self.auth_data, config, and UI accordingly.
-        """
         try:
-            self.login_btn.config(state=tk.DISABLED)
+            self.signals.status.emit("Connexion en cours...")
+            self.login_btn.setEnabled(False)
+
             if auth_code:
-                self.status_var.set("Connexion: Échange du code...")
+                self.signals.status.emit("Échange du code...")
                 ms_token_data = exchange_code_for_token(auth_code)
             elif refresh_token:
-                self.status_var.set("Reconnexion en cours...")
+                self.signals.status.emit("Reconnexion en cours...")
                 ms_token_data = refresh_ms_token(refresh_token)
             else:
-                raise Exception("Aucun code d'authentification ou refresh token fourni.")
-            access_token = ms_token_data['access_token']
-            new_refresh_token = ms_token_data.get('refresh_token')
-            self.status_var.set("Connexion: Authentification Xbox...")
-            xbl_data = authenticate_with_xbox(access_token)
-            xbl_token = xbl_data['Token']
-            user_hash = xbl_data['DisplayClaims']['xui'][0]['uhs']
-            self.status_var.set("Connexion: Récupération du token XSTS...")
-            xsts_data = authenticate_with_xsts(xbl_token)
-            xsts_token = xsts_data['Token']
-            self.status_var.set("Connexion: Connexion à Minecraft...")
-            mc_token_data = login_with_minecraft(user_hash, xsts_token)
-            mc_access_token = mc_token_data['access_token']
-            self.status_var.set("Connexion: Récupération du profil...")
-            profile = get_minecraft_profile(mc_access_token)
-            self.auth_data = {
-                "access_token": mc_access_token,
-                "name": profile['name'],
-                "id": profile['id'],
-            }
-            self.config['account_info'] = {
-                'name': profile['name'],
-                'refresh_token': new_refresh_token
-            }
+                raise Exception("Aucun code ou refresh token fourni.")
+
+            self.signals.status.emit("Authentification Xbox...")
+            xbl_data = authenticate_with_xbox(ms_token_data['access_token'])
+
+            self.signals.status.emit("Récupération du token XSTS...")
+            xsts_data = authenticate_with_xsts(xbl_data['Token'])
+
+            self.signals.status.emit("Connexion à Minecraft...")
+            mc_token_data = login_with_minecraft(xbl_data['DisplayClaims']['xui'][0]['uhs'], xsts_data['Token'])
+
+            self.signals.status.emit("Récupération du profil...")
+            profile = get_minecraft_profile(mc_token_data['access_token'])
+
+            self.auth_data = {"access_token": mc_token_data['access_token'], "name": profile['name'], "id": profile['id']}
+            self.config['account_info'] = {'name': profile['name'], 'refresh_token': ms_token_data.get('refresh_token')}
             self.save_config()
-            self.account_info.set(f"Connecté: {profile['name']}")
-            self.status_var.set("Prêt")
+            self.signals.login_complete.emit(profile)
+
         except Exception as e:
             error_body = str(e.response.text) if hasattr(e, 'response') else str(e)
-            show_error("Erreur de connexion", f"Le processus a échoué:\n\n{error_body}")
-            self.status_var.set("Erreur de connexion")
-            self.auth_data = None
-            self.config['account_info'] = {}
-            self.account_info.set("Non connecté")
-        finally:
-            self.update_login_button_states()
+            self.signals.login_error.emit(f"Le processus a échoué:\n\n{error_body}")
+
+    def handle_login_complete(self, profile):
+        self.signals.account_info.emit(f"Connecté: {profile['name']}")
+        self.signals.status.emit("Prêt")
+        self.update_login_button_states()
+
+    def handle_login_error(self, error):
+        QMessageBox.critical(self, "Erreur de connexion", error)
+        self.signals.status.emit("Erreur de connexion")
+        self.auth_data = None
+        self.config['account_info'] = {}
+        self.save_config()
+        self.signals.account_info.emit("Non connecté")
+        self.update_login_button_states()
 
     def logout(self):
         self.auth_data = None
         self.config['account_info'] = {}
         self.save_config()
-        self.account_info.set("Non connecté")
+        self.signals.account_info.emit("Non connecté")
         self.update_login_button_states()
-        messagebox.showinfo("Déconnexion", "Vous avez été déconnecté.")
+        QMessageBox.information(self, "Déconnexion", "Vous avez été déconnecté.")
 
     def load_modpacks(self):
-        url = self.config["modpack_url"]
+        url = self.config.get("modpack_url", "modpacks.json")
         try:
             if url.startswith(('http://', 'https://')):
                 response = requests.get(url, timeout=10)
                 response.raise_for_status()
                 return response.json()
-            else:
-                return load_json_file(url, fallback=[])
+            return load_json_file(url, fallback=[])
         except Exception:
             return load_json_file("modpacks.json", fallback=[])
 
     @run_in_thread
     def check_modpack_updates(self):
-        self._check_updates()
-        self.check_update_notifications()
-
-    @run_in_thread
-    def manual_check_updates(self):
-        self._check_updates()
-
-    def _check_updates(self):
+        self.signals.status.emit("Vérification des mises à jour...")
         try:
-            self.status_var.set("Vérification des mises à jour...")
             modpacks = self.load_modpacks()
             if not modpacks:
-                self.status_var.set("Aucun modpack trouvé")
+                self.signals.status.emit("Aucun modpack trouvé.")
                 return
+
             updates_available = []
             for modpack in modpacks:
-                has_update, reason = check_update(modpack["name"], modpack["url"], modpack.get("last_modified", ""))
+                has_update, reason = check_update(modpack["name"], modpack["url"], "")
                 if has_update:
                     updates_available.append({'modpack': modpack, 'reason': reason})
+
             if updates_available:
-                update_message = "Mises à jour disponibles:\n\n"
-                for update in updates_available:
-                    modpack = update['modpack']
-                    reason = update['reason']
-                    update_message += f"• {modpack['name']} - {reason}\n"
-                update_message += "\nVoulez-vous installer les mises à jour?"
-                if messagebox.askyesno("Mises à jour disponibles", update_message):
-                    for update in updates_available:
-                        self.install_modpack(update['modpack'])
+                self.signals.updates_found.emit(updates_available)
             else:
-                self.status_var.set("Aucune mise à jour disponible")
-            self.refresh_modpack_list()
+                self.signals.status.emit("Aucune mise à jour disponible.")
         except Exception as e:
-            show_error("Erreur", f"Impossible de vérifier les mises à jour: {str(e)}")
-            self.status_var.set("Erreur lors de la vérification")
+            QMessageBox.critical(self, "Erreur", f"Impossible de vérifier les mises à jour: {e}")
+            self.signals.status.emit("Erreur de vérification.")
 
-    def check_update_notifications(self):
-        notification_file = "update_notification.json"
-        if os.path.exists(notification_file):
-            try:
-                notification_data = load_json_file(notification_file, fallback={})
-                update_message = "Mises à jour disponibles:\n\n"
-                for update in notification_data.get('updates', []):
-                    update_message += f"• {update['name']} v{update['version']} - {update['reason']}\n"
-                update_message += "\nVoulez-vous installer ces mises à jour?"
-                if messagebox.askyesno("Mises à jour disponibles", update_message):
-                    self.manual_check_updates()
-                os.remove(notification_file)
-            except Exception as e:
-                print(f"Erreur lors de la lecture de la notification: {e}")
+    def manual_check_updates(self):
+        self.check_modpack_updates()
 
+    def prompt_for_updates(self, updates):
+        update_message = "Mises à jour disponibles:\n\n"
+        for update in updates:
+            update_message += f"• {update['modpack']['name']} - {update['reason']}\n"
+        update_message += "\nVoulez-vous les installer?"
+
+        reply = QMessageBox.question(self, "Mises à jour disponibles", update_message, QMessageBox.Yes | QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            for update in updates:
+                self.install_modpack(update['modpack'])
+
+    @run_in_thread
     def refresh_modpack_list(self):
         try:
             modpacks = self.load_modpacks()
-            self.modpack_listbox.delete(0, tk.END)
-            for pack in modpacks:
-                self.modpack_listbox.insert(tk.END, f"{pack['name']} - {pack['version']}")
+            self.signals.modpack_list_refreshed.emit(modpacks)
         except Exception as e:
-            print(f"Erreur lors du rafraîchissement de la liste: {e}")
-            show_error("Erreur", f"Impossible de charger les modpacks: {str(e)}")
+            print(f"Erreur lors du rafraîchissement: {e}")
+
+    def update_modpack_list_ui(self, modpacks):
+        self.modpack_list.clear()
+        for pack in modpacks:
+            self.modpack_list.addItem(f"{pack['name']} - {pack['version']}")
 
     @run_in_thread
     def install_modpack(self, modpack_data):
-        self.play_btn.config(state=tk.DISABLED)
+        self.play_btn.setEnabled(False)
         try:
-            self.status_var.set("Téléchargement en cours...")
-            self.progress["value"] = 0
+            self.signals.status.emit(f"Téléchargement de {modpack_data['name']}...")
+            self.signals.progress.emit(0)
+
             install_path = os.path.join(get_minecraft_directory(), "modpacks")
             os.makedirs(install_path, exist_ok=True)
-            backup_dir = os.path.join(install_path, "backups")
-            os.makedirs(backup_dir, exist_ok=True)
-            def progress_callback(current, total):
-                if total > 0:
-                    self.progress["value"] = (current / total) * 100
+
             install_modpack_files(
-                modpack_data["url"], install_path, modpack_data["name"], backup_dir, progress_callback
+                modpack_data["url"], install_path, modpack_data["name"],
+                os.path.join(install_path, "backups"),
+                lambda cur, tot: self.signals.progress.emit(int(cur / tot * 100) if tot > 0 else 0)
             )
-            self.progress["value"] = 100
-            new_timestamp = datetime.now().isoformat()
-            try:
-                response = requests.head(modpack_data["url"])
-                etag = response.headers.get('ETag', '').strip('"')
-                file_size = int(response.headers.get('Content-Length', 0))
-            except:
-                etag = None
-                file_size = None
-            update_installed_info(
-                modpack_data["name"], modpack_data["url"], new_timestamp, etag, file_size
-            )
-            self.status_var.set("Installation terminée!")
+
+            self.signals.progress.emit(100)
+            update_installed_info(modpack_data["name"], modpack_data["url"], datetime.now().isoformat())
+            self.signals.status.emit("Installation terminée!")
+            self.signals.installation_finished.emit()
         except Exception as e:
-            show_error("Erreur", str(e))
-            self.status_var.set("Prêt")
-            self.progress["value"] = 0
+            QMessageBox.critical(self, "Erreur d'installation", str(e))
+            self.signals.status.emit("Erreur")
         finally:
-            self.play_btn.config(state=tk.NORMAL)
+            self.play_btn.setEnabled(True)
+            self.signals.progress.emit(0)
 
     def launch_game(self):
         if not self.auth_data:
-            messagebox.showwarning("Connexion", "Veuillez vous connecter d'abord !")
+            QMessageBox.warning(self, "Connexion Requise", "Veuillez vous connecter avant de jouer.")
             return
-        selected = self.modpack_listbox.curselection()
-        if not selected:
-            messagebox.showwarning("Sélection", "Veuillez sélectionner un modpack !")
+
+        selected_item = self.modpack_list.currentItem()
+        if not selected_item:
+            QMessageBox.warning(self, "Sélection Requise", "Veuillez sélectionner un modpack.")
             return
-        try:
-            modpacks = load_json_file("modpacks.json", fallback=[])
-            modpack = modpacks[selected[0]]
-        except Exception as e:
-            show_error("Erreur", f"Impossible de charger les modpacks : {e}")
+
+        selected_index = self.modpack_list.currentRow()
+        modpacks = self.load_modpacks()
+        if selected_index >= len(modpacks):
+            QMessageBox.critical(self, "Erreur", "Index de modpack invalide.")
             return
+        modpack = modpacks[selected_index]
         self._do_launch_game(modpack)
 
     @run_in_thread
     def _do_launch_game(self, modpack):
-        forge_version_id = f"{modpack['version']}-forge-{modpack['forge_version']}"
-        forge_install_id = f"{modpack['version']}-{modpack['forge_version']}"
-        minecraft_dir = get_minecraft_directory()
-        forge_version_path = os.path.join(minecraft_dir, "versions", forge_version_id)
-        forge_install_path = os.path.join(minecraft_dir, "versions", forge_install_id)
-
-        # Vérifie si la version Forge existe déjà (dans l'un ou l'autre format)
-        if not (os.path.exists(forge_version_path) or os.path.exists(forge_install_path)):
-            install_forge_if_needed(forge_install_id, minecraft_dir)
-        else:
-            print(f"Forge {forge_version_id} déjà présent, pas d'installation.")
-
-        modpack_profile_dir = os.path.join(get_minecraft_directory(), "modpacks", modpack["name"])
-        if not os.path.exists(modpack_profile_dir):
-            reply = messagebox.askyesno("Installation", f"Le modpack {modpack['name']} va être installé. Continuer?")
-            if reply:
-                self.install_modpack(modpack)
-            return
-        
+        self.play_btn.setEnabled(False)
+        self.signals.status.emit("Préparation du lancement...")
         try:
-            self.status_var.set("Préparation du lancement...")
+            modpack_profile_dir = os.path.join(get_minecraft_directory(), "modpacks", modpack["name"])
+            if not os.path.exists(modpack_profile_dir):
+                self.signals.status.emit(f"Le modpack {modpack['name']} doit être installé. Lancement de l'installation...")
+                self.install_modpack(modpack)
+                self.signals.status.emit(f"Modpack {modpack['name']} installé. Cliquez à nouveau sur Jouer.")
+                self.play_btn.setEnabled(True)
+                return
+
+            forge_install_id = f"{modpack['version']}-{modpack['forge_version']}"
+            forge_launch_id = f"{modpack['version']}-forge-{modpack['forge_version']}"
+            minecraft_dir = get_minecraft_directory()
             
-            self.status_var.set(f"Vérification de Forge {forge_version_id}...")
-            
+            forge_launch_path = os.path.join(minecraft_dir, "versions", forge_launch_id)
+            if not os.path.exists(forge_launch_path):
+                 self.signals.status.emit(f"Installation de Forge {forge_install_id}...")
+                 install_forge_if_needed(forge_install_id, minecraft_dir)
+
             options = {
-                "username": self.auth_data['name'],
-                "uuid": self.auth_data['id'],
-                "token": self.auth_data['access_token'],
-                "executablePath": self.config.get("java_path", "javaw.exe"),
-                "jvmArguments": self.config["java_args"].split() if self.config.get("java_args") else [],
+                "username": self.auth_data['name'], "uuid": self.auth_data['id'], "token": self.auth_data['access_token'],
+                "executablePath": self.config.get("java_path") or "javaw.exe",
+                "jvmArguments": self.config.get("java_args", "").split(),
                 "gameDirectory": modpack_profile_dir
             }
-            
-            self.status_var.set("Génération de la commande...")
-            minecraft_command = get_minecraft_command(forge_version_id, minecraft_dir, options)
 
-            # Nettoie la commande pour éviter WinError 87
-            minecraft_command = [str(arg) for arg in minecraft_command if arg and str(arg).strip() != ""]
+            self.signals.status.emit("Génération de la commande...")
+            minecraft_command = get_minecraft_command(forge_launch_id, minecraft_dir, options)
+            minecraft_command = [arg for arg in minecraft_command if arg]
 
-            self.status_var.set("Lancement de Minecraft...")
-            try:
-                subprocess.run(minecraft_command, cwd=modpack_profile_dir)
-            except Exception as e:
-                print("Erreur lors du lancement:", e)
-                show_error("Erreur de Lancement", str(e))
-            self.status_var.set("Prêt")
+            self.signals.status.emit("Lancement de Minecraft...")
+            subprocess.run(minecraft_command, cwd=modpack_profile_dir)
+            self.signals.status.emit("Prêt")
         except Exception as e:
-            self.status_var.set("Erreur lors du lancement.")
-            show_error("Erreur de Lancement", str(e))
-
-    def _set_background(self, image_path):
-        if not os.path.exists(image_path):
-            print(f"Image de fond non trouvée: {image_path} (aucun fond appliqué)")
-            return
-        self.bg_image_raw = Image.open(image_path)
-        self.bg_image = ImageTk.PhotoImage(self.bg_image_raw.resize((self.winfo_width(), self.winfo_height())))
-        if hasattr(self, 'bg_label'):
-            self.bg_label.config(image=self.bg_image)
-        else:
-            self.bg_label = tk.Label(self, image=self.bg_image)
-            self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-            self.bg_label.lower()
-        def on_resize(event):
-            self.bg_image = ImageTk.PhotoImage(self.bg_image_raw.resize((event.width, event.height)))
-            self.bg_label.config(image=self.bg_image)
-        self.bind('<Configure>', on_resize)
-
-    def _set_tab_background(self, tab, image_path):
-        if not os.path.exists(image_path):
-            print(f"Image de fond non trouvée: {image_path} (aucun fond appliqué)")
-            return
-        bg_image_raw = Image.open(image_path)
-        # On suppose que la taille du tab est la même que la fenêtre principale
-        width, height = self.winfo_width(), self.winfo_height()
-        bg_image = ImageTk.PhotoImage(bg_image_raw.resize((width, height)))
-        bg_label = tk.Label(tab, image=bg_image)
-        bg_label.image = bg_image  # garder une référence
-        bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-        bg_label.lower()
-        # Optionnel: resize si la fenêtre change
-        def on_resize(event):
-            new_img = ImageTk.PhotoImage(bg_image_raw.resize((event.width, event.height)))
-            bg_label.config(image=new_img)
-            bg_label.image = new_img
-        tab.bind('<Configure>', on_resize)
+            self.signals.status.emit("Erreur de lancement")
+            print(f"Erreur de Lancement: {e}")
+        finally:
+            self.play_btn.setEnabled(True)
