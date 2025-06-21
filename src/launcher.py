@@ -15,6 +15,7 @@ from minecraft_launcher_lib.command import get_minecraft_command
 import subprocess
 import functools
 from urllib.parse import urlparse, parse_qs
+from PIL import Image, ImageTk
 
 def run_in_thread(fn):
     """Decorator to run a function in a daemon thread."""
@@ -53,6 +54,7 @@ class MinecraftLauncher(tk.Tk):
         self._build_ui()
         self.try_refresh_login()
         self.check_modpack_updates()
+        self._set_background('assets/background.png')
 
     def load_config(self):
         default = {
@@ -99,9 +101,22 @@ class MinecraftLauncher(tk.Tk):
         self._add_tab("Compte", "account_tab")
 
     def _build_main_tab(self):
+        self._set_tab_background(self.main_tab, 'assets/background.png')
         ttk.Label(self.main_tab, text="Modpacks Disponibles:").pack(pady=5)
-        self.modpack_listbox = tk.Listbox(self.main_tab, height=10)
-        self.modpack_listbox.pack(fill='x', padx=20, pady=5)
+        self.modpack_canvas = tk.Canvas(self.main_tab, highlightthickness=0, bd=0)
+        self.modpack_canvas.pack(fill='x', padx=20, pady=5)
+        self._modpack_bg_img_raw = Image.open('assets/background.png')
+        width = self.modpack_canvas.winfo_reqwidth() or 600
+        height = 200
+        self._modpack_bg_img = ImageTk.PhotoImage(self._modpack_bg_img_raw.resize((width, height)))
+        self._modpack_bg_img_id = self.modpack_canvas.create_image(0, 0, anchor='nw', image=self._modpack_bg_img)
+        self.modpack_listbox = tk.Listbox(self.modpack_canvas, height=10, bg='#f0f0f0', highlightthickness=1)
+        self.modpack_listbox.place(relx=0, rely=0, relwidth=1, relheight=1)
+        def on_canvas_resize(event):
+            new_img = ImageTk.PhotoImage(self._modpack_bg_img_raw.resize((event.width, event.height)))
+            self.modpack_canvas.itemconfig(self._modpack_bg_img_id, image=new_img)
+            self._modpack_bg_img = new_img
+        self.modpack_canvas.bind('<Configure>', on_canvas_resize)
         self.progress = ttk.Progressbar(self.main_tab, mode='determinate')
         self.progress.pack(fill='x', padx=20, pady=5)
         self.status_var = tk.StringVar(value="Prêt")
@@ -114,6 +129,7 @@ class MinecraftLauncher(tk.Tk):
         self.check_updates_btn.pack(side='left', padx=5)
 
     def _build_config_tab(self):
+        self._set_tab_background(self.config_tab, 'assets/background.png')
         ttk.Label(self.config_tab, text="Chemin Java:").grid(row=0, column=0, padx=10, pady=5, sticky='w')
         self.java_path_var = tk.StringVar(value=self.config["java_path"])
         java_entry = ttk.Entry(self.config_tab, textvariable=self.java_path_var, width=50)
@@ -130,6 +146,7 @@ class MinecraftLauncher(tk.Tk):
         ttk.Button(self.config_tab, text="Sauvegarder", command=self.save_settings).grid(row=4, column=1, pady=10)
 
     def _build_account_tab(self):
+        self._set_tab_background(self.account_tab, 'assets/background.png')
         self.login_btn = ttk.Button(self.account_tab, text="Login Microsoft", command=self.microsoft_login)
         self.login_btn.pack(pady=10)
         self.logout_btn = ttk.Button(self.account_tab, text="Se déconnecter", command=self.logout)
@@ -404,3 +421,39 @@ class MinecraftLauncher(tk.Tk):
         except Exception as e:
             self.status_var.set("Erreur lors du lancement.")
             show_error("Erreur de Lancement", str(e))
+
+    def _set_background(self, image_path):
+        if not os.path.exists(image_path):
+            print(f"Image de fond non trouvée: {image_path} (aucun fond appliqué)")
+            return
+        self.bg_image_raw = Image.open(image_path)
+        self.bg_image = ImageTk.PhotoImage(self.bg_image_raw.resize((self.winfo_width(), self.winfo_height())))
+        if hasattr(self, 'bg_label'):
+            self.bg_label.config(image=self.bg_image)
+        else:
+            self.bg_label = tk.Label(self, image=self.bg_image)
+            self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+            self.bg_label.lower()
+        def on_resize(event):
+            self.bg_image = ImageTk.PhotoImage(self.bg_image_raw.resize((event.width, event.height)))
+            self.bg_label.config(image=self.bg_image)
+        self.bind('<Configure>', on_resize)
+
+    def _set_tab_background(self, tab, image_path):
+        if not os.path.exists(image_path):
+            print(f"Image de fond non trouvée: {image_path} (aucun fond appliqué)")
+            return
+        bg_image_raw = Image.open(image_path)
+        # On suppose que la taille du tab est la même que la fenêtre principale
+        width, height = self.winfo_width(), self.winfo_height()
+        bg_image = ImageTk.PhotoImage(bg_image_raw.resize((width, height)))
+        bg_label = tk.Label(tab, image=bg_image)
+        bg_label.image = bg_image  # garder une référence
+        bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+        bg_label.lower()
+        # Optionnel: resize si la fenêtre change
+        def on_resize(event):
+            new_img = ImageTk.PhotoImage(bg_image_raw.resize((event.width, event.height)))
+            bg_label.config(image=new_img)
+            bg_label.image = new_img
+        tab.bind('<Configure>', on_resize)
