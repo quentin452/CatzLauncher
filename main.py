@@ -338,7 +338,7 @@ class MinecraftLauncher(tk.Tk):
             
             updates_available = []
             for modpack in modpacks:
-                has_update, reason = check_update(modpack["url"], modpack.get("last_modified", ""))
+                has_update, reason = check_update(modpack["name"], modpack["url"], modpack.get("last_modified", ""))
                 if has_update:
                     updates_available.append({
                         'modpack': modpack,
@@ -379,7 +379,7 @@ class MinecraftLauncher(tk.Tk):
                 return
             updates_available = []
             for modpack in modpacks:
-                has_update, reason = check_update(modpack["url"], modpack.get("last_modified", ""))
+                has_update, reason = check_update(modpack["name"], modpack["url"], modpack.get("last_modified", ""))
                 if has_update:
                     updates_available.append({'modpack': modpack, 'reason': reason})
             if not updates_available:
@@ -440,7 +440,13 @@ class MinecraftLauncher(tk.Tk):
             except:
                 etag = None
                 file_size = None
-            update_installed_info(modpack_data["url"], new_timestamp, etag, file_size)
+            update_installed_info(
+                modpack_data["name"],
+                modpack_data["url"],
+                new_timestamp,
+                etag,
+                file_size
+            )
             self.status_var.set("Installation terminée!")
         except Exception as e:
             messagebox.showerror("Erreur", str(e))

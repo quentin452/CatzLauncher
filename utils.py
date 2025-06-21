@@ -215,13 +215,13 @@ def install_modpack_files(url, install_dir, modpack_name, backup_dir, progress_c
     if os.path.exists(temp_backup_dir):
         shutil.rmtree(temp_backup_dir)
 
-    update_installed_info(url, datetime.now().isoformat())
+    update_installed_info(modpack_name, url, datetime.now().isoformat())
     
     os.remove(temp_zip)
 
-def check_update(url, last_modified, old_url=None):
+def check_update(name, url, last_modified):
     """
-    Vérifie si une mise à jour est disponible pour un modpack.
+    Vérifie si une mise à jour est disponible pour un modpack (clé = nom).
     Utilise plusieurs méthodes de vérification pour plus de fiabilité.
     """
     try:
@@ -229,16 +229,13 @@ def check_update(url, last_modified, old_url=None):
         if os.path.exists(INSTALLED_FILE):
             with open(INSTALLED_FILE, 'r') as f:
                 installed_data = json.load(f)
-        
-        if not os.path.exists(INSTALLED_FILE) or url not in installed_data:
+        local_info = installed_data.get(name)
+        if not local_info:
             return True, "Aucune installation locale détectée"
-        
-        if old_url and url != old_url:
+        if url != local_info.get('url'):
             return True, "URL du modpack modifiée"
-        
         response = requests.head(url, timeout=10)
         response.raise_for_status()
-        
         if 'Last-Modified' in response.headers:
             try:
                 server_modified = response.headers['Last-Modified']
@@ -248,21 +245,17 @@ def check_update(url, last_modified, old_url=None):
                     return True, f"Last-Modified: {server_modified}"
             except (ValueError, TypeError) as e:
                 print(f"Erreur parsing Last-Modified: {e}")
-        
         if 'ETag' in response.headers:
             etag = response.headers['ETag'].strip('"')
-            local_etag = get_local_etag(url)
+            local_etag = local_info.get('etag')
             if local_etag and etag != local_etag:
                 return True, f"ETag changed: {etag}"
-        
         if 'Content-Length' in response.headers:
             server_size = int(response.headers['Content-Length'])
-            local_size = get_local_file_size(url)
+            local_size = local_info.get('file_size')
             if local_size and server_size != local_size:
                 return True, f"File size changed: {server_size} bytes"
-        
         return False, "No update available"
-        
     except requests.RequestException as e:
         print(f"Erreur lors de la vérification de mise à jour: {e}")
         return False, f"Erreur de connexion: {e}"
@@ -285,19 +278,18 @@ def get_local_file_size(url):
     
     return installed_data.get(url, {}).get('file_size')
 
-def update_installed_info(url, timestamp, etag=None, file_size=None):
-    """Met à jour les informations d'installation avec plus de détails"""
+def update_installed_info(modpack_name, url, timestamp, etag=None, file_size=None):
+    """Met à jour les informations d'installation pour un modpack (clé = nom du modpack)."""
     installed_data = {}
     if os.path.exists(INSTALLED_FILE):
         with open(INSTALLED_FILE, 'r') as f:
             installed_data = json.load(f)
-    
-    installed_data[url] = {
+    installed_data[modpack_name] = {
+        'url': url,
         'timestamp': timestamp,
         'etag': etag,
         'file_size': file_size
     }
-    
     with open(INSTALLED_FILE, 'w') as f:
         json.dump(installed_data, f, indent=4)
 
