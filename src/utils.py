@@ -268,22 +268,53 @@ def install_modpack_files(url, install_dir, modpack_name, estimated_mb, progress
 
         # Correction de la structure : déplacer le contenu du sous-dossier si nécessaire
         extracted_items = os.listdir(modpack_profile_dir)
+        print(f"Éléments extraits du ZIP: {extracted_items}")
+        
         if len(extracted_items) == 1 and os.path.isdir(os.path.join(modpack_profile_dir, extracted_items[0])):
             subfolder = os.path.join(modpack_profile_dir, extracted_items[0])
             print(f"Correction de la structure : déplacement du contenu de '{extracted_items[0]}'...")
             
-            # Déplacer tous les fichiers du sous-dossier vers le dossier principal
-            for item in os.listdir(subfolder):
-                src = os.path.join(subfolder, item)
-                dst = os.path.join(modpack_profile_dir, item)
-                shutil.move(src, dst)
+            # Vérifier qu'il y a des fichiers dans le sous-dossier
+            subfolder_contents = os.listdir(subfolder)
+            print(f"Contenu du sous-dossier '{extracted_items[0]}': {subfolder_contents}")
             
-            # Supprimer le sous-dossier vide
-            os.rmdir(subfolder)
-            print("Structure corrigée.")
+            if len(subfolder_contents) > 0:
+                # Déplacer tous les fichiers du sous-dossier vers le dossier principal
+                for item in subfolder_contents:
+                    src = os.path.join(subfolder, item)
+                    dst = os.path.join(modpack_profile_dir, item)
+                    print(f"Déplacement: {src} -> {dst}")
+                    shutil.move(src, dst)
+                
+                # Supprimer le sous-dossier vide seulement s'il est vraiment vide
+                try:
+                    os.rmdir(subfolder)
+                    print("Sous-dossier supprimé avec succès.")
+                except OSError as e:
+                    print(f"Impossible de supprimer le sous-dossier (peut-être pas vide): {e}")
+                
+                print("Structure corrigée.")
+            else:
+                print("ATTENTION: Le sous-dossier est vide ! Aucun fichier à déplacer.")
+        else:
+            print(f"Pas de sous-dossier unique détecté. Structure: {extracted_items}")
+            
+        # Vérification finale
+        final_contents = os.listdir(modpack_profile_dir)
+        print(f"Contenu final du dossier modpack: {final_contents}")
+
+        # Récupérer les informations du commit GitHub si c'est un repo GitHub
+        commit_info = None
+        if 'github.com' in url and '/archive/refs/heads/' in url:
+            print("Récupération des informations du commit GitHub...")
+            commit_info = get_github_last_commit(url)
+            if commit_info:
+                print(f"Commit GitHub récupéré: {commit_info['sha'][:8]} - {commit_info['message']}")
+            else:
+                print("Impossible de récupérer les informations du commit GitHub")
 
         timestamp = datetime.now().isoformat()
-        add_to_installed_log(modpack_name, "1.0.0", timestamp, modpack_profile_dir)
+        add_to_installed_log(modpack_name, "1.0.0", timestamp, modpack_profile_dir, commit_info)
         print(f"'{modpack_name}' a été installé avec succès.")
 
     except Exception as e:
@@ -545,24 +576,35 @@ def get_github_last_commit(repo_url):
         # Extraire les informations du repo depuis l'URL
         if 'github.com' in repo_url and '/archive/refs/heads/' in repo_url:
             # Format: https://github.com/owner/repo/archive/refs/heads/branch.zip
-            parts = repo_url.split('/')
-            owner = parts[3]
-            repo = parts[4]
-            branch = parts[7].replace('.zip', '')
-            
-            # API GitHub pour récupérer le dernier commit de la branche
-            api_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{branch}"
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-            
-            response = requests.get(api_url, headers=headers, timeout=10)
-            response.raise_for_status()
-            
-            commit_data = response.json()
-            return {
-                'sha': commit_data['sha'],
-                'date': commit_data['commit']['author']['date'],
-                'message': commit_data['commit']['message']
-            }
+            # Trouver la position de '/archive/refs/heads/' et extraire la branche
+            start_marker = '/archive/refs/heads/'
+            start_pos = repo_url.find(start_marker)
+            if start_pos != -1:
+                branch_start = start_pos + len(start_marker)
+                branch_end = repo_url.find('.zip', branch_start)
+                if branch_end != -1:
+                    branch = repo_url[branch_start:branch_end]
+                    
+                    # Extraire owner et repo depuis l'URL
+                    parts = repo_url.split('/')
+                    owner = parts[3]
+                    repo = parts[4]
+                    
+                    print(f"Extraction GitHub: owner={owner}, repo={repo}, branch={branch}")
+                    
+                    # API GitHub pour récupérer le dernier commit de la branche
+                    api_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{branch}"
+                    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+                    
+                    response = requests.get(api_url, headers=headers, timeout=10)
+                    response.raise_for_status()
+                    
+                    commit_data = response.json()
+                    return {
+                        'sha': commit_data['sha'],
+                        'date': commit_data['commit']['author']['date'],
+                        'message': commit_data['commit']['message']
+                    }
     except Exception as e:
         print(f"Erreur lors de la récupération du commit GitHub: {e}")
         return None
