@@ -8,7 +8,7 @@ from tkinter import ttk, messagebox, filedialog, simpledialog
 from datetime import datetime
 import requests
 from minecraft_launcher_lib.utils import get_minecraft_directory
-from utils import download_file_with_progress,ensure_requirements, install_modpack, check_update, check_all_modpack_updates, update_modpack_info, install_forge_if_needed, update_installed_info, refresh_ms_token, exchange_code_for_token, authenticate_with_xbox, authenticate_with_xsts, login_with_minecraft, get_minecraft_profile
+from utils import download_file_with_progress,ensure_requirements, install_modpack_files, check_update, check_all_modpack_updates, update_modpack_info, install_forge_if_needed, update_installed_info, refresh_ms_token, exchange_code_for_token, authenticate_with_xbox, authenticate_with_xsts, login_with_minecraft, get_minecraft_profile
 from minecraft_launcher_lib.command import get_minecraft_command
 import sys
 import subprocess
@@ -532,7 +532,7 @@ class MinecraftLauncher(tk.Tk):
             def progress_callback(current, total):
                 if total > 0:
                     self.progress["value"] = (current / total) * 100
-            install_modpack(
+            install_modpack_files(
                 modpack_data["url"],
                 install_path,
                 modpack_data["name"],

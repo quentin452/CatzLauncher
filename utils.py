@@ -182,7 +182,8 @@ def download_file_with_progress(url, destination, callback=None):
         
         print("Téléchargement direct terminé.")
 
-def install_modpack(url, install_dir, modpack_name, backup_dir, progress_callback=None):
+def install_modpack_files(url, install_dir, modpack_name, backup_dir, progress_callback=None):
+    """Installe les fichiers du modpack depuis une archive zip, gère la sauvegarde/restauration des données joueur."""
     # Créer un nom de fichier temporaire
     temp_zip = os.path.join(install_dir, "temp_modpack.zip")
     
