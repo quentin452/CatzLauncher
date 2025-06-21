@@ -11,7 +11,6 @@ from mega import Mega
 import sys
 import subprocess
 import importlib
-from bs4 import BeautifulSoup
 import re
 import urllib.request
 import urllib.error
@@ -22,11 +21,16 @@ os.makedirs(SAVE_DIR, exist_ok=True)
 INSTALLED_FILE = os.path.join(SAVE_DIR, "installed_modpacks.json")
 
 def ensure_requirements():
+    """
+    Vérifie que les paquets requis sont installés.
+    """
     required = [
         ("requests", "requests"),
         ("minecraft_launcher_lib", "minecraft-launcher-lib"),
         ("mega", "mega.py"),
-        ("bs4", "beautifulsoup4"),
+        # Suppression des dépendances inutiles
+        # ("bs4", "beautifulsoup4"),
+        # ("cloudscraper", "cloudscraper"),
     ]
     missing = []
     for mod, pkg in required:
@@ -34,12 +38,16 @@ def ensure_requirements():
             importlib.import_module(mod)
         except ImportError:
             missing.append(pkg)
-    if missing:
-        print(f"Installing missing packages: {', '.join(missing)}")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
-        print("Dependencies installed. Please restart the launcher if you see errors.")
 
-ensure_requirements()
+    if missing:
+        print(f"Paquets manquants : {', '.join(missing)}. Tentative d'installation via pip...")
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", *missing])
+            print("Installation réussie. Veuillez redémarrer l'application.")
+        except Exception as e:
+            print(f"Erreur lors de l'installation des paquets : {e}")
+            print("Veuillez les installer manuellement.")
+        sys.exit(1)
 
 def get_preserved_items():
     """
@@ -103,139 +111,83 @@ def restore_player_data(modpack_profile_dir, saved_items):
 
 def install_forge_if_needed(version_id, minecraft_directory):
     """
-    Installe la version de Forge spécifiée si elle n'est pas déjà présente.
+    Installe Forge si nécessaire.
     """
-    version_path = os.path.join(minecraft_directory, "versions", version_id)
-    if os.path.exists(version_path):
-        print(f"Forge version {version_id} est déjà installée.")
-        return
-
-    print(f"Installation de la version de Forge : {version_id}...")
     try:
-        install_forge_version(version_id, minecraft_directory)
-        print(f"Forge {version_id} installé avec succès.")
+        versions_path = os.path.join(minecraft_directory, "versions")
+        version_path = os.path.join(versions_path, version_id)
+        if not os.path.exists(version_path):
+            print(f"Version Forge {version_id} non trouvée. Installation en cours...")
+            install_forge_version(version_id, minecraft_directory)
+            print(f"Forge {version_id} installé avec succès.")
+        else:
+            print(f"La version Forge {version_id} est déjà installée.")
     except Exception as e:
-        import traceback
         print(f"Erreur lors de l'installation de Forge : {e}")
+        import traceback
         traceback.print_exc()
         raise e
 
-def download_file_with_progress(url, destination, callback=None, recursion_depth=0):
+def download_file_with_progress(url, destination, callback=None):
     """
     Télécharge un fichier depuis une URL HTTP/S ou Mega.nz.
-    Gère intelligemment les pages HTML intermédiaires de Dropbox.
+    Logique ultra-simplifiée pour une robustesse maximale, inspirée par le code de Minelaunched.
     """
-    if recursion_depth > 2: # Limite la récursion pour éviter les boucles infinies.
-        raise ValueError("Trop de redirections lors du téléchargement, le lien est probablement invalide.")
-
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
 
     if 'mega.nz' in url:
-        # La logique pour Mega reste inchangée.
-        print("Téléchargement depuis Mega.nz détecté...")
-        try:
-            mega = Mega()
-            m = mega.login_anonymous()
-            file_node = m.find_url(url)
-            if file_node is None:
-                raise ValueError("Fichier non trouvé sur Mega.nz. L'URL est peut-être invalide ou privée.")
-            
-            dest_folder = os.path.dirname(destination)
-            dest_filename = os.path.basename(destination)
-            m.download(file_node, dest_folder, dest_filename)
-            
-            if callback and os.path.exists(destination):
-                file_size = os.path.getsize(destination)
-                callback(file_size, file_size)
+        print("Lien Mega.nz détecté. Utilisation du client Mega.")
+        mega = Mega()
+        m = mega.login()
+        m.download_url(url, destination, None) # None for progress bar as we handle it
+        return
 
-        except Exception as e:
-            raise ValueError(f"Échec du téléchargement depuis Mega.nz : {e}") from e
-    else:
-        # Logique de téléchargement standard avec gestion des pages HTML de Dropbox.
-        print(f"Tentative de téléchargement depuis : {url}")
+    # La méthode la plus simple et la plus fiable. Pas de parsing HTML, pas de complexité.
+    try:
         req = urllib.request.Request(url, headers=headers)
-        try:
-            with urllib.request.urlopen(req) as response:
-                content_type = response.getheader('Content-Type', '').lower()
-                
-                # Si Dropbox renvoie une page HTML, on cherche le vrai lien dedans.
-                if 'text/html' in content_type:
-                    print("Page HTML détectée. Analyse du contenu...")
-                    html_content = response.read().decode('utf-8', errors='ignore')
+        with urllib.request.urlopen(req) as response:
+            # Gère automatiquement les redirections HTTP.
+            final_url = response.geturl()
+            if url != final_url:
+                print(f"Redirigé vers : {final_url}")
 
-                    # La cause racine de toutes les erreurs : le lien est désactivé pour trafic excessif.
-                    if "shared_link_too_much_traffic" in html_content or "Link Temporarily Disabled" in html_content:
-                        raise ValueError(
-                            "Le lien Dropbox est temporairement désactivé en raison d'un trafic excessif.\n\n"
-                            "Ceci est une restriction de Dropbox. Solutions:\n"
-                            "1. Attendre 24-48h que le lien soit réactivé.\n"
-                            "2. Utiliser un autre hébergeur (GitHub, Modrinth, etc.)"
-                        )
-                    
-                    soup = BeautifulSoup(html_content, 'html.parser')
-                    
-                    real_download_url = None
+            content_type = response.info().get('Content-Type', '').lower()
+            if 'text/html' in content_type:
+                 raise ValueError(f"Le lien a renvoyé une page HTML au lieu d'un fichier. L'URL est probablement incorrecte ou protégée. URL: {final_url}")
 
-                    # Méthode 1: Par ID spécifique (le plus fiable s'il est présent).
-                    button = soup.find('a', id='cjs-download-button')
-                    if button and button.get('href'):
-                        real_download_url = button['href']
-                        print("Lien trouvé via ID.")
-
-                    # Méthode 2: Par une classe CSS commune.
-                    if not real_download_url:
-                        button = soup.find('a', class_='db-download-button')
-                        if button and button.get('href'):
-                            real_download_url = button['href']
-                            print("Lien trouvé via classe CSS.")
-                    
-                    # Méthode 3: Par le texte du lien.
-                    if not real_download_url:
-                        button = soup.find('a', string=re.compile(r'(download|télécharger)', re.IGNORECASE))
-                        if button and button.get('href'):
-                            real_download_url = button['href']
-                            print("Lien trouvé via texte.")
-
-                    if real_download_url:
-                        print(f"Lien final trouvé. Redémarrage du téléchargement : {real_download_url}")
-                        return download_file_with_progress(real_download_url, destination, callback, recursion_depth + 1)
-                    else:
-                        raise ValueError("Dropbox a retourné une page HTML mais le lien de téléchargement final est introuvable.")
-
-                # Si ce n'est pas du HTML, on télécharge le fichier normalement.
-                with open(destination, 'wb') as out_file:
-                    total_size = int(response.getheader('Content-Length', 0))
-                    downloaded = 0
-                    chunk_size = 8192
-                    while True:
-                        chunk = response.read(chunk_size)
-                        if not chunk:
-                            break
-                        out_file.write(chunk)
-                        downloaded += len(chunk)
-                        if callback:
-                            callback(downloaded, total_size)
+            total_size = int(response.getheader('Content-Length', 0))
+            bytes_so_far = 0
             
-            if os.path.exists(destination) and os.path.getsize(destination) == 0:
-                os.remove(destination) 
-                raise ValueError("Le téléchargement a résulté en un fichier vide.")
+            with open(destination, 'wb') as f:
+                while True:
+                    buffer = response.read(8192)
+                    if not buffer:
+                        break
+                    f.write(buffer)
+                    bytes_so_far += len(buffer)
+                    if callback and total_size > 0:
+                        progress = (bytes_so_far / total_size) * 100
+                        callback(progress)
             
-            print("Téléchargement du fichier terminé.")
-        except urllib.error.HTTPError as e:
-            raise ValueError(f"{e.code} {e.reason}") from e
-        except Exception as e:
-            raise ValueError(f"Erreur de téléchargement : {e}") from e
+            if callback:
+                callback(100)
+
+    except urllib.error.URLError as e:
+        print(f"Erreur de réseau ou d'URL lors du téléchargement de {url}: {e.reason}")
+        raise e
+    except Exception as e:
+        print(f"Une erreur inattendue est survenue : {e}")
+        raise e
 
 def install_modpack_files(url, install_dir, modpack_name, backup_dir, progress_callback=None):
     """
-    Télécharge et installe les fichiers du modpack.
+    Télécharge et installe les fichiers du modpack avec la nouvelle logique simplifiée.
     """
     modpack_profile_dir = os.path.join(install_dir, modpack_name)
     temp_zip = os.path.join(install_dir, "temp_modpack.zip")
 
-    # Nettoyage initial
     print(f"Nettoyage des installations précédentes pour '{modpack_name}'...")
     remove_from_installed_log(modpack_name)
     if os.path.isdir(modpack_profile_dir):
@@ -244,91 +196,44 @@ def install_modpack_files(url, install_dir, modpack_name, backup_dir, progress_c
 
     try:
         final_url = url
-        # Restauration de la logique de transformation des URL Dropbox.
-        # Ceci convertit un lien de partage standard (www.dropbox.com) en lien de téléchargement direct.
-        # Le fichier modpacks.json DOIT contenir le lien de PARTAGE, pas un lien temporaire.
-        if 'dropbox.com' in url and 'dl.dropboxusercontent.com' not in url:
-            print("Lien de partage Dropbox détecté. Conversion en lien de téléchargement direct...")
-            try:
-                parts = urllib.parse.urlsplit(url)
-                query_params = urllib.parse.parse_qs(parts.query)
-                query_params['dl'] = ['1']
-                
-                new_query = urllib.parse.urlencode(query_params, doseq=True)
-                final_url = urllib.parse.urlunsplit((parts.scheme, parts.netloc, parts.path, new_query, parts.fragment))
-                print(f"URL Dropbox convertie : {final_url}")
-            except Exception as e:
-                print(f"Avertissement : échec de la conversion de l'URL Dropbox. Tentative avec l'URL originale. Erreur: {e}")
-                final_url = url
-
-        print(f"Téléchargement de '{modpack_name}' depuis : {final_url}")
+        # La seule transformation d'URL nécessaire et robuste pour Dropbox.
+        if 'dropbox.com' in url and 'dl=1' not in url:
+            parsed_url = urllib.parse.urlparse(url)
+            query_params = urllib.parse.parse_qs(parsed_url.query)
+            query_params['dl'] = ['1']
+            # Reconstruire l'URL avec dl=1, en conservant les autres paramètres comme rlkey.
+            new_query = urllib.parse.urlencode(query_params, doseq=True)
+            final_url = urllib.parse.urlunparse(
+                (parsed_url.scheme, parsed_url.netloc, parsed_url.path, parsed_url.params, new_query, parsed_url.fragment)
+            )
+            print(f"URL Dropbox convertie pour téléchargement direct : {final_url}")
+        
+        print(f"Téléchargement de '{modpack_name}' depuis {final_url}...")
         download_file_with_progress(final_url, temp_zip, progress_callback)
 
-        print("Téléchargement terminé.")
-
-        # Vérification du fichier ZIP avec détection d'erreur
+        print("Vérification de l'intégrité du fichier téléchargé...")
         if not zipfile.is_zipfile(temp_zip):
-            # Vérifier si c'est une page d'erreur Dropbox
-            with open(temp_zip, 'r', encoding='utf-8', errors='ignore') as f:
-                content = f.read(1000)
-                
-                if "Dropbox 429" in content or "too many downloads" in content:
-                    raise ValueError(
-                        "Erreur Dropbox: Trop de téléchargements.\n"
-                        "Solution: Patientez 24h ou hébergez le modpack ailleurs."
-                    )
-                elif "html" in content.lower() or "<!doctype" in content.lower():
-                    raise ValueError(
-                        "Dropbox a retourné une page HTML au lieu du fichier.\n"
-                        "Causes possibles:\n"
-                        "1. Le lien n'est pas un lien direct\n"
-                        "2. Le quota de téléchargement est dépassé\n"
-                        "3. Le fichier est trop volumineux\n\n"
-                        "Solutions:\n"
-                        "- Utilisez un autre hébergeur (Google Drive, MediaFire)\n"
-                        "- Copiez manuellement le lien dans votre navigateur"
-                    )
+            with open(temp_zip, 'r', errors='ignore') as f:
+                content_preview = f.read(512)
+            raise ValueError(f"Le fichier téléchargé n'est pas un ZIP valide. Contenu initial : {content_preview}")
 
-            raise ValueError("Le fichier téléchargé n'est pas une archive ZIP valide")
-
-        # Extraction du ZIP
-        print(f"Extraction de l'archive pour '{modpack_name}'...")
+        print(f"Extraction de '{modpack_name}' dans {modpack_profile_dir}...")
         with zipfile.ZipFile(temp_zip, 'r') as zip_ref:
             zip_ref.extractall(modpack_profile_dir)
-        
-        # Correction de la structure de dossier
-        extracted_items = os.listdir(modpack_profile_dir)
-        if len(extracted_items) == 1 and os.path.isdir(os.path.join(modpack_profile_dir, extracted_items[0])):
-            root_folder = os.path.join(modpack_profile_dir, extracted_items[0])
-            for item in os.listdir(root_folder):
-                shutil.move(os.path.join(root_folder, item), modpack_profile_dir)
-            os.rmdir(root_folder)
-            print(f"Structure du .zip corrigée pour '{modpack_name}'.")
+        print("Extraction terminée.")
 
-        # Mise à jour des informations d'installation
-        print(f"Installation de '{modpack_name}' terminée avec succès.")
-        update_installed_info(modpack_name, url, datetime.now().isoformat())
+        timestamp = datetime.now().isoformat()
+        add_to_installed_log(modpack_name, "1.0.0", timestamp, modpack_profile_dir)
+        print(f"'{modpack_name}' a été installé avec succès.")
 
     except Exception as e:
-        error_msg = f"❌ Erreur d'installation: {str(e)}"
-        
-        # Conseils spécifiques pour Dropbox
-        if 'dropbox' in url.lower() and 'html' in str(e).lower():
-            error_msg += (
-                "\n\nCONSEIL DÉPANNAGE DROPBOX:\n"
-                "1. Ouvrez le lien dans votre navigateur\n"
-                "2. Cliquez sur 'Télécharger' (pas sur 'Prévisualiser')\n"
-                "3. Copiez le nouveau lien de téléchargement\n"
-                "4. Collez-le dans le fichier modpacks.json"
-            )
-        
-        raise ValueError(error_msg)
-
+        print(f"ERREUR FATALE lors de l'installation de '{modpack_name}': {e}")
+        if os.path.isdir(modpack_profile_dir):
+            shutil.rmtree(modpack_profile_dir)
+        raise e
     finally:
-        # Nettoyage final
         if os.path.exists(temp_zip):
             os.remove(temp_zip)
-            print("Fichier temporaire supprimé.")
 
 def check_update(name, url, last_modified):
     """
@@ -534,3 +439,28 @@ def get_minecraft_profile(minecraft_token):
     response = requests.get(url, headers=headers)
     response.raise_for_status()
     return response.json()
+
+def get_installed_modpacks():
+    """
+    Récupère la liste des modpacks installés depuis le fichier JSON.
+    """
+    if not os.path.exists(INSTALLED_FILE):
+        return {}
+    try:
+        with open(INSTALLED_FILE, 'r') as f:
+            return json.load(f)
+    except (IOError, json.JSONDecodeError):
+        return {}
+
+def add_to_installed_log(modpack_name, version, timestamp, install_dir):
+    """
+    Ajoute un modpack au journal des installations.
+    """
+    installed = get_installed_modpacks()
+    installed[modpack_name] = {
+        "version": version,
+        "timestamp": timestamp,
+        "path": install_dir
+    }
+    with open(INSTALLED_FILE, 'w') as f:
+        json.dump(installed, f, indent=4)
