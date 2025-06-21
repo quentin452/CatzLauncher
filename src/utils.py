@@ -131,35 +131,28 @@ def install_forge_if_needed(version_id, minecraft_directory):
 def download_file_with_progress(url, destination, callback=None):
     """
     Télécharge un fichier depuis une URL HTTP/S ou Mega.nz.
-    Logique ultra-simplifiée pour une robustesse maximale, inspirée par le code de Minelaunched.
+    Version ultra-simple : aucun header personnalisé.
     """
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
-
     if 'mega.nz' in url:
         print("Lien Mega.nz détecté. Utilisation du client Mega.")
         mega = Mega()
         m = mega.login()
-        m.download_url(url, destination, None) # None for progress bar as we handle it
+        m.download_url(url, destination, None)
         return
 
-    # La méthode la plus simple et la plus fiable. Pas de parsing HTML, pas de complexité.
     try:
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req) as response:
-            # Gère automatiquement les redirections HTTP.
+        # Requête SANS AUCUN HEADER personnalisé
+        with urllib.request.urlopen(url) as response:
             final_url = response.geturl()
             if url != final_url:
                 print(f"Redirigé vers : {final_url}")
 
             content_type = response.info().get('Content-Type', '').lower()
             if 'text/html' in content_type:
-                 raise ValueError(f"Le lien a renvoyé une page HTML au lieu d'un fichier. L'URL est probablement incorrecte ou protégée. URL: {final_url}")
+                raise ValueError(f"Le lien a renvoyé une page HTML au lieu d'un fichier. L'URL est probablement incorrecte ou protégée. URL: {final_url}")
 
             total_size = int(response.getheader('Content-Length', 0))
             bytes_so_far = 0
-            
             with open(destination, 'wb') as f:
                 while True:
                     buffer = response.read(8192)
@@ -170,10 +163,8 @@ def download_file_with_progress(url, destination, callback=None):
                     if callback and total_size > 0:
                         progress = (bytes_so_far / total_size) * 100
                         callback(progress)
-            
             if callback:
                 callback(100)
-
     except urllib.error.URLError as e:
         print(f"Erreur de réseau ou d'URL lors du téléchargement de {url}: {e.reason}")
         raise e
