@@ -108,7 +108,9 @@ def install_forge_if_needed(version_id, minecraft_directory):
         install_forge_version(version_id, minecraft_directory)
         print(f"Forge {version_id} installé avec succès.")
     except Exception as e:
+        import traceback
         print(f"Erreur lors de l'installation de Forge : {e}")
+        traceback.print_exc()
         raise e
 
 def download_file_with_progress(url, destination, callback=None):

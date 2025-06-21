@@ -394,17 +394,27 @@ class MinecraftLauncher(tk.Tk):
 
     @run_in_thread
     def _do_launch_game(self, modpack):
+        forge_version_id = f"{modpack['version']}-forge-{modpack['forge_version']}"
+        
         modpack_profile_dir = os.path.join(get_minecraft_directory(), "modpacks", modpack["name"])
         if not os.path.exists(modpack_profile_dir):
-            messagebox.showinfo("Installation", f"Le modpack {modpack['name']} va être installé.")
-            self.install_modpack(modpack)
+            reply = messagebox.askyesno("Installation", f"Le modpack {modpack['name']} va être installé. Continuer?")
+            if reply:
+                self.install_modpack(modpack)
             return
+        
         try:
             self.status_var.set("Préparation du lancement...")
-            forge_version_id = f"{modpack['version']}-forge-{modpack['forge_version']}"
-            self.status_var.set(f"Vérification de Forge {forge_version_id}...")
             minecraft_dir = get_minecraft_directory()
+            
+            # Verify Forge installation
             install_forge_if_needed(forge_version_id, minecraft_dir)
+            
+            # Additional debug: list installed versions
+            versions_path = os.path.join(minecraft_dir, "versions")
+            
+            self.status_var.set(f"Vérification de Forge {forge_version_id}...")
+            
             options = {
                 "username": self.auth_data['name'],
                 "uuid": self.auth_data['id'],
@@ -413,8 +423,10 @@ class MinecraftLauncher(tk.Tk):
                 "jvmArguments": self.config["java_args"].split() if self.config.get("java_args") else [],
                 "gameDirectory": modpack_profile_dir
             }
+            
             self.status_var.set("Génération de la commande...")
             minecraft_command = get_minecraft_command(forge_version_id, minecraft_dir, options)
+            
             self.status_var.set("Lancement de Minecraft...")
             subprocess.run(minecraft_command, cwd=modpack_profile_dir)
             self.status_var.set("Prêt")
