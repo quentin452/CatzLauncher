@@ -16,7 +16,6 @@ import subprocess
 import functools
 from urllib.parse import urlparse, parse_qs
 
-# --- Utility Functions ---
 def run_in_thread(fn):
     """Decorator to run a function in a daemon thread."""
     @functools.wraps(fn)
@@ -38,7 +37,6 @@ def save_json_file(path, data):
 def show_error(title, msg):
     messagebox.showerror(title, msg)
 
-# --- Launcher Class ---
 class MinecraftLauncher(tk.Tk):
     SAVE_DIR = os.path.join(os.getcwd(), "saves")
     CONFIG_FILE = os.path.join(SAVE_DIR, "launcher_config.json")
@@ -49,14 +47,13 @@ class MinecraftLauncher(tk.Tk):
         os.makedirs(self.SAVE_DIR, exist_ok=True)
         self.title("Modpack Launcher")
         self.geometry("800x600")
-        self.config_file = self.CONFIG_FILE
+        self.config_path = self.CONFIG_FILE
         self.config = self.load_config()
         self.auth_data = None
         self._build_ui()
         self.try_refresh_login()
         self.check_modpack_updates()
 
-    # --- Config Management ---
     def load_config(self):
         default = {
             "java_path": "",
@@ -65,23 +62,28 @@ class MinecraftLauncher(tk.Tk):
             "auto_check_updates": True,
             "account_info": {}
         }
-        if os.path.exists(self.config_file):
+        if os.path.exists(self.config_path):
             try:
-                loaded = load_json_file(self.config_file, fallback={})
+                loaded = load_json_file(self.config_path, fallback={})
                 if isinstance(loaded, list) and loaded:
-                    save_json_file(self.config_file, default)
+                    save_json_file(self.config_path, default)
                     return default
                 default.update(loaded)
             except Exception:
-                save_json_file(self.config_file, default)
+                save_json_file(self.config_path, default)
         else:
-            save_json_file(self.config_file, default)
+            save_json_file(self.config_path, default)
         return default
 
     def save_config(self):
-        save_json_file(self.config_file, self.config)
+        save_json_file(self.config_path, self.config)
 
-    # --- UI Construction ---
+    def _add_tab(self, label, attr_name):
+        frame = ttk.Frame(self.notebook)
+        self.notebook.add(frame, text=label)
+        setattr(self, attr_name, frame)
+        return frame
+
     def _build_ui(self):
         self._build_notebook()
         self._build_main_tab()
@@ -92,12 +94,9 @@ class MinecraftLauncher(tk.Tk):
     def _build_notebook(self):
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill='both', expand=True, padx=10, pady=10)
-        self.main_tab = ttk.Frame(self.notebook)
-        self.config_tab = ttk.Frame(self.notebook)
-        self.account_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.main_tab, text="Jouer")
-        self.notebook.add(self.config_tab, text="Configuration")
-        self.notebook.add(self.account_tab, text="Compte")
+        self._add_tab("Jouer", "main_tab")
+        self._add_tab("Configuration", "config_tab")
+        self._add_tab("Compte", "account_tab")
 
     def _build_main_tab(self):
         ttk.Label(self.main_tab, text="Modpacks Disponibles:").pack(pady=5)
@@ -138,7 +137,6 @@ class MinecraftLauncher(tk.Tk):
         self.account_info = tk.StringVar(value="Non connecté")
         ttk.Label(self.account_tab, textvariable=self.account_info).pack(pady=10)
 
-    # --- UI Actions ---
     def browse_java(self):
         path = filedialog.askopenfilename(
             title="Sélectionnez l'exécutable Java",
@@ -162,7 +160,6 @@ class MinecraftLauncher(tk.Tk):
             self.login_btn.config(state=tk.NORMAL)
             self.logout_btn.config(state=tk.DISABLED)
 
-    # --- Authentication ---
     def microsoft_login(self):
         client_id = "00000000402b5328"
         redirect_uri = "https://login.live.com/oauth20_desktop.srf"
@@ -251,7 +248,6 @@ class MinecraftLauncher(tk.Tk):
         self.update_login_button_states()
         messagebox.showinfo("Déconnexion", "Vous avez été déconnecté.")
 
-    # --- Modpack Management ---
     def load_modpacks(self):
         url = self.config["modpack_url"]
         try:
@@ -363,7 +359,6 @@ class MinecraftLauncher(tk.Tk):
         finally:
             self.play_btn.config(state=tk.NORMAL)
 
-    # --- Game Launch ---
     def launch_game(self):
         if not self.auth_data:
             messagebox.showwarning("Connexion", "Veuillez vous connecter d'abord !")
