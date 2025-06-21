@@ -1,4 +1,3 @@
-# utils.py
 import os
 import json
 import shutil
@@ -80,14 +79,12 @@ def restore_player_data(modpack_profile_dir, saved_items):
         if os.path.exists(saved_path):
             target_path = os.path.join(modpack_profile_dir, item)
             
-            # Si l'élément existe déjà dans le nouveau modpack, le supprimer
             if os.path.exists(target_path):
                 if os.path.isdir(target_path):
                     shutil.rmtree(target_path)
                 else:
                     os.remove(target_path)
             
-            # Restaurer l'élément sauvegardé
             if os.path.isdir(saved_path):
                 shutil.move(saved_path, target_path)
             else:
@@ -110,19 +107,16 @@ def install_forge_if_needed(version_id, minecraft_directory):
         print(f"Forge {version_id} installé avec succès.")
     except Exception as e:
         print(f"Erreur lors de l'installation de Forge : {e}")
-        # Remonter l'erreur pour que l'interface puisse l'afficher
         raise e
 
 def download_file_with_progress(url, destination, callback=None):
     """
     Télécharge un fichier depuis une URL HTTP/S ou Mega.nz avec une barre de progression.
     """
-    # Headers pour simuler un navigateur et éviter les blocages
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
 
-    # Vérifier si l'URL est un lien Mega
     if 'mega.nz' in url:
         print("Téléchargement depuis Mega.nz détecté...")
         try:
@@ -159,7 +153,6 @@ def download_file_with_progress(url, destination, callback=None):
             print(f"Erreur lors du téléchargement depuis Mega : {e}")
             raise ValueError(f"Échec du téléchargement depuis Mega.nz : {e}") from e
     else:
-        # Logique pour les téléchargements HTTP directs
         print(f"Début du téléchargement direct : {url}")
         response = requests.get(url, stream=True, headers=headers)
         response.raise_for_status()
@@ -174,9 +167,8 @@ def download_file_with_progress(url, destination, callback=None):
                     if callback:
                         callback(downloaded, total_size)
         
-        # Vérification finale que le fichier n'est pas vide
         if os.path.exists(destination) and os.path.getsize(destination) == 0:
-            os.remove(destination) # Nettoyer le fichier vide
+            os.remove(destination) 
             raise ValueError("Le téléchargement a résulté en un fichier vide. "
                              "Le lien est peut-être invalide ou le serveur a bloqué la requête.")
         
@@ -184,65 +176,47 @@ def download_file_with_progress(url, destination, callback=None):
 
 def install_modpack_files(url, install_dir, modpack_name, backup_dir, progress_callback=None):
     """Installe les fichiers du modpack depuis une archive zip, gère la sauvegarde/restauration des données joueur."""
-    # Créer un nom de fichier temporaire
     temp_zip = os.path.join(install_dir, "temp_modpack.zip")
     
-    # Télécharger le modpack
     download_file_with_progress(url, temp_zip, progress_callback)
     
-    # Le nom du dossier est maintenant basé sur le nom du modpack, pas l'URL
     modpack_profile_dir = os.path.join(install_dir, modpack_name)
     
-    # Variables pour sauvegarder les données du joueur
     saved_items = {}
     
     if os.path.exists(modpack_profile_dir):
-        # Créer un dossier temporaire pour les sauvegardes
         temp_backup_dir = os.path.join(install_dir, f"temp_backup_{modpack_name}")
         os.makedirs(temp_backup_dir, exist_ok=True)
         
-        # Sauvegarder les données du joueur
         saved_items = preserve_player_data(modpack_profile_dir, temp_backup_dir)
         
-        # Faire le backup de l'ancienne version
         backup_name = f"{modpack_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         shutil.move(modpack_profile_dir, os.path.join(backup_dir, backup_name))
     
-    # Créer le dossier du profil avant l'extraction
     os.makedirs(modpack_profile_dir, exist_ok=True)
     
-    # Extraire le nouveau modpack
     with ZipFile(temp_zip, 'r') as zip_ref:
         zip_ref.extractall(modpack_profile_dir)
 
-    # --- Début de la correction pour les .zip avec un dossier racine ---
-    # Vérifier si l'extraction a créé un unique sous-dossier
     extracted_items = os.listdir(modpack_profile_dir)
     if len(extracted_items) == 1 and os.path.isdir(os.path.join(modpack_profile_dir, extracted_items[0])):
         root_folder = os.path.join(modpack_profile_dir, extracted_items[0])
         
-        # Déplacer tout le contenu du sous-dossier vers le dossier parent
         for item in os.listdir(root_folder):
             shutil.move(os.path.join(root_folder, item), modpack_profile_dir)
             
-        # Supprimer le dossier racine vide
         os.rmdir(root_folder)
         print(f"La structure du .zip a été corrigée pour le modpack '{modpack_name}'.")
-    # --- Fin de la correction ---
 
-    # Restaurer les données du joueur
     if saved_items:
         restore_player_data(modpack_profile_dir, saved_items)
     
-    # Nettoyer le dossier temporaire de sauvegarde
     temp_backup_dir = os.path.join(install_dir, f"temp_backup_{modpack_name}")
     if os.path.exists(temp_backup_dir):
         shutil.rmtree(temp_backup_dir)
 
-    # Mettre à jour les informations d'installation
     update_installed_info(url, datetime.now().isoformat())
     
-    # Nettoyer
     os.remove(temp_zip)
 
 def check_update(url, last_modified, old_url=None):
@@ -251,25 +225,20 @@ def check_update(url, last_modified, old_url=None):
     Utilise plusieurs méthodes de vérification pour plus de fiabilité.
     """
     try:
-        # Charger les données d'installation locales
         installed_data = {}
         if os.path.exists(INSTALLED_FILE):
             with open(INSTALLED_FILE, 'r') as f:
                 installed_data = json.load(f)
         
-        # Si aucune installation locale n'est détectée, forcer la mise à jour
         if not os.path.exists(INSTALLED_FILE) or url not in installed_data:
             return True, "Aucune installation locale détectée"
         
-        # Si l'URL a changé, forcer la mise à jour
         if old_url and url != old_url:
             return True, "URL du modpack modifiée"
         
-        # Faire une requête HEAD pour obtenir les métadonnées
         response = requests.head(url, timeout=10)
         response.raise_for_status()
         
-        # Méthode 1: Vérifier Last-Modified header
         if 'Last-Modified' in response.headers:
             try:
                 server_modified = response.headers['Last-Modified']
@@ -280,15 +249,12 @@ def check_update(url, last_modified, old_url=None):
             except (ValueError, TypeError) as e:
                 print(f"Erreur parsing Last-Modified: {e}")
         
-        # Méthode 2: Vérifier ETag header
         if 'ETag' in response.headers:
             etag = response.headers['ETag'].strip('"')
-            # Comparer avec l'ETag stocké localement
             local_etag = get_local_etag(url)
             if local_etag and etag != local_etag:
                 return True, f"ETag changed: {etag}"
         
-        # Méthode 3: Vérifier la taille du fichier
         if 'Content-Length' in response.headers:
             server_size = int(response.headers['Content-Length'])
             local_size = get_local_file_size(url)
@@ -338,17 +304,14 @@ def update_installed_info(url, timestamp, etag=None, file_size=None):
 def update_modpack_info(modpack, new_timestamp):
     """Met à jour les informations d'un modpack dans modpacks.json"""
     try:
-        # Charger le fichier modpacks.json
         with open('modpacks.json', 'r') as f:
             modpacks = json.load(f)
         
-        # Trouver et mettre à jour le modpack
         for pack in modpacks:
             if pack['url'] == modpack['url']:
                 pack['last_modified'] = new_timestamp
                 break
         
-        # Sauvegarder
         with open('modpacks.json', 'w') as f:
             json.dump(modpacks, f, indent=4)
             

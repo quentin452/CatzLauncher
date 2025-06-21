@@ -1,4 +1,3 @@
-# main.py
 import os
 import json
 import threading
@@ -15,7 +14,6 @@ from urllib.parse import urlparse, parse_qs
 
 ensure_requirements()
 
-# --- Nouvelle fonction utilitaire pour trouver le .jar ---
 def find_main_jar(directory):
     """
     Trouve le .jar principal de manière intelligente :
@@ -23,24 +21,18 @@ def find_main_jar(directory):
     2. Sinon, prend le .jar le plus volumineux à la racine.
     3. En dernier recours, cherche le plus gros .jar partout, sauf dans le dossier 'mods'.
     """
-    # Étape 1 & 2: Chercher à la racine du profil
     root_jars = []
-    # On cherche d'abord un loader à la racine
     for filename in os.listdir(directory):
         if filename.endswith('.jar'):
-            # Si on trouve un loader, on le retourne immédiatement
             if 'forge' in filename.lower() or 'fabric' in filename.lower():
                 return os.path.join(directory, filename)
             root_jars.append((os.path.join(directory, filename), os.path.getsize(os.path.join(directory, filename))))
     
-    # Si on a trouvé des .jar à la racine (mais pas de loader), on retourne le plus gros
     if root_jars:
         return max(root_jars, key=lambda x: x[1])[0]
 
-    # Étape 3: Si aucun .jar n'est à la racine, on cherche partout en ignorant les mods
     all_jar_files = []
     for root, dirs, files in os.walk(directory):
-        # Exclure le dossier 'mods' de la recherche
         if 'mods' in dirs:
             dirs.remove('mods')
             
@@ -54,26 +46,21 @@ def find_main_jar(directory):
         
     return max(all_jar_files, key=lambda x: x[1])[0]
 
-# --- Fin des nouvelles fonctions ---
-
 def load_modpacks(modpack_url):
     """
     Charge les modpacks depuis une URL ou un fichier local.
     Gère automatiquement les deux cas.
     """
     try:
-        # Si c'est une URL HTTP/HTTPS, faire une requête
         if modpack_url.startswith(('http://', 'https://')):
             response = requests.get(modpack_url, timeout=10)
             response.raise_for_status()
             return response.json()
         else:
-            # Sinon, c'est un fichier local
             with open(modpack_url, 'r', encoding='utf-8') as f:
                 return json.load(f)
     except Exception as e:
         print(f"Erreur lors du chargement des modpacks depuis {modpack_url}: {e}")
-        # En cas d'erreur, essayer le fichier local modpacks.json
         try:
             with open("modpacks.json", 'r', encoding='utf-8') as f:
                 return json.load(f)
@@ -93,21 +80,11 @@ class MinecraftLauncher(tk.Tk):
         super().__init__()
         self.title("Modpack Launcher")
         self.geometry("800x600")
-        
-        # Configuration
         self.config_file = "launcher_config.json"
         self.load_config()
-        
-        # Authentification
         self.auth_data = None
-        
-        # UI Setup
         self.create_widgets()
-        
-        # Essayer de se reconnecter automatiquement au démarrage
         self.try_refresh_login()
-        
-        # Vérifier les mises à jour au démarrage
         self.check_modpack_updates()
 
     def load_config(self):
@@ -124,16 +101,9 @@ class MinecraftLauncher(tk.Tk):
                 with open(self.config_file, 'r') as f:
                     loaded_data = json.load(f)
                 
-                # Vérifier si le fichier contient des données de modpacks au lieu de configuration
                 if isinstance(loaded_data, list) and len(loaded_data) > 0:
-                    # C'est une liste de modpacks, pas une configuration
-                    print("Fichier launcher_config.json contient des données de modpacks")
-                    print("Création d'une nouvelle configuration par défaut")
-                    
-                    # Créer une nouvelle configuration par défaut
                     self.save_config()
                 else:
-                    # C'est une configuration valide
                     self.config.update(loaded_data)
                     
             except (json.JSONDecodeError, ValueError) as e:
@@ -146,23 +116,18 @@ class MinecraftLauncher(tk.Tk):
             json.dump(self.config, f, indent=4)
 
     def create_widgets(self):
-        # Notebook pour les onglets
         notebook = ttk.Notebook(self)
         notebook.pack(fill='both', expand=True, padx=10, pady=10)
         
-        # Onglet Principal
         main_tab = ttk.Frame(notebook)
         notebook.add(main_tab, text="Jouer")
         
-        # Onglet Configuration
         config_tab = ttk.Frame(notebook)
         notebook.add(config_tab, text="Configuration")
         
-        # Onglet Compte
         account_tab = ttk.Frame(notebook)
         notebook.add(account_tab, text="Compte")
         
-        # Widgets Onglet Principal
         ttk.Label(main_tab, text="Modpacks Disponibles:").pack(pady=5)
         self.modpack_listbox = tk.Listbox(main_tab, height=10)
         self.modpack_listbox.pack(fill='x', padx=20, pady=5)
@@ -173,7 +138,6 @@ class MinecraftLauncher(tk.Tk):
         self.status_var = tk.StringVar(value="Prêt")
         ttk.Label(main_tab, textvariable=self.status_var).pack(pady=5)
         
-        # Boutons pour les mises à jour
         update_frame = ttk.Frame(main_tab)
         update_frame.pack(pady=5)
         
@@ -186,7 +150,6 @@ class MinecraftLauncher(tk.Tk):
         auto_update_btn = ttk.Button(update_frame, text="Mise à jour automatique", command=self.auto_update_all)
         auto_update_btn.pack(side='left', padx=5)
         
-        # Widgets Configuration
         ttk.Label(config_tab, text="Chemin Java:").grid(row=0, column=0, padx=10, pady=5, sticky='w')
         self.java_path_var = tk.StringVar(value=self.config["java_path"])
         java_entry = ttk.Entry(config_tab, textvariable=self.java_path_var, width=50)
@@ -198,7 +161,6 @@ class MinecraftLauncher(tk.Tk):
         java_args_entry = ttk.Entry(config_tab, textvariable=self.java_args_var, width=50)
         java_args_entry.grid(row=1, column=1, columnspan=2, padx=5, pady=5, sticky='we')
         
-        # Configuration des mises à jour automatiques
         ttk.Label(config_tab, text="Vérification automatique:").grid(row=2, column=0, padx=10, pady=5, sticky='w')
         self.auto_check_var = tk.BooleanVar(value=self.config.get("auto_check_updates", True))
         auto_check_cb = ttk.Checkbutton(config_tab, text="Activer", variable=self.auto_check_var)
@@ -206,7 +168,6 @@ class MinecraftLauncher(tk.Tk):
         
         ttk.Button(config_tab, text="Sauvegarder", command=self.save_settings).grid(row=4, column=1, pady=10)
         
-        # Widgets Compte
         self.login_btn = ttk.Button(account_tab, text="Login Microsoft", command=self.microsoft_login)
         self.login_btn.pack(pady=10)
 
@@ -306,7 +267,7 @@ class MinecraftLauncher(tk.Tk):
         refresh_token = account_info.get('refresh_token')
 
         if not refresh_token:
-            return  # Pas de token, on ne fait rien
+            return 
 
         def refresh_flow_thread():
             """Exécute tout le flux de rafraîchissement en arrière-plan."""
@@ -314,35 +275,28 @@ class MinecraftLauncher(tk.Tk):
                 self.status_var.set("Reconnexion en cours...")
                 self.update_login_button_states()
 
-                # Étape 1: Rafraîchir le token Microsoft
                 ms_token_data = refresh_ms_token(refresh_token)
                 new_access_token = ms_token_data['access_token']
                 new_refresh_token = ms_token_data['refresh_token']
 
-                # Étape 2: S'authentifier auprès de Xbox Live
                 xbl_data = authenticate_with_xbox(new_access_token)
                 xbl_token = xbl_data['Token']
                 user_hash = xbl_data['DisplayClaims']['xui'][0]['uhs']
 
-                # Étape 3: Obtenir le token XSTS
                 xsts_data = authenticate_with_xsts(xbl_token)
                 xsts_token = xsts_data['Token']
 
-                # Étape 4: Se connecter à Minecraft
                 mc_token_data = login_with_minecraft(user_hash, xsts_token)
                 mc_access_token = mc_token_data['access_token']
 
-                # Étape 5: Récupérer le profil du joueur
                 profile = get_minecraft_profile(mc_access_token)
                 
-                # Stocker les informations de session
                 self.auth_data = {
                     "access_token": mc_access_token,
                     "name": profile['name'],
                     "id": profile['id'],
                 }
                 
-                # Mettre à jour et sauvegarder le nouveau refresh_token
                 self.config['account_info'] = {
                     'name': profile['name'],
                     'refresh_token': new_refresh_token
@@ -353,9 +307,8 @@ class MinecraftLauncher(tk.Tk):
                 self.status_var.set("Prêt")
 
             except Exception as e:
-                # La reconnexion a échoué, probablement un token invalide
                 print(f"La reconnexion automatique a échoué: {e}")
-                self.logout() # On déconnecte l'utilisateur pour qu'il se reconnecte manuellement
+                self.logout() 
                 self.status_var.set("Échec de la reconnexion. Veuillez vous connecter.")
             finally:
                 self.update_login_button_states()
@@ -386,7 +339,6 @@ class MinecraftLauncher(tk.Tk):
                 with open(notification_file, 'r') as f:
                     notification_data = json.load(f)
                 
-                # Afficher la notification
                 update_message = "Mises à jour disponibles:\n\n"
                 for update in notification_data['updates']:
                     update_message += f"• {update['name']} v{update['version']} - {update['reason']}\n"
@@ -396,7 +348,6 @@ class MinecraftLauncher(tk.Tk):
                 if messagebox.askyesno("Mises à jour disponibles", update_message):
                     self.auto_update_all()
                 
-                # Supprimer le fichier de notification
                 os.remove(notification_file)
                 
             except Exception as e:
@@ -411,14 +362,12 @@ class MinecraftLauncher(tk.Tk):
         try:
             self.status_var.set("Vérification des mises à jour...")
             
-            # Charger les modpacks
             modpacks = load_modpacks(self.config["modpack_url"])
             
             if not modpacks:
                 self.status_var.set("Aucun modpack trouvé")
                 return
             
-            # Vérifier les mises à jour pour chaque modpack
             updates_available = []
             for modpack in modpacks:
                 has_update, reason = check_update(modpack["url"], modpack.get("last_modified", ""))
@@ -429,7 +378,6 @@ class MinecraftLauncher(tk.Tk):
                     })
             
             if updates_available:
-                # Afficher les mises à jour disponibles
                 update_message = "Mises à jour disponibles:\n\n"
                 for update in updates_available:
                     modpack = update['modpack']
@@ -443,7 +391,6 @@ class MinecraftLauncher(tk.Tk):
             else:
                 self.status_var.set("Aucune mise à jour disponible")
                 
-            # Mettre à jour la liste des modpacks
             self.refresh_modpack_list()
             
         except Exception as e:
@@ -488,7 +435,6 @@ class MinecraftLauncher(tk.Tk):
     def refresh_modpack_list(self):
         """Rafraîchit la liste des modpacks dans l'interface"""
         try:
-            # Charger les modpacks
             modpacks = load_modpacks(self.config["modpack_url"])
             
             self.modpack_listbox.delete(0, tk.END)
@@ -502,7 +448,7 @@ class MinecraftLauncher(tk.Tk):
     def install_modpack(self, modpack_data):
         try:
             self.status_var.set("Téléchargement en cours...")
-            self.progress["value"] = 0 # Réinitialiser la barre
+            self.progress["value"] = 0 
             install_path = os.path.join(get_minecraft_directory(), "modpacks")
             os.makedirs(install_path, exist_ok=True)
             backup_dir = os.path.join(install_path, "backups")

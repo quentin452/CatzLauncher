@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# auto_updater.py
-"""
-Script de vérification automatique des mises à jour des modpacks.
-Peut être exécuté en arrière-plan ou via un cron job.
-"""
-
 import os
 import json
 import time
@@ -17,7 +10,6 @@ import sys
 import subprocess
 import importlib
 
-# Configuration du logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -35,18 +27,15 @@ def load_modpacks(modpack_url):
     Gère automatiquement les deux cas.
     """
     try:
-        # Si c'est une URL HTTP/HTTPS, faire une requête
         if modpack_url.startswith(('http://', 'https://')):
             response = requests.get(modpack_url, timeout=10)
             response.raise_for_status()
             return response.json()
         else:
-            # Sinon, c'est un fichier local
             with open(modpack_url, 'r', encoding='utf-8') as f:
                 return json.load(f)
     except Exception as e:
         logging.error(f"Erreur lors du chargement des modpacks depuis {modpack_url}: {e}")
-        # En cas d'erreur, essayer le fichier local modpacks.json
         try:
             with open("modpacks.json", 'r', encoding='utf-8') as f:
                 return json.load(f)
@@ -87,14 +76,12 @@ class AutoUpdater:
         logging.info("Début de la vérification des mises à jour...")
         
         try:
-            # Charger les modpacks
             modpacks = load_modpacks(self.config["modpack_url"])
             
             if not modpacks:
                 logging.info("Aucun modpack trouvé")
                 return
             
-            # Vérifier les mises à jour pour chaque modpack
             updates_available = []
             for modpack in modpacks:
                 from utils import check_update
@@ -111,17 +98,14 @@ class AutoUpdater:
             
             logging.info(f"{len(updates_available)} mise(s) à jour disponible(s)")
             
-            # Afficher les détails des mises à jour
             for update in updates_available:
                 modpack = update['modpack']
                 reason = update['reason']
                 logging.info(f"Mise à jour: {modpack['name']} - {reason}")
             
-            # Installer automatiquement si configuré
             if self.config.get("auto_install_updates", False):
                 self.install_updates(updates_available)
             else:
-                # Créer un fichier de notification pour le launcher
                 self.create_update_notification(updates_available)
             
         except Exception as e:
@@ -142,10 +126,8 @@ class AutoUpdater:
             logging.info(f"Installation de {modpack['name']}... ({i+1}/{len(updates_available)})")
             
             try:
-                # Installer le modpack avec les bons paramètres
                 install_modpack(modpack["url"], install_path, modpack["name"], backup_dir)
                 
-                # Mettre à jour les informations dans modpacks.json
                 new_timestamp = datetime.now().isoformat()
                 update_modpack_info(modpack, new_timestamp)
                 
