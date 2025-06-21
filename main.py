@@ -14,38 +14,6 @@ from urllib.parse import urlparse, parse_qs
 
 ensure_requirements()
 
-def find_main_jar(directory):
-    """
-    Trouve le .jar principal de manière intelligente :
-    1. Cherche un .jar de loader (forge/fabric) à la racine.
-    2. Sinon, prend le .jar le plus volumineux à la racine.
-    3. En dernier recours, cherche le plus gros .jar partout, sauf dans le dossier 'mods'.
-    """
-    root_jars = []
-    for filename in os.listdir(directory):
-        if filename.endswith('.jar'):
-            if 'forge' in filename.lower() or 'fabric' in filename.lower():
-                return os.path.join(directory, filename)
-            root_jars.append((os.path.join(directory, filename), os.path.getsize(os.path.join(directory, filename))))
-    
-    if root_jars:
-        return max(root_jars, key=lambda x: x[1])[0]
-
-    all_jar_files = []
-    for root, dirs, files in os.walk(directory):
-        if 'mods' in dirs:
-            dirs.remove('mods')
-            
-        for file in files:
-            if file.endswith('.jar'):
-                full_path = os.path.join(root, file)
-                all_jar_files.append((full_path, os.path.getsize(full_path)))
-    
-    if not all_jar_files:
-        return None
-        
-    return max(all_jar_files, key=lambda x: x[1])[0]
-
 def load_modpacks(modpack_url):
     """
     Charge les modpacks depuis une URL ou un fichier local.
