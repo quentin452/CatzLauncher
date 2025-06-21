@@ -11,7 +11,9 @@ import sys
 import subprocess
 import importlib
 
-INSTALLED_FILE = "installed_modpacks.json"
+SAVE_DIR = os.path.join(os.getcwd(), "saves")
+os.makedirs(SAVE_DIR, exist_ok=True)
+INSTALLED_FILE = os.path.join(SAVE_DIR, "installed_modpacks.json")
 
 def ensure_requirements():
     required = [

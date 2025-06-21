@@ -14,6 +14,10 @@ from urllib.parse import urlparse, parse_qs
 
 ensure_requirements()
 
+SAVE_DIR = os.path.join(os.getcwd(), "saves")
+os.makedirs(SAVE_DIR, exist_ok=True)
+CONFIG_FILE = os.path.join(SAVE_DIR, "launcher_config.json")
+
 def load_modpacks(modpack_url):
     """
     Charge les modpacks depuis une URL ou un fichier local.
@@ -48,7 +52,7 @@ class MinecraftLauncher(tk.Tk):
         super().__init__()
         self.title("Modpack Launcher")
         self.geometry("800x600")
-        self.config_file = "launcher_config.json"
+        self.config_file = CONFIG_FILE
         self.load_config()
         self.auth_data = None
         self.create_widgets()
