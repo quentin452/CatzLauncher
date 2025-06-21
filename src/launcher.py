@@ -118,11 +118,8 @@ class MinecraftLauncher(tk.Tk):
         self.play_btn = ttk.Button(main_tab, text="Jouer", command=self.launch_game)
         self.play_btn.pack(pady=5)
         
-        check_updates_btn = ttk.Button(update_frame, text="Vérifier les mises à jour", command=self.manual_check_updates)
-        check_updates_btn.pack(side='left', padx=5)
-        
-        auto_update_btn = ttk.Button(update_frame, text="Mise à jour automatique", command=self.auto_update_all)
-        auto_update_btn.pack(side='left', padx=5)
+        self.check_updates_btn = ttk.Button(update_frame, text="Vérifier les mises à jour", command=self.manual_check_updates)
+        self.check_updates_btn.pack(side='left', padx=5)
         
         ttk.Label(config_tab, text="Chemin Java:").grid(row=0, column=0, padx=10, pady=5, sticky='w')
         self.java_path_var = tk.StringVar(value=self.config["java_path"])
@@ -320,7 +317,7 @@ class MinecraftLauncher(tk.Tk):
                 update_message += "\nVoulez-vous installer ces mises à jour?"
                 
                 if messagebox.askyesno("Mises à jour disponibles", update_message):
-                    self.auto_update_all()
+                    self.manual_check_updates()
                 
                 os.remove(notification_file)
                 
@@ -361,7 +358,8 @@ class MinecraftLauncher(tk.Tk):
                 update_message += "\nVoulez-vous installer les mises à jour?"
                 
                 if messagebox.askyesno("Mises à jour disponibles", update_message):
-                    self.auto_update_all()
+                    for update in updates_available:
+                        self.install_modpack(update['modpack'])
             else:
                 self.status_var.set("Aucune mise à jour disponible")
                 
@@ -370,41 +368,6 @@ class MinecraftLauncher(tk.Tk):
         except Exception as e:
             messagebox.showerror("Erreur", f"Impossible de vérifier les mises à jour: {str(e)}")
             self.status_var.set("Erreur lors de la vérification")
-
-    @run_in_thread
-    def auto_update_all(self):
-        """Mise à jour automatique de tous les modpacks"""
-        self._auto_update_all()
-
-    def _auto_update_all(self):
-        try:
-            self.status_var.set("Mise à jour automatique en cours...")
-            modpacks = load_modpacks(self.config["modpack_url"])
-            if not modpacks:
-                self.status_var.set("Aucun modpack trouvé")
-                return
-            updates_available = []
-            for modpack in modpacks:
-                has_update, reason = check_update(modpack["name"], modpack["url"], modpack.get("last_modified", ""))
-                if has_update:
-                    updates_available.append({'modpack': modpack, 'reason': reason})
-            if not updates_available:
-                self.status_var.set("Aucune mise à jour nécessaire")
-                return
-            for i, update in enumerate(updates_available):
-                modpack = update['modpack']
-                self.status_var.set(f"Mise à jour de {modpack['name']}... ({i+1}/{len(updates_available)})")
-                try:
-                    self.install_modpack(modpack)
-                    new_timestamp = datetime.now().isoformat()
-                    update_modpack_info(modpack, new_timestamp)
-                except Exception as e:
-                    messagebox.showerror("Erreur", f"Erreur lors de la mise à jour de {modpack['name']}: {str(e)}")
-            self.status_var.set("Mises à jour terminées!")
-            self.refresh_modpack_list()
-        except Exception as e:
-            messagebox.showerror("Erreur", f"Erreur lors de la mise à jour automatique: {str(e)}")
-            self.status_var.set("Erreur lors de la mise à jour")
 
     def refresh_modpack_list(self):
         """Rafraîchit la liste des modpacks dans l'interface"""
