@@ -76,3 +76,15 @@ Stocke les informations d'installation :
     }
 }
 ```
+
+### `launcher_config.json`
+Stocke les informations du launcher :
+```json
+{
+    "java_path": "",
+    "java_args": "-Xmx11G -Xms2G",
+    "modpack_url": "modpacks.json",
+    "auto_check_updates": true,
+    "account_info": {}
+}
+```
