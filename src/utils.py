@@ -128,11 +128,32 @@ def install_forge_if_needed(version_id, minecraft_directory):
         traceback.print_exc()
         raise e
 
+def extract_mb_from_string(mb_string):
+    """
+    Extrait le nombre de MB d'une chaîne comme "849MB" ou "200".
+    """
+    if isinstance(mb_string, (int, float)):
+        return int(mb_string)
+    
+    if isinstance(mb_string, str):
+        # Enlever "MB" et convertir en int
+        mb_string = mb_string.replace('MB', '').replace('mb', '').strip()
+        try:
+            return int(mb_string)
+        except ValueError:
+            print(f"Impossible de convertir '{mb_string}' en nombre. Utilisation de 200 MB par défaut.")
+            return 200
+    
+    return 200  # Valeur par défaut
+
 def download_file_with_progress(url, destination, callback=None, estimated_mb=200):
     """
     Télécharge un fichier depuis une URL HTTP/S ou Mega.nz.
     Version avec User-Agent pour GitHub et taille estimée pour la progression.
     """
+    # Convertir estimated_mb en nombre si c'est une chaîne
+    estimated_mb = extract_mb_from_string(estimated_mb)
+    
     if 'mega.nz' in url:
         print("Lien Mega.nz détecté. Utilisation du client Mega.")
         mega = Mega()
@@ -171,9 +192,11 @@ def download_file_with_progress(url, destination, callback=None, estimated_mb=20
         
         # Si pas de taille, utiliser l'estimation
         if total_size == 0:
-            total_size = estimated_mb * 1024 * 1024  # Convertir MB en bytes
+            total_size = int(estimated_mb * 1024 * 1024)  # Convertir MB en bytes et s'assurer que c'est un int
             print(f"Utilisation de la taille estimée: {estimated_mb} MB ({total_size} bytes)")
         
+        # S'assurer que total_size est bien un entier
+        total_size = int(total_size)
         bytes_so_far = 0
         
         print("Début de l'écriture du fichier...")
@@ -187,7 +210,6 @@ def download_file_with_progress(url, destination, callback=None, estimated_mb=20
                 if callback:
                     progress = (bytes_so_far / total_size) * 100
                     mb_downloaded = bytes_so_far / (1024 * 1024)
-                    print(f"Progression: {progress:.1f}% ({mb_downloaded:.1f} MB / {estimated_mb} MB)")
                     callback(bytes_so_far, total_size)
         
         print(f"Téléchargement terminé. {bytes_so_far} bytes écrits.")
@@ -276,7 +298,7 @@ def install_modpack_files(url, install_dir, modpack_name, estimated_mb, progress
 def check_update(name, url, last_modified):
     """
     Vérifie si une mise à jour est disponible pour un modpack (clé = nom).
-    Utilise plusieurs méthodes de vérification pour plus de fiabilité.
+    Utilise la vérification GitHub si disponible, sinon les méthodes classiques.
     """
     try:
         installed_data = {}
@@ -286,6 +308,12 @@ def check_update(name, url, last_modified):
         local_info = installed_data.get(name)
         if not local_info:
             return True, "Aucune installation locale détectée"
+        
+        # Vérification GitHub si disponible
+        if 'github.com' in url and local_info.get('github_commit'):
+            return check_github_update(name, url, local_info['github_commit'])
+        
+        # Méthodes classiques pour les autres types d'URL
         if url != local_info.get('url'):
             return True, "URL du modpack modifiée"
         response = requests.head(url, timeout=10)
@@ -490,9 +518,9 @@ def get_installed_modpacks():
     except (IOError, json.JSONDecodeError):
         return {}
 
-def add_to_installed_log(modpack_name, version, timestamp, install_dir):
+def add_to_installed_log(modpack_name, version, timestamp, install_dir, commit_info=None):
     """
-    Ajoute un modpack au journal des installations.
+    Ajoute un modpack au journal des installations avec les informations du commit GitHub.
     """
     installed = get_installed_modpacks()
     installed[modpack_name] = {
@@ -500,5 +528,64 @@ def add_to_installed_log(modpack_name, version, timestamp, install_dir):
         "timestamp": timestamp,
         "path": install_dir
     }
+    
+    # Ajouter les informations du commit si disponibles
+    if commit_info:
+        installed[modpack_name]["github_commit"] = commit_info
+    
     with open(INSTALLED_FILE, 'w') as f:
         json.dump(installed, f, indent=4)
+
+def get_github_last_commit(repo_url):
+    """
+    Récupère le dernier commit d'une branche GitHub.
+    Exemple: get_github_last_commit("https://github.com/quentin452/CatzLauncher/archive/refs/heads/forge-1.16.5-biggess-pack-cat-edition-v2.zip")
+    """
+    try:
+        # Extraire les informations du repo depuis l'URL
+        if 'github.com' in repo_url and '/archive/refs/heads/' in repo_url:
+            # Format: https://github.com/owner/repo/archive/refs/heads/branch.zip
+            parts = repo_url.split('/')
+            owner = parts[3]
+            repo = parts[4]
+            branch = parts[7].replace('.zip', '')
+            
+            # API GitHub pour récupérer le dernier commit de la branche
+            api_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{branch}"
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+            
+            response = requests.get(api_url, headers=headers, timeout=10)
+            response.raise_for_status()
+            
+            commit_data = response.json()
+            return {
+                'sha': commit_data['sha'],
+                'date': commit_data['commit']['author']['date'],
+                'message': commit_data['commit']['message']
+            }
+    except Exception as e:
+        print(f"Erreur lors de la récupération du commit GitHub: {e}")
+        return None
+    
+    return None
+
+def check_github_update(name, url, last_commit_info):
+    """
+    Vérifie si une mise à jour est disponible en comparant les commits GitHub.
+    """
+    try:
+        if not last_commit_info or 'github.com' not in url:
+            return False, "Pas d'information de commit GitHub"
+        
+        current_commit = get_github_last_commit(url)
+        if not current_commit:
+            return False, "Impossible de récupérer le commit actuel"
+        
+        if current_commit['sha'] != last_commit_info['sha']:
+            return True, f"Nouveau commit: {current_commit['sha'][:8]} - {current_commit['message']}"
+        
+        return False, "Aucune mise à jour disponible"
+        
+    except Exception as e:
+        print(f"Erreur lors de la vérification GitHub: {e}")
+        return False, f"Erreur de vérification: {e}"
