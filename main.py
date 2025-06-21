@@ -1,4 +1,3 @@
-
 from src.launcher import MinecraftLauncher
 
 if __name__ == "__main__":

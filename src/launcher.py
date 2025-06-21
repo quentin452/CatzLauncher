@@ -115,8 +115,8 @@ class MinecraftLauncher(tk.Tk):
         update_frame = ttk.Frame(main_tab)
         update_frame.pack(pady=5)
         
-        play_btn = ttk.Button(main_tab, text="Jouer", command=self.launch_game)
-        play_btn.pack(pady=5)
+        self.play_btn = ttk.Button(main_tab, text="Jouer", command=self.launch_game)
+        self.play_btn.pack(pady=5)
         
         check_updates_btn = ttk.Button(update_frame, text="Vérifier les mises à jour", command=self.manual_check_updates)
         check_updates_btn.pack(side='left', padx=5)
@@ -420,6 +420,7 @@ class MinecraftLauncher(tk.Tk):
 
     @run_in_thread
     def install_modpack(self, modpack_data):
+        self.play_btn.config(state=tk.DISABLED)
         try:
             self.status_var.set("Téléchargement en cours...")
             self.progress["value"] = 0 
@@ -458,6 +459,8 @@ class MinecraftLauncher(tk.Tk):
             messagebox.showerror("Erreur", str(e))
             self.status_var.set("Prêt")
             self.progress["value"] = 0
+        finally:
+            self.play_btn.config(state=tk.NORMAL)
 
     @run_in_thread
     def _launch_game_thread(self, modpack, modpack_profile_dir):
