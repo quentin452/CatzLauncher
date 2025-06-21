@@ -395,7 +395,17 @@ class MinecraftLauncher(tk.Tk):
     @run_in_thread
     def _do_launch_game(self, modpack):
         forge_version_id = f"{modpack['version']}-forge-{modpack['forge_version']}"
-        
+        forge_install_id = f"{modpack['version']}-{modpack['forge_version']}"
+        minecraft_dir = get_minecraft_directory()
+        forge_version_path = os.path.join(minecraft_dir, "versions", forge_version_id)
+        forge_install_path = os.path.join(minecraft_dir, "versions", forge_install_id)
+
+        # Vérifie si la version Forge existe déjà (dans l'un ou l'autre format)
+        if not (os.path.exists(forge_version_path) or os.path.exists(forge_install_path)):
+            install_forge_if_needed(forge_install_id, minecraft_dir)
+        else:
+            print(f"Forge {forge_version_id} déjà présent, pas d'installation.")
+
         modpack_profile_dir = os.path.join(get_minecraft_directory(), "modpacks", modpack["name"])
         if not os.path.exists(modpack_profile_dir):
             reply = messagebox.askyesno("Installation", f"Le modpack {modpack['name']} va être installé. Continuer?")
@@ -405,13 +415,6 @@ class MinecraftLauncher(tk.Tk):
         
         try:
             self.status_var.set("Préparation du lancement...")
-            minecraft_dir = get_minecraft_directory()
-            
-            # Verify Forge installation
-            install_forge_if_needed(forge_version_id, minecraft_dir)
-            
-            # Additional debug: list installed versions
-            versions_path = os.path.join(minecraft_dir, "versions")
             
             self.status_var.set(f"Vérification de Forge {forge_version_id}...")
             
@@ -426,6 +429,13 @@ class MinecraftLauncher(tk.Tk):
             
             self.status_var.set("Génération de la commande...")
             minecraft_command = get_minecraft_command(forge_version_id, minecraft_dir, options)
+            
+            # Crée un batch pour lancer la commande
+            bat_path = os.path.join(modpack_profile_dir, "launch.bat")
+            with open(bat_path, "w") as bat_file:
+                bat_file.write("@echo off\n")
+                bat_file.write(" ".join(f'"{arg}"' if " " in arg else arg for arg in minecraft_command))
+                bat_file.write("\npause\n")
             
             self.status_var.set("Lancement de Minecraft...")
             subprocess.run(minecraft_command, cwd=modpack_profile_dir)
