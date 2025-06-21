@@ -341,8 +341,9 @@ def check_update(name, url, last_modified):
             return True, "Aucune installation locale détectée"
         
         # Vérification GitHub si disponible
-        if 'github.com' in url and local_info.get('github_commit'):
-            return check_github_update(name, url, local_info['github_commit'])
+        if 'github.com' in url and local_info.get('github_commit') and local_info['github_commit'].get('sha'):
+            print(f"DEBUG: SHA local = {local_info['github_commit']['sha']}")
+            return check_github_update(url, local_info['github_commit'])
         
         # Méthodes classiques pour les autres types d'URL
         if url != local_info.get('url'):
@@ -611,7 +612,7 @@ def get_github_last_commit(repo_url):
     
     return None
 
-def check_github_update(name, url, last_commit_info):
+def check_github_update(url, last_commit_info):
     """
     Vérifie si une mise à jour est disponible en comparant les commits GitHub.
     """
@@ -623,9 +624,11 @@ def check_github_update(name, url, last_commit_info):
         if not current_commit:
             return False, "Impossible de récupérer le commit actuel"
         
+        print(f"DEBUG: SHA local = {last_commit_info['sha']}")
+        print(f"DEBUG: SHA distant = {current_commit['sha']}")
+        
         if current_commit['sha'] != last_commit_info['sha']:
             return True, f"Nouveau commit: {current_commit['sha'][:8]} - {current_commit['message']}"
-        
         return False, "Aucune mise à jour disponible"
         
     except Exception as e:

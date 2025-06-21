@@ -866,7 +866,8 @@ class MinecraftLauncher(QMainWindow):
                 self.signals.progress.emit(progress)
                 self.signals.status.emit(f"🔍 Vérification de {modpack['name']}...")
                 
-                if check_update(modpack['name'], modpack['url'], modpack.get('last_modified')):
+                update_needed, reason = check_update(modpack['name'], modpack['url'], modpack.get('last_modified'))
+                if update_needed:
                     updates.append(modpack)
             
             self.signals.progress.emit(100)
