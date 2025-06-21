@@ -11,7 +11,7 @@ import time
 import logging
 import requests
 from datetime import datetime, timedelta
-from utils import check_all_modpack_updates, update_modpack_info, install_modpack
+from utils import check_all_modpack_updates, update_modpack_info, install_modpack,ensure_requirements
 from minecraft_launcher_lib.utils import get_minecraft_directory
 import sys
 import subprocess
@@ -26,23 +26,6 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
-
-def ensure_requirements():
-    required = [
-        ("requests", "requests"),
-        ("minecraft_launcher_lib", "minecraft-launcher-lib"),
-        ("mega", "mega.py"),
-    ]
-    missing = []
-    for mod, pkg in required:
-        try:
-            importlib.import_module(mod)
-        except ImportError:
-            missing.append(pkg)
-    if missing:
-        print(f"Installing missing packages: {', '.join(missing)}")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
-        print("Dependencies installed. Please restart the updater if you see errors.")
 
 ensure_requirements()
 

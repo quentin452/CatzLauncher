@@ -39,16 +39,16 @@ def get_preserved_items():
     Ces éléments contiennent les données du joueur et ne doivent pas être écrasés.
     """
     return [
-        "saves",           # Mondes sauvegardés
-        "options.txt",     # Configuration du jeu
-        "config",          # Configuration des mods
-        "screenshots",     # Captures d'écran
-        "logs",           # Logs du jeu
-        "crash-reports",  # Rapports de crash
-        "resourcepacks",  # Packs de ressources personnalisés
-        "shaderpacks",    # Shaders personnalisés
-        "backups",        # Sauvegardes manuelles
-        "local"           # Données locales du joueur
+        "saves",         
+        "options.txt",   
+        "config",        
+        "screenshots",  
+        "logs",         
+        "crash-reports", 
+        "resourcepacks",  
+        "shaderpacks",  
+        "backups",       
+        "local"    
     ]
 
 def preserve_player_data(modpack_profile_dir, temp_backup_dir):
