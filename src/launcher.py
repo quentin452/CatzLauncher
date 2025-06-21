@@ -182,44 +182,66 @@ class MinecraftLauncher(tk.Tk):
         if not code:
             messagebox.showwarning("Annulé", "Impossible d'extraire le code d'authentification.")
             return
-        @run_in_thread
-        def login_flow():
-            try:
-                self.login_btn.config(state=tk.DISABLED)
+        self._do_microsoft_auth_flow(auth_code=code)
+
+    def try_refresh_login(self):
+        account_info = self.config.get('account_info', {})
+        refresh_token = account_info.get('refresh_token')
+        if not refresh_token:
+            return
+        self._do_microsoft_auth_flow(refresh_token=refresh_token)
+
+    @run_in_thread
+    def _do_microsoft_auth_flow(self, auth_code=None, refresh_token=None):
+        """
+        Handles both Microsoft login (auth_code) and refresh (refresh_token) flows.
+        Updates self.auth_data, config, and UI accordingly.
+        """
+        try:
+            self.login_btn.config(state=tk.DISABLED)
+            if auth_code:
                 self.status_var.set("Connexion: Échange du code...")
-                ms_token_data = exchange_code_for_token(code)
-                access_token = ms_token_data['access_token']
-                self.status_var.set("Connexion: Authentification Xbox...")
-                xbl_data = authenticate_with_xbox(access_token)
-                xbl_token = xbl_data['Token']
-                user_hash = xbl_data['DisplayClaims']['xui'][0]['uhs']
-                self.status_var.set("Connexion: Récupération du token XSTS...")
-                xsts_data = authenticate_with_xsts(xbl_token)
-                xsts_token = xsts_data['Token']
-                self.status_var.set("Connexion: Connexion à Minecraft...")
-                mc_token_data = login_with_minecraft(user_hash, xsts_token)
-                mc_access_token = mc_token_data['access_token']
-                self.status_var.set("Connexion: Récupération du profil...")
-                profile = get_minecraft_profile(mc_access_token)
-                self.auth_data = {
-                    "access_token": mc_access_token,
-                    "name": profile['name'],
-                    "id": profile['id'],
-                }
-                self.config['account_info'] = {
-                    'name': profile['name'],
-                    'refresh_token': ms_token_data.get('refresh_token')
-                }
-                self.save_config()
-                self.account_info.set(f"Connecté: {profile['name']}")
-                self.status_var.set("Prêt")
-            except Exception as e:
-                error_body = str(e.response.text) if hasattr(e, 'response') else str(e)
-                show_error("Erreur de connexion", f"Le processus a échoué:\n\n{error_body}")
-                self.status_var.set("Erreur de connexion")
-            finally:
-                self.update_login_button_states()
-        login_flow()
+                ms_token_data = exchange_code_for_token(auth_code)
+            elif refresh_token:
+                self.status_var.set("Reconnexion en cours...")
+                ms_token_data = refresh_ms_token(refresh_token)
+            else:
+                raise Exception("Aucun code d'authentification ou refresh token fourni.")
+            access_token = ms_token_data['access_token']
+            new_refresh_token = ms_token_data.get('refresh_token')
+            self.status_var.set("Connexion: Authentification Xbox...")
+            xbl_data = authenticate_with_xbox(access_token)
+            xbl_token = xbl_data['Token']
+            user_hash = xbl_data['DisplayClaims']['xui'][0]['uhs']
+            self.status_var.set("Connexion: Récupération du token XSTS...")
+            xsts_data = authenticate_with_xsts(xbl_token)
+            xsts_token = xsts_data['Token']
+            self.status_var.set("Connexion: Connexion à Minecraft...")
+            mc_token_data = login_with_minecraft(user_hash, xsts_token)
+            mc_access_token = mc_token_data['access_token']
+            self.status_var.set("Connexion: Récupération du profil...")
+            profile = get_minecraft_profile(mc_access_token)
+            self.auth_data = {
+                "access_token": mc_access_token,
+                "name": profile['name'],
+                "id": profile['id'],
+            }
+            self.config['account_info'] = {
+                'name': profile['name'],
+                'refresh_token': new_refresh_token
+            }
+            self.save_config()
+            self.account_info.set(f"Connecté: {profile['name']}")
+            self.status_var.set("Prêt")
+        except Exception as e:
+            error_body = str(e.response.text) if hasattr(e, 'response') else str(e)
+            show_error("Erreur de connexion", f"Le processus a échoué:\n\n{error_body}")
+            self.status_var.set("Erreur de connexion")
+            self.auth_data = None
+            self.config['account_info'] = {}
+            self.account_info.set("Non connecté")
+        finally:
+            self.update_login_button_states()
 
     def logout(self):
         self.auth_data = None
@@ -228,46 +250,6 @@ class MinecraftLauncher(tk.Tk):
         self.account_info.set("Non connecté")
         self.update_login_button_states()
         messagebox.showinfo("Déconnexion", "Vous avez été déconnecté.")
-
-    def try_refresh_login(self):
-        account_info = self.config.get('account_info', {})
-        refresh_token = account_info.get('refresh_token')
-        if not refresh_token:
-            return
-        def refresh_flow_thread():
-            try:
-                self.status_var.set("Reconnexion en cours...")
-                self.update_login_button_states()
-                ms_token_data = refresh_ms_token(refresh_token)
-                new_access_token = ms_token_data['access_token']
-                new_refresh_token = ms_token_data['refresh_token']
-                xbl_data = authenticate_with_xbox(new_access_token)
-                xbl_token = xbl_data['Token']
-                user_hash = xbl_data['DisplayClaims']['xui'][0]['uhs']
-                xsts_data = authenticate_with_xsts(xbl_token)
-                xsts_token = xsts_data['Token']
-                mc_token_data = login_with_minecraft(user_hash, xsts_token)
-                mc_access_token = mc_token_data['access_token']
-                profile = get_minecraft_profile(mc_access_token)
-                self.auth_data = {
-                    "access_token": mc_access_token,
-                    "name": profile['name'],
-                    "id": profile['id'],
-                }
-                self.config['account_info'] = {
-                    'name': profile['name'],
-                    'refresh_token': new_refresh_token
-                }
-                self.save_config()
-                self.account_info.set(f"Connecté: {profile['name']}")
-                self.status_var.set("Prêt")
-            except Exception as e:
-                print(f"La reconnexion automatique a échoué: {e}")
-                self.logout()
-                self.status_var.set("Échec de la reconnexion. Veuillez vous connecter.")
-            finally:
-                self.update_login_button_states()
-        threading.Thread(target=refresh_flow_thread, daemon=True).start()
 
     # --- Modpack Management ---
     def load_modpacks(self):
