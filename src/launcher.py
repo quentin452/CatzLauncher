@@ -429,16 +429,16 @@ class MinecraftLauncher(tk.Tk):
             
             self.status_var.set("Génération de la commande...")
             minecraft_command = get_minecraft_command(forge_version_id, minecraft_dir, options)
-            
-            # Crée un batch pour lancer la commande
-            bat_path = os.path.join(modpack_profile_dir, "launch.bat")
-            with open(bat_path, "w") as bat_file:
-                bat_file.write("@echo off\n")
-                bat_file.write(" ".join(f'"{arg}"' if " " in arg else arg for arg in minecraft_command))
-                bat_file.write("\npause\n")
-            
+
+            # Nettoie la commande pour éviter WinError 87
+            minecraft_command = [str(arg) for arg in minecraft_command if arg and str(arg).strip() != ""]
+
             self.status_var.set("Lancement de Minecraft...")
-            subprocess.run(minecraft_command, cwd=modpack_profile_dir)
+            try:
+                subprocess.run(minecraft_command, cwd=modpack_profile_dir)
+            except Exception as e:
+                print("Erreur lors du lancement:", e)
+                show_error("Erreur de Lancement", str(e))
             self.status_var.set("Prêt")
         except Exception as e:
             self.status_var.set("Erreur lors du lancement.")
