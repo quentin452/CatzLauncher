@@ -8,8 +8,30 @@ from datetime import datetime
 from zipfile import ZipFile
 from minecraft_launcher_lib.forge import install_forge_version
 from mega import Mega
+import sys
+import subprocess
+import importlib
 
 INSTALLED_FILE = "installed_modpacks.json"
+
+def ensure_requirements():
+    required = [
+        ("requests", "requests"),
+        ("minecraft_launcher_lib", "minecraft-launcher-lib"),
+        ("mega", "mega.py"),
+    ]
+    missing = []
+    for mod, pkg in required:
+        try:
+            importlib.import_module(mod)
+        except ImportError:
+            missing.append(pkg)
+    if missing:
+        print(f"Installing missing packages: {', '.join(missing)}")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+        print("Dependencies installed. Please restart the launcher if you see errors.")
+
+ensure_requirements()
 
 def get_preserved_items():
     """

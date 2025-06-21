@@ -10,6 +10,28 @@ import requests
 from minecraft_launcher_lib.utils import get_minecraft_directory
 from utils import download_file_with_progress, install_modpack, check_update, check_all_modpack_updates, update_modpack_info, install_forge_if_needed, update_installed_info
 from minecraft_launcher_lib.command import get_minecraft_command
+import sys
+import subprocess
+import importlib
+
+def ensure_requirements():
+    required = [
+        ("requests", "requests"),
+        ("minecraft_launcher_lib", "minecraft-launcher-lib"),
+        ("mega", "mega.py"),
+    ]
+    missing = []
+    for mod, pkg in required:
+        try:
+            importlib.import_module(mod)
+        except ImportError:
+            missing.append(pkg)
+    if missing:
+        print(f"Installing missing packages: {', '.join(missing)}")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+        print("Dependencies installed. Please restart the launcher if you see errors.")
+
+ensure_requirements()
 
 # --- Début des nouvelles fonctions de connexion ---
 

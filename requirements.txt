@@ -1,0 +1,4 @@
+requests
+minecraft-launcher-lib
+mega.py
+# tkinter is part of the Python standard library (usually included by default) 
