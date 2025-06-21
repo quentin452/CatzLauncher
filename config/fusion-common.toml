@@ -1,0 +1,51 @@
+
+[General]
+	#Allow Fusion loot to be added to chests?
+	AddChestLoot = true
+
+["Alloy Recipes"]
+	#false disables alloy recipes
+	EnableSteelMaking = true
+	#false disables alloy recipes
+	EnableBronzeMaking = true
+	#false disables alloy recipes
+	EnableSinisiteMaking = true
+	#false disables alloy recipes
+	EnableThyriumMaking = true
+
+[Tools]
+	#false disables recipes
+	EnableSteelTools = true
+	#false disables recipes
+	EnableBronzeTools = true
+	#false disables recipes
+	EnableSinisiteTools = true
+	#false disables recipes
+	EnableThyriumTools = true
+
+[Armor]
+	#false disables recipes
+	EnableSteelArmor = true
+	#false disables recipes
+	EnableBronzeArmor = true
+	#false disables recipes
+	EnableSinisiteArmor = true
+	#false disables recipes
+	EnableThyriumArmor = true
+
+[Bows]
+	#false disables recipes
+	EnableFusionBows = true
+
+["Simple Fusion Recycling"]
+	#Enable Simple Fusion Recycling recipes for vanilla metals?
+	enableVanillaRecycling = true
+	#Enable Simple Fusion Recycling recipes for Simple Ores?
+	enableSimpleOresRecycling = true
+	#Enable Simple Fusion Recycling recipes for Netherrocks?
+	enableNetherrocksRecycling = false
+	#Enable Simple Fusion Recycling recipes for Fusion?
+	enableFusionRecycling = true
+	#Enable Simple Fusion Recycling recipes for Diamonds/Onyx?
+	enableGemRecycling = true
+

@@ -1,0 +1,23 @@
+
+[gameplay]
+	#No comment
+	drunkSpeech = true
+	#The minimum possible time (in seconds) for which an NPC will stand still and display talking animations when spoken to by a player
+	#Range: 3 ~ 60
+	npcTalkToPlayerMinDuration = 5
+	#The maximum possible time (in seconds) for which an NPC will stand still and display talking animations when spoken to by a player
+	#Range: 3 ~ 60
+	npcTalkToPlayerMaxDuration = 10
+	#Alignment gains depend on factions' areas of influence
+	areasOfInfluence = true
+	#Factions dislike if a player has + alignment with enemy factions
+	alignmentDraining = true
+
+[mobs]
+	#They're simply too big!
+	smallerBees = true
+
+[datapack-utility]
+	#If enabled, the mod will generate up-to-date biome JSON files for all its biomes and output them in the game directory during loading. These biome templates are provided to help datapack creators.
+	generateBiomeJsons = false
+

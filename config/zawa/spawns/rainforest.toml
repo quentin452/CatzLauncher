@@ -1,0 +1,246 @@
+
+#
+# This is 1 of ZAWA's 10 habitat ranges. Each sub-range has its own list of biomes, and all of the sub-range's entities will spawn in those biomes.
+# Disable entities (or a species variant) by setting "enabled" under their category to false.
+# Use ONLY whole numbers greater than 0 for chance, min, and max!
+# "chance" is how common they spawn, a higher number is more common than a lower number. "min" and "max" adjusts their spawning group size.
+# !! If modded biomes are not generated, delete the entire "biomes" line for each sub-category and restart minecraft. !!
+#
+#
+[dry_rainforest]
+	biomes = ["minecraft:plains", "minecraft:sunflower_plains", "biomesoplenty:golden_prairie", "biomesoplenty:grassland_clover_patch", "biomesoplenty:lavender_field", "biomesoplenty:shrubland_hills", "petfish:suba", "projectvibrantjourneys:pine_meadows", "projectvibrantjourneys:prairie", "projectvibrantjourneys:blossoming_fields", "projectvibrantjourneys:meadows", "projectvibrantjourneys:stony_fields", "traverse:meadow", "traverse:plains_plateau", "traverse:rolling_hills", "universalcataclysm:radiant_plains", "universalcataclysm:fireland", "universalcataclysm:corruption_forest", "universalcataclysm:chaos_biome", "minecraft:jungle_edge", "minecraft:modified_jungle_edge", "minecraft:bamboo_jungle", "minecraft:bamboo_jungle_hills", "biomesoplenty:tropic_beach", "biomesoplenty:fungal_field", "biomesoplenty:fungal_jungle", "biomesoplenty:rainforest_floodplain", "biomesoplenty:tropics", "terrestria:rainbow_rainforest_lake"]
+
+	[dry_rainforest.mexican_red_knee_tarantula]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[dry_rainforest.ghost_praying_mantis]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[dry_rainforest.hyacinth_macaw]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[dry_rainforest.antilles_pinktoe_tarantula]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[dry_rainforest.asian_elephant]
+		enabled = true
+		chance = 8
+		min = 3
+		max = 4
+
+	[dry_rainforest.red_fronted_macaw]
+		enabled = true
+		chance = 10
+		min = 1
+		max = 4
+
+[wet_rainforest]
+	biomes = ["minecraft:jungle", "minecraft:jungle_hills", "minecraft:modified_jungle", "biomesoplenty:rainforest", "biomesoplenty:rainforest_cliffs", "projectvibrantjourneys:overgrown_spires", "traverse:mini_jungle", "terraforged:stone_forest", "terrestria:rainbow_rainforest", "terrestria:rainbow_rainforest_mountains", "minecraft:swamp", "minecraft:swamp_hills", "biomesoplenty:bayou_mangrove", "biomesoplenty:bayou", "biomesoplenty:deep_bayou", "biomesoplenty:dense_marsh", "biomesoplenty:highland_moor", "biomesoplenty:marsh", "biomesoplenty:rainforest_floodplain", "biomesoplenty:shroomy_wetland", "biomesoplenty:wetland", "biomesoplenty:wetland_forest", "projectvibrantjourneys:mangrove_marsh", "projectvibrantjourneys:willow_wetlands", "villagers_and_mosnetrs_legacy:swamp_cave", "terraforged:marshland", "twilightforest:swamp", "twilightforest:fire_swamp", "terrestria:cypress_swamp"]
+
+	[wet_rainforest.green_winged_macaw]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[wet_rainforest.brown_spider_monkey]
+		chance = 10
+		min = 3
+		max = 3
+		enabled = true
+
+	[wet_rainforest.wrinkled_hornbill]
+		chance = 10
+		min = 2
+		max = 3
+		enabled = true
+
+	[wet_rainforest.goliath_birdeater_tarantula]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[wet_rainforest.blue_and_gold_macaw]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[wet_rainforest.corydoras]
+		chance = 10
+		min = 4
+		max = 5
+		enabled = true
+
+	[wet_rainforest.scarlet_macaw]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[wet_rainforest.wreathed_hornbill]
+		chance = 10
+		min = 2
+		max = 3
+		enabled = true
+
+	[wet_rainforest.chestnut_fronted_macaw]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[wet_rainforest.cobalt_blue_tarantula]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[wet_rainforest.common_chimpanzee]
+		enabled = true
+		chance = 8
+		min = 4
+		max = 5
+
+	[wet_rainforest.pygmy_three_toed_sloth]
+		enabled = true
+		chance = 10
+		min = 1
+		max = 1
+
+	[wet_rainforest.pale_throated_sloth]
+		enabled = true
+		chance = 10
+		min = 1
+		max = 1
+
+	[wet_rainforest.hoffmans_two_toed_sloth]
+		enabled = true
+		chance = 10
+		min = 1
+		max = 1
+
+	[wet_rainforest.betta]
+		enabled = true
+		chance = 4
+		min = 1
+		max = 2
+
+	[wet_rainforest.leafcutter_ant]
+		enabled = true
+		chance = 4
+		min = 4
+		max = 6
+
+	[wet_rainforest.plecostomus]
+		enabled = true
+		chance = 10
+		min = 1
+		max = 1
+
+[deep_rainforest]
+	biomes = ["minecraft:jungle", "minecraft:jungle_hills", "minecraft:modified_jungle", "minecraft:modified_jungle_edge", "minecraft:bamboo_jungle", "minecraft:bamboo_jungle_hills", "biomesoplenty:tropic_beach", "biomesoplenty:fungal_field", "biomesoplenty:fungal_jungle", "biomesoplenty:rainforest_cliffs", "biomesoplenty:rainforest_floodplain", "biomesoplenty:tropics", "projectvibrantjourneys:overgrown_spires", "traverse:mini_jungle", "terraforged:stone_forest", "terrestria:rainbow_rainforest", "terrestria:rainbow_rainforest_mountains", "terrestria:rainbow_rainforest_lake"]
+
+	[deep_rainforest.asian_forest_scorpion]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[deep_rainforest.orchid_praying_mantis]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[deep_rainforest.emperor_scorpion]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[deep_rainforest.butterfly]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[deep_rainforest.palawan_hornbill]
+		chance = 10
+		min = 2
+		max = 3
+		enabled = true
+
+	[deep_rainforest.rhinoceros_hornbill]
+		chance = 10
+		min = 2
+		max = 3
+		enabled = true
+
+	[deep_rainforest.sumatran_orangutan]
+		chance = 8
+		min = 1
+		max = 1
+		enabled = true
+
+	[deep_rainforest.red_claw_scorpion]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[deep_rainforest.black_headed_spider_monkey]
+		chance = 10
+		min = 3
+		max = 3
+		enabled = true
+
+	[deep_rainforest.red_faced_spider_monkey]
+		chance = 10
+		min = 3
+		max = 3
+		enabled = true
+
+	[deep_rainforest.brown_throated_sloth]
+		enabled = true
+		chance = 10
+		min = 1
+		max = 1
+
+	[deep_rainforest.maned_three_toed_sloth]
+		enabled = true
+		chance = 10
+		min = 1
+		max = 1
+
+	[deep_rainforest.linnaeuss_two_toed_sloth]
+		enabled = true
+		chance = 10
+		min = 1
+		max = 1
+
+	[deep_rainforest.tree_frog]
+		enabled = true
+		chance = 15
+		min = 3
+		max = 4
+
+	[deep_rainforest.western_lowland_gorilla]
+		enabled = true
+		chance = 8
+		min = 4
+		max = 5
+

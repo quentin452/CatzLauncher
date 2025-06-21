@@ -1,0 +1,41 @@
+
+[ToolTips]
+	"Enable tooltips" = true
+	#(ToolTip color applies to both default tooltip description text and when shift-clicking) 
+	#Colors include: 
+	#AQUA, BLACK, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_GREEN, DARK_PURPLE, DARK_RED, 
+	#GREEN, GOLD, LIGHT_PURPLE, RED, WHITE, YELLOW
+	"ToolTip Color" = "AQUA"
+	"Enable damage tooltips" = true
+
+	[ToolTips."Critter Cage"]
+		"Display mob info on a filled critter cage" = true
+		"Display the entity's registry name, alongside its modid" = true
+		"Display the entity's display name" = true
+		"Display the entity's health" = true
+		"Display the villager's profession" = true
+		"Display the villager's trading level" = true
+		"Display the tamed entity's owner's name" = true
+		"Display the tamed entity's collar color" = true
+
+[Dimensions]
+
+	[Dimensions."Crystal Dimension"]
+		"Enable fog in the Crystal Dimension" = true
+		"Enable particles in the Crystal Dimension" = true
+		"Crystal Dimension fog density" = 0.05
+		"Crystal Dimension particle density" = 2
+
+[Functionality]
+
+	[Functionality.Camera]
+		"Enable camera shake" = true
+
+	[Functionality.Armor]
+
+		[Functionality.Armor."Lava Eel Armor"]
+			#A static fog value for when you have the full Lava Eel set equipped and you're inside lava.
+			"Lava fog density" = 0.02
+			#The position of fire on your screen when you're inside lava. 0 is the default. Positive movs it up, and negative moves it down.
+			"Fire (y) Position on screen" = -0.5
+

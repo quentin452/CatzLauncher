@@ -1,0 +1,10 @@
+
+[general]
+	#Citadel generation switch.
+	citadel = true
+	#Tungsten Ore generation switch.
+	tungsten_end = true
+	#Tungsten Ore frequency. Lower is less.
+	#Range: 0 ~ 16
+	freq_tungsten_end = 2
+

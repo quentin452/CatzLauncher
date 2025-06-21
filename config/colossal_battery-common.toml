@@ -1,0 +1,15 @@
+
+[structure]
+
+	[structure.general]
+		#The divider of mek battery type's per block storage and transfer rate from mek's energy cube's. (default = 8)
+		mek_divider = 8
+		#The maximum size of colossal structure (default = 20).
+		max_size = 20
+
+[render]
+
+	[render.general]
+		#How many "Energy Core" to render in a colossal mek energy cube. (default = 1)
+		mek_core_render_count = 1
+

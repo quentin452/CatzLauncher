@@ -1,0 +1,82 @@
+
+[environment]
+	#Toggle the Middle-earth sky renderer
+	modSky = true
+	#Toggle the Middle-earth cloud renderer
+	modClouds = true
+	#No comment
+	#Range: > 0
+	cloudRange = 1024
+	#The Aurora, or Northern Lights! May be a slightly performance-intensive feature for some users
+	northernLights = true
+	#No comment
+	sunGlare = true
+	#No comment
+	rainMist = true
+	#No comment
+	mistyMountainsMist = true
+	#New rain and snow textures (in Middle-earth), ash, and sandstorms
+	newWeatherRendering = true
+	#Replace rain ground particles in Middle-earth, to match the new rain textures
+	newRainGroundParticles = true
+
+[gui]
+	#Display the mod's custom main menu screen
+	modMainMenu = true
+	#No comment
+	sepiaMap = false
+	#No comment
+	mapLabels = true
+	#Will be automatically set to false after the world type help display has been shown once
+	showWorldTypeHelp = true
+	#Toggle the map exploration fog. If a server has set forceFogOfWar to either force enable or disable the fog, that server setting will override this one.
+	fogOfWar = true
+	#Display waypoint distances in leagues, miles, and yards instead of metric (blocks)
+	imperialWaypointDistances = false
+
+[hud]
+	#Middle-earth on-screen compass
+	compass = true
+	#On-screen compass: coordinates and biome name
+	compassInfo = true
+	#Display the alignment meter even in non-mod dimensions
+	showAlignmentEverywhere = false
+	#Configure the x-position of the alignment meter on-screen. Negative values move it left, positive values right
+	#Range: > -2147483648
+	alignmentXOffset = 0
+	#Configure the y-position of the alignment meter on-screen. Negative values move it up, positive values down
+	#Range: > -2147483648
+	alignmentYOffset = 0
+	#If set to true, NPC speech will appear on-screen with the NPC. If set to false, it will be sent to the chat box
+	immersiveSpeech = true
+	#Toggle whether speech still shows in the chat box when Immersive Speech is enabled
+	immersiveSpeechChatLog = false
+	#The duration (in seconds) of Immersive Speech displays
+	#Range: 0 ~ 60
+	immersiveSpeechDuration = 10
+	#Render other players' alignment values above their heads
+	displayAlignmentAboveHead = true
+
+[model]
+	#The number of wings on the swan knights' chestplates
+	#Range: 0 ~ 24
+	dolAmrothChestplateWings = 12
+	#If true, Mannish women NPCs will use the 'Alex' model style, with slimmer arms
+	mannishWomenUseAlexModelStyle = true
+	#If true, Elf-women NPCs will use the 'Alex' model style, with slimmer arms
+	elfWomenUseAlexModelStyle = true
+	#If true, Dwarf-women NPCs will use the 'Alex' model style, with slimmer arms
+	dwarfWomenUseAlexModelStyle = false
+	#If true, Hobbit-women NPCs will use the 'Alex' model style, with slimmer arms
+	hobbitWomenUseAlexModelStyle = false
+	#If true, Orc-women NPCs will use the 'Alex' model style, with slimmer arms
+	orcWomenUseAlexModelStyle = false
+
+[sound]
+	#No comment
+	windAmbience = true
+	#No comment
+	newRainSounds = true
+	#No comment
+	newThunderSounds = true
+

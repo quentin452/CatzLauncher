@@ -1,0 +1,10 @@
+{
+	"x": -100,
+	"y": 84,
+	"width": 98,
+	"height": 20,
+	"texture": "packmenu:textures/gui/widgets.png",
+	"langKey": "menu.options",
+	"action": "OPEN_GUI",
+	"data": "OPTIONS"
+}

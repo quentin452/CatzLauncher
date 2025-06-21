@@ -1,0 +1,99 @@
+
+#
+# This is 1 of ZAWA's 10 habitat ranges. Each sub-range has its own list of biomes, and all of the sub-range's entities will spawn in those biomes.
+# Disable entities (or a species variant) by setting "enabled" under their category to false.
+# Use ONLY whole numbers greater than 0 for chance, min, and max!
+# "chance" is how common they spawn, a higher number is more common than a lower number. "min" and "max" adjusts their spawning group size.
+# !! If modded biomes are not generated, delete the entire "biomes" line for each sub-category and restart minecraft. !!
+#
+#
+[dry_savanna]
+	biomes = ["minecraft:savanna", "minecraft:savanna_plateau", "minecraft:shattered_savanna", "minecraft:shattered_savanna_plateau", "biomesoplenty:dryland", "biomesoplenty:dry_boneyard", "biomesoplenty:scrubland", "biomesoplenty:wasteland", "biomesoplenty:wooded_scrubland", "projectvibrantjourneys:baobab_fields", "terraforged:savanna_scrub", "terraforged:shattered_savanna_scrub", "minecraft:desert", "minecraft:desert_hills", "minecraft:desert_lakes", "biomesoplenty:dryland", "biomesoplenty:dry_boneyard", "projectvibrantjourneys:desert_shrubland", "traverse:desert_shrubland", "atum:dead_oasis", "atum:dense_woods", "atum:sparse_woods", "atum:dried_river", "atum:limestone_crags", "atum:limestone_mountains", "atum:sand_dunes", "atum:sand_hills", "atum:sand_plains", "terrestria:canyon_arches", "terrestria:canyon_cliffs", "terrestria:canyon_edge", "terrestria:dunes", "terrestria:dunes_edge", "terrestria:lush_desert", "terrestria:oasis"]
+
+	[dry_savanna.northern_giraffe]
+		chance = 10
+		min = 3
+		max = 5
+		enabled = true
+
+	[dry_savanna.butterfly]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[dry_savanna.yellow_billed_hornbill]
+		chance = 10
+		min = 2
+		max = 3
+		enabled = true
+
+	[dry_savanna.grevys_zebra]
+		chance = 10
+		min = 2
+		max = 6
+		enabled = true
+
+	[dry_savanna.african_lion]
+		chance = 8
+		min = 3
+		max = 6
+		enabled = true
+
+[wet_savanna]
+	biomes = ["minecraft:savanna", "minecraft:savanna_plateau", "biomesoplenty:volcanic_plains", "biomesoplenty:bayou_mangrove", "biomesoplenty:bayou", "biomesoplenty:deep_bayou", "biomesoplenty:lush_desert", "biomesoplenty:lush_savanna", "biomesoplenty:wooded_scrubland", "projectvibrantjourneys:verdant_sands", "levinide:dominator_land", "terraforged:savanna_scrub", "twilightforest:fire_swamp", "terrestria:lush_desert", "terrestria:oasis", "terrestria:volcanic_island", "terrestria:volcanic_island_shore", "terrestria:volcanic_island_beach"]
+
+	[wet_savanna.masai_giraffe]
+		chance = 10
+		min = 3
+		max = 5
+		enabled = true
+
+	[wet_savanna.african_lake_cichlid]
+		chance = 10
+		min = 5
+		max = 6
+		enabled = true
+
+	[wet_savanna.southern_giraffe]
+		chance = 10
+		min = 3
+		max = 5
+		enabled = true
+
+	[wet_savanna.african_wild_dog]
+		chance = 8
+		min = 4
+		max = 6
+		enabled = true
+
+	[wet_savanna.trumpeter_hornbill]
+		chance = 10
+		min = 2
+		max = 3
+		enabled = true
+
+	[wet_savanna.reticulated_giraffe]
+		chance = 10
+		min = 3
+		max = 5
+		enabled = true
+
+	[wet_savanna.jacksons_hornbill]
+		chance = 10
+		min = 2
+		max = 3
+		enabled = true
+
+	[wet_savanna.red_billed_hornbill]
+		chance = 10
+		min = 2
+		max = 3
+		enabled = true
+
+	[wet_savanna.king_baboon_tarantula]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+

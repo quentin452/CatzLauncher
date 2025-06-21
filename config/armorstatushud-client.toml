@@ -1,0 +1,51 @@
+
+#General settings
+[general]
+	#Enables or disables the Armor Status HUD display
+	enabled = true
+	#Sets the position of the HUD on the screen
+	#Allowed Values: TOPLEFT, TOPCENTER, TOPRIGHT, MIDDLELEFT, MIDDLECENTER, MIDDLERIGHT, BOTTOMLEFT, BOTTOMCENTER, BOTTOMRIGHT
+	alignMode = "BOTTOMLEFT"
+	#Sets the direction to display status items
+	#Allowed Values: VERTICAL, HORIZONTAL
+	listMode = "HORIZONTAL"
+	#Set to true to show item names
+	enableItemName = false
+	#Set to true to show the standard inventory item overlay (damage bar)
+	showDamageOverlay = true
+	#Set to true to show the item count overlay
+	showItemCount = true
+	#This is a list of percent damage thresholds and text color codes that will be used when item damage is <= the threshold. Format used: "," separates the threshold and the color code, ";" separates each pair. Valid color values are 0-9, a-f (color values can be found here: http://www.minecraftwiki.net/wiki/File:Colors.png)
+	damageColorList = "100,f; 80,7; 60,e; 40,6; 25,c; 10,4"
+	#Valid damageDisplayType strings are value, percent, or none
+	#Allowed Values: VALUE, PERCENT, NONE
+	damageDisplayType = "VALUE"
+	#The type of threshold to use when applying the damageColorList thresholds
+	#Allowed Values: VALUE, PERCENT
+	damageThresholdType = "PERCENT"
+	#Set to true to show held item damage values
+	showItemDamage = true
+	#Set to true to show armor damage values
+	showArmorDamage = true
+	#Set to true to show the max damage when damageDisplayType=value
+	showMaxDamage = false
+	#Set to true to show info for your currently equipped item
+	showEquippedItem = true
+	#Set to true to show info for your currently offhand equipped item
+	showOffHandItem = false
+	#Horizontal offset from the edge of the screen (when using right alignments the x offset is relative to the right edge of the screen)
+	#Range: > 0
+	xOffset = 2
+	#Vertical offset from the edge of the screen (when using bottom alignments the y offset is relative to the bottom edge of the screen)
+	#Range: > 0
+	yOffset = 2
+	#Vertical offset used only for the bottomcenter alignment to avoid the vanilla HUD
+	#Range: > 0
+	yOffsetBottomCenter = 41
+	#Set to true if you want the xOffset value to be applied when using a center alignment
+	applyXOffsetToCenter = false
+	#Set to true if you want the yOffset value to be applied when using a middle alignment
+	applyYOffsetToMiddle = false
+	#Set to true to show info when chat is open, false to disable info when chat is open
+	showInChat = false
+

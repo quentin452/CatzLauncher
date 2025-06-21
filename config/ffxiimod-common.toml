@@ -1,0 +1,432 @@
+
+["Allow entity spawns"]
+	#Whether to spawn Cactites or not
+	"Spawn Cactites" = true
+	#Whether to spawn Flowering Cactoids or not
+	"Spawn Flowering Cactoids" = true
+	#Whether to spawn Cactoids or not
+	"Spawn Cactoids" = true
+	#Whether to spawn Sleipnirs or not
+	"Spawn Sleipnirs" = true
+	#Whether to spawn Leynirs or not
+	"Spawn Leynirs" = true
+	#Whether to spawn Mesmenirs or not
+	"Spawn Mesmenirs" = true
+	#Whether to spawn Shadonirs or not
+	"Spawn Shadonirs" = true
+	#Whether to spawn Soulnirs or not
+	"Spawn Soulnirs" = true
+	#Whether to spawn Hyenas or not
+	"Spawn Hyenas" = true
+	#Whether to spawn Alpha Hyenas or not
+	"Spawn Alpha Hyenas" = true
+	#Whether to spawn Coyotes or not
+	"Spawn Coyotes" = true
+	#Whether to spawn Alpha Coyotes or not
+	"Spawn Alpha Coyotes" = true
+	#Whether to spawn Silver Lobos or not
+	"Spawn Silver Lobos" = true
+	#Whether to spawn White Wolves or not
+	"Spawn White Wolves" = true
+	#Whether to spawn Worgens or not
+	"Spawn White Worgens" = true
+	#Whether to spawn Hell Hounds or not
+	"Spawn Hell Hounds" = true
+	#Whether to spawn Tartarus' or not
+	"Spawn Tartarus'" = true
+	#Whether to spawn Cerberus' or not
+	"Spawn Cerberus'" = true
+	#Whether to spawn Thexteras or not
+	"Spawn Thextera'" = true
+	#Whether to spawn Thenzeras or not
+	"Spawn Thenzera'" = true
+	#Whether to spawn Werewolves or not
+	"Spawn Werewolf'" = true
+	#Whether to spawn Chocobos or not
+	"Spawn Chocobo'" = true
+	#Whether to spawn Humbabas or not
+	"Spawn Humbaba'" = true
+	#Whether to spawn Yetis or not
+	"Spawn Yeti'" = true
+	#Whether to spawn Zaghnals or not
+	"Spawn Zaghnal'" = true
+	#Whether to spawn Behemoths or not
+	"Spawn Behemoth'" = true
+	#Whether to spawn Reavers or not
+	"Spawn Reaver'" = true
+	#Whether to spawn High Reavers or not
+	"Spawn High Reaver'" = true
+	#Whether to spawn Catoblepas or not
+	"Spawn Catoblepas'" = true
+	#Whether to spawn Little Catoblepas or not
+	"Spawn Little Catoblepas'" = true
+	#Whether to spawn Mandragoras or not
+	"Spawn Mandragoras'" = true
+	#Whether to spawn Rouge Tomato or not
+	"Spawn Rouge Tomato'" = true
+	#Whether to spawn Slaven or not
+	"Spawn Slaven'" = true
+	#Whether to spawn Slaven Warders or not
+	"Spawn Slaven Warders'" = true
+	#Whether to spawn Slaven Wilders or not
+	"Spawn Slaven Wilders'" = true
+	#Whether to spawn Enkelados or not
+	"Spawn Enkelados'" = true
+	#Whether to spawn Achstyx or not
+	"Spawn Achstyx'" = true
+	#Whether to spawn Night Walker or not
+	"Spawn Night Walker'" = true
+	#Whether to spawn Night Walker Mage or not
+	"Spawn Night Walker Mage'" = true
+	#Whether to spawn Gazer or not
+	"Spawn Gazer'" = true
+	#Whether to spawn Ixtab or not
+	"Spawn Ixtab'" = true
+	#Whether to spawn Giza Rabbit or not
+	"Spawn Giza Rabbit'" = true
+	#Whether to spawn Bangaa or not
+	"Spawn Bangaa'" = true
+	#Whether to spawn Death Scythe or not
+	"Spawn Death Scythe'" = true
+	#Whether to spawn Etem or not
+	"Spawn Etem'" = true
+	#Whether to spawn Reaper or not
+	"Spawn Reaper'" = true
+	#Whether to spawn Oversoul or not
+	"Spawn Oversoul'" = true
+	#Whether to spawn Gespenst or not
+	"Spawn Gespenst'" = true
+	#Whether to spawn Mimic or not
+	"Spawn Mimic'" = true
+	#Whether to spawn Battery Mimic or not
+	"Spawn Battery Mimic'" = true
+	#Whether to spawn Mimeo or not
+	"Spawn Mimeo'" = true
+	#Whether to spawn Thunder Bug or not
+	"Spawn Thunder Bug'" = true
+	#Whether to spawn Pandora or not
+	"Spawn Pandora'" = true
+	#Whether to spawn Mimic Vase or not
+	"Spawn Mimic Vase'" = true
+	#Whether to spawn Bomb or not
+	"Spawn Bomb'" = true
+	#Whether to spawn Balloon or not
+	"Spawn Balloon'" = true
+	#Whether to spawn Grenade or not
+	"Spawn Grenade'" = true
+	#Whether to spawn matriarch Bomb or not
+	"Spawn Matriarch Bomb'" = true
+	#Whether to spawn Nether Mobs or not
+	"Spawn Nether Mobs" = true
+
+["Entity spawn rates"]
+	#The weight of Cactites in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Cactite weight" = 4
+	#The weight of Flowering Cactoids in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Flowering Cactoid weight" = 2
+	#The weight of Cactoids in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Cactoid weight" = 4
+	#The weight of Sleipnirs in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Sleipnir weight" = 2
+	#The weight of Leynirs in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Leynir weight" = 1
+	#The weight of Mesmenirs in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Mesmenir weight" = 1
+	#The weight of Shadonirs in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Shadonir weight" = 1
+	#The weight of Soulnirs in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Soulnir weight" = 5
+	#The weight of Hyenas in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Hyena weight" = 5
+	#The weight of Alpha Hyenas in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Alpha Hyena weight" = 3
+	#The weight of Coyotes in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Coyote weight" = 5
+	#The weight of Coyotes in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Alpha Coyote weight" = 3
+	#The weight of Silver Lobos in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Silver Lobo weight" = 4
+	#The weight of White Wolves in vanilla spawn rate
+	#Range: 1 ~ 100
+	"White Wolf weight" = 4
+	#The weight of Worgens in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Worgen weight" = 3
+	#The weight of Hell Hounds in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Hell Hound weight" = 25
+	#The weight of Tartarus in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Tartarus weight" = 20
+	#The weight of Cerberus in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Cerberus weight" = 20
+	#The weight of Thextera in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Thextera weight" = 1
+	#The weight of Thenzera in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Thenzera weight" = 1
+	#The weight of Chocobo in vanilla spawn rate
+	#Range: 2 ~ 100
+	"Chocobo weight" = 2
+	#The weight of Werewolf in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Werewolf weight" = 1
+	#The weight of Humbaba in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Humbaba weight" = 1
+	#The weight of Yeti in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Yeti weight" = 1
+	#The weight of Zaghnal in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Zaghnal weight" = 1
+	#The weight of Behemoth in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Behemoth weight" = 5
+	#The weight of Reaver in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Reaver weight" = 5
+	#The weight of High Reaver in vanilla spawn rate
+	#Range: 1 ~ 100
+	"High Reaver weight" = 3
+	#The weight of Catoblepas in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Catoblepas weight" = 2
+	#The weight of Mandragora in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Mandragora weight" = 4
+	#The weight of Rouge Tomato in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Rouge Tomato weight" = 2
+	#The weight of Slaven in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Slaven weight" = 1
+	#The weight of Slaven Warders in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Slaven Warder weight" = 1
+	#The weight of Slaven Wilders in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Slaven Wilder weight" = 1
+	#The weight of Enkelados in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Enkelados weight" = 1
+	#The weight of Achstyx in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Achstyx weight" = 10
+	#The weight of Night Walker in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Night Walker weight" = 1
+	#The weight of Night Walker Mage in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Night Walker Mage weight" = 1
+	#The weight of Gazer in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Gazer weight" = 3
+	#The weight of Ixtab in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Ixtab weight" = 1
+	#The weight of Giza Rabbit in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Giza Rabbit weight" = 2
+	#The weight of Bangaa in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Bangaa weight" = 1
+	#The weight of Death Scythe in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Death Scythe weight" = 1
+	#The weight of Etem in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Etem weight" = 2
+	#The weight of Reaper in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Reaper weight" = 4
+	#The weight of Oversoul in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Oversoul weight" = 1
+	#The weight of Gespenst in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Gespenst weight" = 2
+	#The weight of Mimic in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Mimic weight" = 4
+	#The weight of Battery Mimic in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Battery Mimic weight" = 2
+	#The weight of Mimeo in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Mimeo weight" = 2
+	#The weight of Thunder Bug in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Thunder Bug weight" = 1
+	#The weight of Pandora in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Pandora weight" = 1
+	#The weight of Mimic Vase in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Mimic Vase weight" = 4
+	#The weight of Bomb in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Bomb weight" = 3
+	#The weight of Balloon in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Balloon weight" = 2
+	#The weight of Grenade in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Grenade weight" = 2
+	#The weight of Matriarch Bomb in vanilla spawn rate
+	#Range: 1 ~ 100
+	"Matriarch Bomb weight" = 1
+
+["Whitelisted nether spawn biomes"]
+	#Use the format "mod_ID:biome" like "minecraft:plains" or "rats:ratlantis". You can see a mod's ID by clicking the 'Mods' button on the main screen and clicking on the mod's name on the left 
+	"Cactoid whitelist" = ["minecraft:basalt_deltas", "minecraft:crimson_forest", "minecraft:nether_wastes", "minecraft:warped_forest", "biomesoplenty:crystalline_chasm", "biomesoplenty:undergrowth", "biomesoplenty:visceral_heap", "biomesoplenty:withered_abyss"]
+
+["Whitelisted cactoid overworld spawn biomes"]
+	#Use the format "mod_ID:biome" like "minecraft:plains" or "rats:ratlantis". You can see a mod's ID by clicking the 'Mods' button on the main screen and clicking on the mod's name on the left 
+	"Cactoid whitelist" = ["minecraft:badlands", "minecraft:eroded_badlands", "minecraft:badlands_plateau", "minecraft:modified_badlands_plateau", "minecraft:desert", "minecraft:desert_lakes", "minecraft:desert_hills", "biomesoplenty:lush_desert"]
+
+["Whitelisted sleipnir overworld spawn biomes"]
+	#Biome ID
+	"Sleipnir whitelest" = ["minecraft:plains", "minecraft:savanna", "minecraft:savanna_plateau", "biomesoplenty:dryland", "biomesoplenty:meadow", "biomesoplenty:prairie", "biomesoplenty:scrubland", "biomesoplenty:shrubland", "biomesoplenty:golden_prairie"]
+
+["Whitelisted leynir overworld spawn biomes"]
+	#Biome ID
+	"Leynir whitelest" = ["minecraft:dark_forest", "minecraft:dark_forest_hills", "biomesoplenty:dead_forest", "biomesoplenty:mystic_grove", "biomesoplenty:ominous_woods"]
+
+["Whitelisted mesmenir overworld spawn biomes"]
+	#Biome ID
+	"Mesmenir whitelest" = ["minecraft:sunflower_plains", "minecraft:flower_forest", "biomesoplenty:cherry_blossom_grove", "biomesoplenty:lavender_field", "biomesoplenty:mystic_grove", "biomesoplenty:orchard", "biomesoplenty:flower_meadow", "biomesoplenty:lush_savanna", "biomesoplenty:rainbow_hills"]
+
+["Whitelisted shadonir overworld spawn biomes"]
+	#Biome ID
+	"Shadonir whitelest" = ["minecraft:ice_spikes", "minecraft:snowy_taiga", "minecraft:snowy_taiga_mountains", "minecraft:snowy_beach", "biomesoplenty:ominous_woods", "biomesoplenty:snowy_coniferous_forest", "biomesoplenty:wasteland", "biomesoplenty:wooded_wasteland", "biomesoplenty:alps_foothills", "biomesoplenty:dry_boneyard", "biomesoplenty:snowy_fir_clearing", "biomesoplenty:snowy_maple_forest", "biomesoplenty:wooded_wasteland"]
+
+["Whitelisted soulnir spawn biomes"]
+	#Biome ID
+	"Soulnir whitelist" = ["minecraft:soul_sand_valley", "biomesoplenty:withered_abyss"]
+
+["Whitelisted hyena spawn biomes"]
+	#Biome ID
+	"Hyena whitelist" = ["minecraft:savanna", "minecraft:savanna_plateau", "biomesoplenty:dryland", "biomesoplenty:lush_desert", "biomesoplenty:scrubland", "biomesoplenty:golden_prairie", "biomesoplenty:seasonal_pumpkin_patch", "biomesoplenty:wooded_scrubland"]
+
+["Whitelisted coyote spawn biomes"]
+	#Biome ID
+	"Coyote whitelist" = ["minecraft:desert", "minecraft:badlands", "biomesoplenty:lush_desert", "biomesoplenty:dead_forest", "biomesoplenty:dryland", "biomesoplenty:dry_boneyard"]
+
+["Whitelisted silver lobo spawn biomes"]
+	#Biome ID
+	"Silver Lobo whitelist" = ["minecraft:plains", "minecraft:sunflower_plains", "biomesoplenty:grove", "biomesoplenty:meadow", "biomesoplenty:prairie", "biomesoplenty:scrubland", "biomesoplenty:shrubland", "biomesoplenty:orchard", "biomesoplenty:jade_grassland", "biomesoplenty:mystic_plains", "biomesoplenty:golden_prairie"]
+
+["Whitelisted white wolf spawn biomes"]
+	#Biome ID
+	"White Wolf whitelist" = ["minecraft:snowy_tundra", "minecraft:snowy_taiga", "biomesoplenty:alps", "biomesoplenty:snowy_coniferous_forest", "biomesoplenty:tundra", "biomesoplenty:alps_foothills", "biomesoplenty:snowy_fir_clearing", "biomesoplenty:snowy_maple_forest"]
+
+["Whitelisted worgen spawn biomes"]
+	#Biome ID
+	"Worgen whitelist" = ["minecraft:forest", "minecraft:dark_forest", "biomesoplenty:coniferous_forest", "biomesoplenty:dead_forest", "biomesoplenty:ominous_woods", "biomesoplenty:redwood_forest", "biomesoplenty:seasonal_forest", "biomesoplenty:redwood_forest_edge", "biomesoplenty:meadow_forest", "biomesoplenty:wooded_scrubland"]
+
+["Whitelisted hell hound spawn biomes"]
+	#Biome ID
+	"Hell Hound whitelist" = ["minecraft:soul_sand_valley", "minecraft:nether_wastes", "biomesoplenty:volcano", "biomesoplenty:crystalline_chasm", "biomesoplenty:withered_abyss"]
+
+["Whitelisted tartarus spawn biomes"]
+	#Biome ID
+	"Tartarus whitelist" = ["minecraft:warped_forest", "biomesoplenty:undergrowth"]
+
+["Whitelisted cerberus spawn biomes"]
+	#Biome ID
+	"Cerberus whitelist" = ["minecraft:crimson_forest", "minecraft:nether_wastes", "biomesoplenty:undergrowth", "biomesoplenty:crystalline_chasm"]
+
+["Whitelisted chocobo spawn biomes"]
+	#Biome ID
+	"Chocobo whitelist" = ["minecraft:plains", "biomesoplenty:meadow", "biomesoplenty:prairie", "biomesoplenty:shrubland"]
+
+["Whitelisted humbaba spawn biomes"]
+	#Biome ID
+	"Humbaba whitelist" = ["minecraft:mountains", "minecraft:gravelly_mountains", "minecraft:wooded_mountains", "biomesoplenty:highland"]
+
+["Whitelisted yeti spawn biomes"]
+	#Biome ID
+	"Yeti whitelist" = ["minecraft:snowy_mountains", "minecraft:snowy_tundra", "minecraft:snowy_taiga", "biomesoplenty:alps", "biomesoplenty:alps_foothills"]
+
+["Whitelisted behemoth spawn biomes"]
+	#Biome ID
+	"Behemoth whitelist" = ["minecraft:soul_sand_valley", "biomesoplenty:withered_abyss", "biomesoplenty:ominous_woods", "biomesoplenty:wasteland", "biomesoplenty:wooded_wasteland", "biomesoplenty:dead_swamp", "biomesoplenty:volcano"]
+
+["Whitelisted reaver spawn biomes"]
+	#Biome ID
+	"Reaver whitelist" = ["minecraft:nether_wastes", "minecraft:basalt_deltas", "biomesoplenty:withered_abyss", "biomesoplenty:visceral_heap", "biomesoplenty:volcano"]
+
+["Whitelisted catoblepas spawn biomes"]
+	#Biome ID
+	"Catoblepas whitelist" = ["minecraft:warped_forest", "biomesoplenty:mystic_grove", "biomesoplenty:undergrowth", "biomesoplenty:silkglade"]
+
+["Whitelisted mandragora spawn biomes"]
+	#Biome ID
+	"Mandragora whitelist" = ["minecraft:swamp", "minecraft:flower_forest", "minecraft:jungle", "biomesoplenty:cherry_blossom_grove", "biomesoplenty:grove", "biomesoplenty:mystic_grove", "biomesoplenty:prairie", "biomesoplenty:seasonal_pumpkin_patch"]
+
+["Whitelisted slaven spawn biomes"]
+	#Biome ID
+	"Slaven whitelist" = ["minecraft:savanna", "biomesoplenty:prairie", "biomesoplenty:scrubland"]
+
+["Whitelisted slaven warder spawn biomes"]
+	#Biome ID
+	"Slaven Warder whitelist" = ["minecraft:ice_spikes", "biomesoplenty:tundra", "biomesoplenty:alps_foothills", "biomesoplenty:snowy_fir_clearing"]
+
+["Whitelisted slaven wilder spawn biomes"]
+	#Biome ID
+	"Slaven Wilder whitelist" = ["minecraft:giant_spruce_taiga", "biomesoplenty:dryland", "biomesoplenty:redwood_forest_edge", "biomesoplenty:fir_clearing"]
+
+["Whitelisted night walker spawn biomes"]
+	#Biome ID
+	"Night Walker whitelist" = ["minecraft:giant_spruce_taiga", "minecraft:plains", "minecraft:snowy_taiga", "minecraft:snowy_tundra", "minecraft:forest", "biomesoplenty:alps", "biomesoplenty:dead_forest", "biomesoplenty:ominous_woods", "biomesoplenty:seasonal_pumpkin_patch"]
+
+["Whitelisted gazer spawn biomes"]
+	#Biome ID
+	"Gazer whitelist" = ["biomesoplenty:volcano", "biomesoplenty:dead_forest"]
+	#Biome ID
+	"Giza Rabbit whitelist" = ["minecraft:savanna", "minecraft:forest", "minecraft:plains", "minecraft:birch_forest", "minecraft:taiga", "minecraft:sunflower_plains", "minecraft:flower_forest", "biomesoplenty:grove", "biomesoplenty:lavender_field", "biomesoplenty:meadow", "biomesoplenty:prairie", "biomesoplenty:scrubland", "biomesoplenty:shrubland", "biomesoplenty:orchard", "biomesoplenty:redwood_forest_edge"]
+
+["Whitelisted death scythe spawn biomes"]
+	#Biome ID
+	"Death Scythe whitelist" = ["minecraft:badlands_plataeu"]
+
+["Whitelisted etem spawn biomes"]
+	#Biome ID
+	"Etem whitelist" = ["minecraft:jungle", "biomesoplenty:bayou", "biomesoplenty:mystic_grove", "biomesoplenty:redwood:forest"]
+
+["Whitelisted reaper spawn biomes"]
+	#Biome ID
+	"Reaper whitelist" = ["minecraft:desert", "minecraft:badlands", "biomesoplenty:dry_boneyard"]
+
+["Whitelisted oversoul spawn biomes"]
+	#Biome ID
+	"Oversoul whitelist" = ["minecraft:end_midlands"]
+
+["Whitelisted gespenst spawn biomes"]
+	#Biome ID
+	"Gespenst whitelist" = ["minecraft:end_midlands", "biomesoplenty:ominous_woods"]
+
+["Whitelisted bomb spawn biomes"]
+	#Biome ID
+	"Bomb whitelist" = ["minecraft:forest", "minecraft:plains", "minecraft:nether_wastes", "minecraft:basalt_deltas", "biomesoplenty:withered_abyss", "biomesoplenty:visceral_heap", "biomesoplenty:volcano"]
+
+["Whitelisted balloon spawn biomes"]
+	#Biome ID
+	"Balloon whitelist" = ["minecraft:swamp", "minecraft:jungle", "minecraft:mountains", "minecraft:soul_sand_valley", "minecraft:basalt_deltas", "biomesoplenty:mystic_grove", "biomesoplenty:withered_abyss", "biomesoplenty:visceral_heap", "biomesoplenty:volcano"]
+

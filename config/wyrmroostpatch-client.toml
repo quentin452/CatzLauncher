@@ -1,0 +1,59 @@
+
+["Enable Shush Mode"]
+	#This mode allows modification of Wyrmroost sounds' volumes.
+	#All applicable multipliers are applied to a given sound. If you have the global
+	#multiplier set to 0.5, the roar multiplier set to 0.8, and the Alpine multiplier
+	#set to 0.25, then Alpine dragons' roars will be at 0.5*0.8*0.25 = 10% volume.
+	#
+	#This feature may produce minor lag.
+	#
+	#Enable Shush Mode. Default: false
+	"Shush Mode" = false
+
+["Shush Mode Volume Multipliers"]
+	#Multiplier for all dragon roars. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Roar Multiplier" = 1.0
+	#Multiplier for Overworld Drake noises. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Overworld Drake Multiplier" = 1.0
+	#Multiplier for Coin Dragon noises. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Coin Dragon Multiplier" = 1.0
+	#Multiplier for Lesser Desertwyrm noises. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Lesser Desertwyrm Multiplier" = 1.0
+	#Multiplier for Alpine noises. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Alpine Multiplier" = 1.0
+	#Multiplier for Royal Red noises. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Royal Red Multiplier" = 1.0
+	#Multiplier for Butterfly Leviathan noises. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Butterfly Leviathan Multiplier" = 1.0
+	#Multiplier for Canari Wyvern noises. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Canari Wyvern Multiplier" = 1.0
+	#Multiplier for Rooststalker noises. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Rooststalker Multiplier" = 1.0
+	#Global multiplier for all Wyrmroost noises. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Global Multiplier" = 1.0
+	#Multiplier for Dragonfruit Drake noises. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Dragonfruit Drake Multiplier" = 1.0
+	#Multiplier for Silver Glider noises. Default: 1
+	#Range: 0.0 ~ 2.0
+	"Silver Glider Multiplier" = 1.0
+
+["Idle Sound Reducer"]
+	#Chance that idle sounds will be cancelled. Default: 0
+	#Range: 0.0 ~ 1.0
+	"Idle Sound Cancellation Chance" = 0.0
+
+["Fixed Rooststalker Tooltip"]
+	#Fixes tooltip for half-eaten gold nuggets. Produces negligible performance hit. Default: true
+	"Fixed Rooststalker Tooltip" = true
+

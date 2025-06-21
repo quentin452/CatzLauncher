@@ -1,0 +1,6 @@
+
+#Dalek Mod Common Configuration Setting
+[common]
+	#Minimum Y value TARDIS can fly to
+	tardisMinY = 0
+

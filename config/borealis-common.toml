@@ -1,0 +1,41 @@
+
+["Enable Borealis"]
+	#Enable or disable the Borealis Mod?
+	#Borealis opens a port on your computer to allow you to connect to it.
+	#If you don't want to use Borealis, you can disable it here without removing it.
+	isEnabled = true
+
+	["Enable Borealis".playerListJSON]
+		#Enable/Disable PlayerList JSON.
+		#Allowed Values: ENABLED, REQUIRES_AUTH, DISABLED
+		playerListJSON = "ENABLED"
+
+	["Enable Borealis".worldInfoJSON]
+		#Enable/Disable worldInfo JSON.
+		#Allowed Values: ENABLED, REQUIRES_AUTH, DISABLED
+		worldInfoJSON = "ENABLED"
+
+	["Enable Borealis".playerListPage]
+		#Enable/Disable PlayerList Page.
+		#Allowed Values: ENABLED, REQUIRES_AUTH, DISABLED
+		playerListPage = "ENABLED"
+
+	["Enable Borealis".jsonUtilPage]
+		#Enable/Disable jsonUtil Page.
+		#Allowed Values: ENABLED, REQUIRES_AUTH, DISABLED
+		jsonUtilPage = "ENABLED"
+
+	["Enable Borealis".borealisPort]
+		#Borealis Webserver Port. Default: 48574
+		#Range: 1025 ~ 65534
+		borealisPort = 48574
+
+	["Enable Borealis".modListPage]
+		#List of modids to blacklist from the mod list page.
+		#Example of hiding minecraft and forge on the mod list:
+		#blacklistedMods = ["minecraft","forge"]
+		blacklistedMods = []
+		#Enable/Disable ModList Page.
+		#Allowed Values: ENABLED, REQUIRES_AUTH, DISABLED
+		modListPage = "ENABLED"
+

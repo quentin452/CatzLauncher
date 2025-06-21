@@ -1,0 +1,69 @@
+
+#
+# This is 1 of ZAWA's 10 habitat ranges. Each sub-range has its own list of biomes, and all of the sub-range's entities will spawn in those biomes.
+# Disable entities (or a species variant) by setting "enabled" under their category to false.
+# Use ONLY whole numbers greater than 0 for chance, min, and max!
+# "chance" is how common they spawn, a higher number is more common than a lower number. "min" and "max" adjusts their spawning group size.
+# !! If modded biomes are not generated, delete the entire "biomes" line for each sub-category and restart minecraft. !!
+#
+#
+[temperate_alpine]
+	biomes = ["minecraft:wooded_mountains", "minecraft:taiga_mountains", "biomesoplenty:jade_cliffs", "projectvibrantjourneys:redwood_peaks", "traverse:high_coniferous_forest", "twilightforest:highlands"]
+
+	[temperate_alpine.butterfly]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[temperate_alpine.giant_panda]
+		chance = 5
+		min = 1
+		max = 1
+		enabled = true
+
+	[temperate_alpine.red_panda]
+		enabled = true
+		chance = 5
+		min = 1
+		max = 1
+
+[dry_alpine]
+	biomes = ["minecraft:savanna_plateau", "minecraft:wooded_badlands_plateau", "minecraft:badlands_plateau", "minecraft:shattered_savanna_plateau", "minecraft:modified_wooded_badlands_plateau", "minecraft:modified_badlands_plateau", "projectvibrantjourneys:boreal_plateau", "undercraft:delta_mountain"]
+
+	[dry_alpine.coquerels_sifaka]
+		enabled = true
+		chance = 8
+		min = 1
+		max = 3
+
+[tropical_alpine]
+	biomes = ["minecraft:modified_jungle", "minecraft:modified_jungle_edge", "minecraft:bamboo_jungle", "minecraft:bamboo_jungle_hills", "biomesoplenty:tropic_beach", "biomesoplenty:fungal_field", "biomesoplenty:fungal_jungle", "biomesoplenty:tropics", "terrestria:rainbow_rainforest_mountains"]
+
+	[tropical_alpine.mandrill]
+		chance = 10
+		min = 3
+		max = 4
+		enabled = true
+
+	[tropical_alpine.great_indian_hornbill]
+		chance = 10
+		min = 2
+		max = 3
+		enabled = true
+
+	[tropical_alpine.white_bellied_spider_monkey]
+		chance = 10
+		min = 3
+		max = 3
+		enabled = true
+
+[tundra_alpine]
+	biomes = ["minecraft:mountains", "minecraft:snowy_mountains", "minecraft:mountain_edge", "minecraft:gravelly_mountains", "minecraft:modified_gravelly_mountains", "biomesoplenty:alps", "biomesoplenty:highland", "biomesoplenty:highland_crag", "biomesoplenty:highland_moor", "petfish:dark", "projectvibrantjourneys:windswept_cliffs", "demon_realm:boiling_titan_knee", "demon_realm:boiling_extreme_titan_peak", "traverse:cliffs", "traverse:snowy_cliffs", "undercraft:delta_mountain", "terrestria:caldera", "terrestria:caldera_beach", "terrestria:caldera_ridge", "terrestria:outback_uluru"]
+
+	[tundra_alpine.snow_leopard]
+		chance = 5
+		min = 1
+		max = 1
+		enabled = true
+

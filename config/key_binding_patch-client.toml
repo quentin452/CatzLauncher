@@ -1,0 +1,4 @@
+#Shadow key bindings are replications of the specified key binding.
+#This brings the ability to have multiple key setups for a single functionality.
+shadow_key_bindings = []
+

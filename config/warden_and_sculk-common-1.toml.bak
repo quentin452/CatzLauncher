@@ -1,0 +1,52 @@
+
+["Config for Warden and Sculk Mod"]
+	#Defines Sculk Ruins max height for generation. Default: 35
+	#Range: 10 ~ 255
+	ruins_max_height = 35
+	#Defines Ancient City separation. Default: 50
+	"Ancient Cities Separation" = 50
+	#Defines Sculk Ruins size. Default: 6
+	#Range: 0 ~ 35
+	ruins_size = 6
+	#Disables Ancient City generation. Default: True
+	"Sculk Propagation" = true
+	#Defines Sculk Ruins min height for generation. Default: 0
+	#Range: 0 ~ 255
+	ruins_min_height = 0
+	#Defines Ancient City spacing. Default: 40
+	"Ancient Cities Spacing" = 40
+	#Defines the maximum vertical size of Ancient Cities. Default: 60
+	#Range: 0 ~ 255
+	ancient_vertical_pieces = 60
+	#Uncheck to disable Warden generation. Default: true
+	"Warden Generation" = true
+	#Defines Ancient City min height for generation. Default: 0
+	#Range: 0 ~ 255
+	ancient_min_height = 0
+	#Defines Deepslate Tower size. Default: 8
+	#Range: 0 ~ 35
+	"Deepslate Tower Size" = 8
+	#Defines Deepslate Tower min height for generation. Default: 0
+	#Range: 0 ~ 255
+	"Deepslate Tower Min Height" = 0
+	#More vision on darkness effect. Default: 1.0F
+	"Darkness Multiplier" = 1.0
+	#Desactivates Sculk Sensor. Default: false
+	"Sculk Sensor Active" = false
+	#This is the value of the health of Warden. Default: 500
+	"Warden Health" = 500
+	#Defines Ancient City max height for generation. Default: 30
+	#Range: 20 ~ 255
+	ancient_max_height = 30
+	#It's the probability of generating sculk biome per million of chunks. Default: 9200
+	#Range: 0 ~ 32000
+	"Sculk Biome Probability" = 9200
+	#Defines Ancient City size. Default: 15
+	#Range: 0 ~ 35
+	ancient_size = 15
+	#Defines Deepslate Tower max height for generation. Default: 5
+	#Range: 5 ~ 255
+	"Deepslate Tower Max Height" = 5
+	#Disable Sculk Biome. Default: false
+	"Sculk Biome" = false
+

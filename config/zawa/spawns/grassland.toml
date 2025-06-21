@@ -1,0 +1,63 @@
+
+#
+# This is 1 of ZAWA's 10 habitat ranges. Each sub-range has its own list of biomes, and all of the sub-range's entities will spawn in those biomes.
+# Disable entities (or a species variant) by setting "enabled" under their category to false.
+# Use ONLY whole numbers greater than 0 for chance, min, and max!
+# "chance" is how common they spawn, a higher number is more common than a lower number. "min" and "max" adjusts their spawning group size.
+# !! If modded biomes are not generated, delete the entire "biomes" line for each sub-category and restart minecraft. !!
+#
+#
+[cold_grassland]
+	biomes = ["minecraft:plains", "minecraft:snowy_tundra", "minecraft:sunflower_plains", "biomesoplenty:orchard", "biomesoplenty:flower_meadow", "biomesoplenty:golden_prairie", "biomesoplenty:grassland", "biomesoplenty:grassland_clover_patch", "biomesoplenty:grove_clearing", "biomesoplenty:highland", "biomesoplenty:highland_crag", "biomesoplenty:lavender_field", "biomesoplenty:mystic_plains", "biomesoplenty:prairie", "biomesoplenty:shrubland", "biomesoplenty:shrubland_hills", "biomesoplenty:tundra", "biomesoplenty:tundra_basin", "petfish:suba", "projectvibrantjourneys:pine_meadows", "projectvibrantjourneys:prairie", "projectvibrantjourneys:blossoming_fields", "projectvibrantjourneys:meadows", "projectvibrantjourneys:stony_fields", "traverse:meadow", "traverse:plains_plateau", "traverse:rolling_hills", "universalcataclysm:radiant_plains", "universalcataclysm:fireland", "universalcataclysm:corruption_forest", "universalcataclysm:chaos_biome", "twilightforest:clearing", "twilightforest:glacier", "twilightforest:thornlands", "twilightforest:final_plateau", "undercraft:delta_mountain"]
+
+[dry_grassland]
+	biomes = ["minecraft:plains", "minecraft:savanna", "minecraft:savanna_plateau", "minecraft:sunflower_plains", "biomesoplenty:orchard", "biomesoplenty:flower_meadow", "biomesoplenty:golden_prairie", "biomesoplenty:grove_clearing", "biomesoplenty:highland", "biomesoplenty:lavender_field", "biomesoplenty:lush_savanna", "biomesoplenty:prairie", "biomesoplenty:shrubland", "biomesoplenty:shrubland_hills", "petfish:suba", "projectvibrantjourneys:pine_meadows", "projectvibrantjourneys:prairie", "projectvibrantjourneys:blossoming_fields", "projectvibrantjourneys:meadows", "projectvibrantjourneys:stony_fields", "traverse:plains_plateau", "traverse:rolling_hills", "universalcataclysm:radiant_plains", "universalcataclysm:fireland", "universalcataclysm:corruption_forest", "universalcataclysm:chaos_biome", "atum:sand_plains", "terraforged:savanna_scrub", "twilightforest:clearing", "minecraft:badlands", "minecraft:badlands_plateau", "terraforged:bryce", "twilightforest:final_plateau", "terrestria:outback", "terrestria:outback_uluru"]
+
+	[dry_grassland.african_praying_mantis]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[dry_grassland.giant_anteater]
+		chance = 8
+		min = 1
+		max = 1
+		enabled = true
+
+	[dry_grassland.black_footed_ferret]
+		chance = 5
+		min = 1
+		max = 2
+		enabled = true
+
+	[dry_grassland.arizona_bark_scorpion]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[dry_grassland.butterfly]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[dry_grassland.brazilian_black_tarantula]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[dry_grassland.devils_flower_praying_mantis]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[dry_grassland.northern_scorpion]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+

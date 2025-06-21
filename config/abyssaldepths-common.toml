@@ -1,0 +1,34 @@
+
+#Spawning configuration settings
+#All of these settings require a game restart to take effect
+[spawns]
+	#Range: 0 ~ 25
+	clownfishWeight = 7
+	#Mobs will only spawn in the biomes from the given mod IDs
+	#You can see a mod's ID by clicking the 'Mods' button on the main screen and clicking on the mod's name on the left
+	biomeWhitelist = ["minecraft", "biomesoplenty", "byg", "omni"]
+	#Range: 0 ~ 25
+	maskedButterflyfishWeight = 7
+	#Range: 0 ~ 25
+	bannerfishWeight = 7
+	#Range: 0 ~ 25
+	butterflyfishWeight = 9
+	#Range: 0 ~ 25
+	raccoonButterflyfishWeight = 7
+	#Range: 0 ~ 25
+	seahorseWeight = 4
+	#Range: 0 ~ 25
+	swordfishWeight = 1
+	#Range: 0 ~ 25
+	fishWeight = 10
+	#Range: 0 ~ 25
+	blackcapBassletWeight = 7
+	#Range: 0 ~ 25
+	seaSerpentWeight = 1
+	#Range: 0 ~ 25
+	fairyBassletWeight = 7
+	#Range: 0 ~ 25
+	spotfinButterflyfishWeight = 7
+	#Range: 0 ~ 25
+	sailfishWeight = 1
+

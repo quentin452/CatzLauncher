@@ -1,0 +1,31 @@
+
+[Mining]
+	#The list of blocks (as registry names) to ensure are included in the list of blocks that are regarded as ores.
+	#Any block with an ores tag will automatically be added, so only include ores without that tag here.
+	#NOT ALL BLOCKS ARE GUARANTEED TO WORK.
+	#Example: ["minecraft:stone", "minecraft:obsidian"]
+	additionalOres = []
+	#The list of blocks (as registry names) to ensure are excluded from the list of blocks that regarded as ores.
+	#Any block with an ores tag will automatically be added unless specified here.
+	#This is useful if you notice modded blocks that are tagged as ores that you don't want/think should be.
+	#Example: ["minecraft:coal_ore", "minecraft:diamond_ore"]
+	excludedOres = []
+
+[Woodcutting]
+	#The list of tuples of blocks that you want to additionally add as trees
+	#This is useful for modded trees that don't already have support.
+	#NOT ALL BLOCKS ARE GUARANTEED TO WORK.
+	#Example: ["[minecraft:oak_log; minecraft:oak_leaves; minecraft:oak_sapling]", "[...]"]
+	#This would add oak trees as a custom tree (but they already have support so you don't need to add them here).
+	customTrees = []
+
+[Farming]
+	#The list of blocks (as registry names) to ensure are included in the list of blocks that are regarded as crops.
+	#NOT ALL BLOCKS ARE GUARANTEED TO WORK.
+	#Example: ["minecraft:wheat", "minecraft:melon"]
+	additionalCrops = []
+	#The list of blocks (as registry names) to ensure are excluded from the list of blocks that regarded as crops.
+	#This is useful if you notice modded blocks that have been added as crops that you don't want/think should be.
+	#Example: ["minecraft:wheat", "minecraft:melon"]
+	excludedCrops = []
+

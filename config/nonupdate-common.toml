@@ -1,0 +1,15 @@
+
+#General settings for the mod.
+[general]
+	#Logging level: MUTE, BLOCKED, DETAILED, VERBOSE
+	#MUTE: do not output anything
+	#BLOCKED: output blocked info
+	#DETAILED: output detailed blocked info
+	#VERBOSE: output every attemption, blocked and permitted
+	#Allowed Values: MUTE, BLOCKED, DETAILED, VERBOSE
+	loggingLevel = "BLOCKED"
+	#Default block all address and use blacklist as whitelist?
+	defaultBlocking = false
+	#Blocked/Allowed domain/ip address
+	blacklist = ["raw.githubusercontent.com", "yumc.pw"]
+

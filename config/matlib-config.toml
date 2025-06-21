@@ -1,0 +1,17 @@
+
+#Miscellaneous
+[general]
+	#Chance of Rock/Nugget spawn per chunk(0-100%)
+	#Range: 0 ~ 100
+	rockChance = 2
+	#Chance of Oil lake spawn per chunk(0-100%)
+	#Range: 0 ~ 100
+	lakeChance = 15
+	#Should Methane Gas flow to the ceiling?
+	gasFlow = true
+	#Chance of Methane Gas not spreading to the ceiling(0-100%, lower numbers will increase the flow!
+	#Range: 0 ~ 100
+	gasChance = 100
+	#Block blacklist of where Rock/Nugget spawns shouldn't be placed on
+	rockBlackist = ["minecraft:ice", "minecraft:packed_ice", "minecraft:bedrock"]
+

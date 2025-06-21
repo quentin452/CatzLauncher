@@ -1,0 +1,78 @@
+#Maximum enchanting power provided by bookshelves to scale infuser costs by.
+#This is basically how many bookshelves you need around the infuser to be able to apply maximum level enchantments.
+#All bookshelves on the same level as the infuser and one block above are counted, all need to have a taxicab distance of exactly 2 blocks (meaning corners count too).
+#This option only affects advanced enchanting infusers.
+#Range: > 0
+maximum_power_advanced = 30
+#Maximum enchanting power provided by bookshelves to scale infuser costs by.
+#This is basically how many bookshelves you need around the infuser to be able to apply maximum level enchantments.
+#All bookshelves on the same level as the infuser and one block above are counted, all need to have a taxicab distance of exactly 2 blocks (meaning corners count too).
+#This option only affects normal enchanting infusers.
+#Range: > 0
+maximum_power_normal = 30
+
+[power]
+	#Multiplier for maximum enchanting power for when rare enchantments become available.
+	#Range: -1.0 ~ 1.0
+	rare_multiplier = 0.4
+	#Multiplier for maximum enchanting power for when undiscoverable enchantments become available.
+	#They also need to be enabled in the "Types" config.
+	#Range: 0.0 ~ 1.0
+	undiscoverable_multiplier = 0.9
+	#Multiplier for maximum enchanting power for when treasure enchantments become available.
+	#They also need to be enabled in the "Types" config.
+	#Range: 0.0 ~ 1.0
+	treasure_multiplier = 0.95
+	#Multiplier for maximum enchanting power for when curse enchantments become available.
+	#They also need to be enabled in the "Types" config.
+	#Range: 0.0 ~ 1.0
+	curse_multiplier = 1.0
+	#Multiplier for maximum enchanting power for when common enchantments become available.
+	#Range: -1.0 ~ 1.0
+	common_multiplier = -0.2
+	#Multiplier for maximum enchanting power for when very rare enchantments become available.
+	#Range: -1.0 ~ 1.0
+	very_rare_multiplier = 0.6
+	#Multiplier for maximum enchanting power for how much power is required to max out an enchantment.
+	#Range: 0.0 ~ 1.0
+	level_multiplier = 0.4
+	#Multiplier for maximum enchanting power for when uncommon enchantments become available.
+	#Range: -1.0 ~ 1.0
+	uncommon_multiplier = 0.2
+
+[types]
+	#Allow treasure enchantments (e.g. mending) to be applied using the enchanting infuser.
+	treasure = false
+	#Allow undiscoverable enchantments (e.g. soul speed) to be applied using the enchanting infuser.
+	#This option takes precedence over other options for treasure and curse enchantments.
+	undiscoverable = false
+	#Allow curses (e.g. curse of vanishing) to be applied using the enchanting infuser.
+	#This option takes precedence over option for treasure enchantments.
+	curses = false
+
+[costs]
+	#When scaling costs, only account for vanilla enchantments. Otherwise enchanting costs will become ludicrously cheap with many modded enchantments present.
+	vanilla_cost_only = true
+	#Base cost multiplier for each level for uncommon enchantments.
+	#Range: > -2147483648
+	uncommon_cost = 3
+	#Base cost multiplier for each level for rare enchantments.
+	#Range: > -2147483648
+	rare_cost = 4
+	#Double prices for enchantments normally unobtainable from enchanting tables (e.g. mending, soul speed).
+	double_uniques = true
+	#Cost level to scale prices by. This is not a strict value, meaning it can be exceeded (e.g. when applying treasure enchantments).
+	#This option only affects advanced enchanting infusers.
+	#Range: > -2147483648
+	maximum_cost_advanced = 15
+	#Base cost multiplier for each level for very rare enchantments.
+	#Range: > -2147483648
+	very_rare_cost = 5
+	#Base cost multiplier for each level for common enchantments.
+	#Range: > -2147483648
+	common_cost = 2
+	#Cost level to scale prices by. This is not a strict value, meaning it can be exceeded (e.g. when applying treasure enchantments).
+	#This option only affects normal enchanting infusers.
+	#Range: > -2147483648
+	maximum_cost_normal = 25
+

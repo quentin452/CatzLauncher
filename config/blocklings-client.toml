@@ -1,0 +1,5 @@
+
+[Misc]
+	#Set this to true to disable the mixed blockling type textures.
+	disableDirtyBlocklings = false
+

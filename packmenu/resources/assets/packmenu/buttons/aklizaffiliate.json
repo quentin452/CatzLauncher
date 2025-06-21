@@ -1,0 +1,18 @@
+{
+	"x": 104,
+	"y": 48,
+	"width": 20,
+	"height": 20,
+	"texture": "packmenu:textures/gui/aklizbutton.png",
+	"u": 0,
+	"v": 0,
+	"hoverU": 0,
+	"hoverV": 20,
+	"texWidth": 20,
+	"texHeight": 40,
+	"widgets": false,
+	"langKey": "packmenu.akliz",
+	"action": "OPEN_URL",
+	"data": "https://github.com/quentin452/privates-minecraft-modpack/blob/privates-minecraft-modpacks/CHANGELOGS/SUPPORTED/1.16.5%20FORGE%20Biggess%20Pack%20Cat%20Edition.md",
+	"textXOffset": 5
+}

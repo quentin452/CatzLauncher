@@ -1,0 +1,84 @@
+
+#
+# This is 1 of ZAWA's 10 habitat ranges. Each sub-range has its own list of biomes, and all of the sub-range's entities will spawn in those biomes.
+# Disable entities (or a species variant) by setting "enabled" under their category to false.
+# Use ONLY whole numbers greater than 0 for chance, min, and max!
+# "chance" is how common they spawn, a higher number is more common than a lower number. "min" and "max" adjusts their spawning group size.
+# !! If modded biomes are not generated, delete the entire "biomes" line for each sub-category and restart minecraft. !!
+#
+#
+[dry_forest]
+	biomes = ["minecraft:savanna_plateau", "minecraft:shattered_savanna_plateau", "minecraft:forest", "minecraft:wooded_hills", "minecraft:birch_forest", "minecraft:birch_forest_hills", "minecraft:flower_forest", "biomesoplenty:redwood_forest_edge", "biomesoplenty:orchard", "biomesoplenty:grove", "biomesoplenty:seasonal_forest", "biomesoplenty:seasonal_orchard", "biomesoplenty:seasonal_pumpkin_patch", "biomesoplenty:woodland", "traverse:autumnal_woods", "traverse:woodlands", "weird_wonderful_wild:weird_woods", "terraforged:flower_plains", "twilightforest:forest", "twilightforest:firefly_forest", "twilightforest:oak_savannah", "twilightforest:mushroom_forest", "twilightforest:dense_mushroom_forest", "twilightforest:enchanted_forest", "slugterra_v:slugvaly", "undercraft:delta_forest", "terrestria:cypress_forest", "terrestria:wooded_cypress_hills", "terrestria:sakura_forest", "terrestria:wooded_sakura_hills", "terrestria:japanese_maple_forest", "terrestria:wooded_japanese_maple_hills"]
+
+	[dry_forest.military_macaw]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[dry_forest.koala]
+		chance = 10
+		min = 1
+		max = 1
+		enabled = true
+
+	[dry_forest.blue_throated_macaw]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[dry_forest.spix_macaw]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[dry_forest.ring_tailed_lemur]
+		enabled = true
+		chance = 8
+		min = 4
+		max = 6
+
+[temperate_forest]
+	biomes = ["minecraft:forest", "minecraft:wooded_hills", "minecraft:birch_forest", "minecraft:birch_forest_hills", "minecraft:wooded_mountains", "minecraft:flower_forest", "biomesoplenty:redwood_forest_edge", "biomesoplenty:orchard", "biomesoplenty:bamboo_blossom_grove", "biomesoplenty:cherry_blossom_grove", "biomesoplenty:grove", "biomesoplenty:mystic_grove", "biomesoplenty:seasonal_forest", "biomesoplenty:seasonal_orchard", "biomesoplenty:seasonal_pumpkin_patch", "biomesoplenty:woodland", "projectvibrantjourneys:flooded_woodlands", "traverse:autumnal_woods", "traverse:woodlands", "weird_wonderful_wild:weird_woods", "terraforged:flower_plains", "twilightforest:forest", "twilightforest:firefly_forest", "twilightforest:oak_savannah", "twilightforest:mushroom_forest", "twilightforest:dense_mushroom_forest", "twilightforest:enchanted_forest", "slugterra_v:slugvaly", "undercraft:delta_forest", "terrestria:cypress_forest", "terrestria:wooded_cypress_hills", "terrestria:sakura_forest", "terrestria:wooded_sakura_hills", "terrestria:japanese_maple_forest", "terrestria:wooded_japanese_maple_hills", "minecraft:bamboo_jungle", "minecraft:bamboo_jungle_hills", "terrestria:rainbow_rainforest_mountains"]
+
+	[temperate_forest.chinese_praying_mantis]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+	[temperate_forest.honey_bee]
+		chance = 10
+		min = 3
+		max = 5
+		enabled = true
+
+	[temperate_forest.butterfly]
+		chance = 10
+		min = 1
+		max = 4
+		enabled = true
+
+	[temperate_forest.european_praying_mantis]
+		chance = 4
+		min = 1
+		max = 1
+		enabled = true
+
+[wet_forest]
+	biomes = ["minecraft:dark_forest", "minecraft:dark_forest_hills", "biomesoplenty:ominous_woods", "biomesoplenty:ominous_mire", "weird_wonderful_wild:weird_woods", "graveyard:haunted_forest", "graveyard:haunted_lakes", "graveyard:eroded_haunted_forest", "twilightforest:spooky_forest", "twilightforest:dark_forest", "twilightforest:dark_forest_center", "biomesoplenty:orchard", "biomesoplenty:bamboo_blossom_grove", "biomesoplenty:cherry_blossom_grove", "biomesoplenty:lavender_forest", "biomesoplenty:mystic_grove", "biomesoplenty:rainbow_hills", "biomesoplenty:rainforest", "twilightforest:firefly_forest", "terrestria:lush_redwood_forest", "terrestria:lush_redwood_forest_edge", "biomesoplenty:bamboo_blossom_grove", "biomesoplenty:cherry_blossom_grove", "biomesoplenty:meadow", "biomesoplenty:meadow_forest", "biomesoplenty:mystic_grove", "biomesoplenty:ominous_woods", "biomesoplenty:ominous_mire", "biomesoplenty:rainbow_hills", "biomesoplenty:shroomy_wetland", "biomesoplenty:wetland", "biomesoplenty:wetland_forest", "projectvibrantjourneys:flooded_woodlands"]
+
+	[wet_forest.kakapo]
+		chance = 5
+		min = 1
+		max = 2
+		enabled = true
+
+	[wet_forest.brown_rat]
+		chance = 15
+		min = 2
+		max = 4
+		enabled = true
+

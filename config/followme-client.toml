@@ -1,0 +1,9 @@
+
+[general]
+	#How to show an entity is following the player (0: no rendering, 1 message below nameplate
+	followRenderMode = 1
+	#Colour of the following text in the rgb format.
+	followMessageColour = [0, 255, 33]
+	#Use the entities team colour for the follow message
+	followMessageUseTeamColour = true
+

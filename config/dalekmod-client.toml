@@ -1,0 +1,11 @@
+
+#Dalek Mod Client configuration settings
+[client]
+	#Use the custom Dalek Mod titlescreen
+	customTitleScreen = false
+	#Connect the the SWDTeam website to get the latest title screen splashes
+	#If customTitleScreen is disabled, this will be too
+	getSplashes = true
+	#Toggle lightmaps
+	renderLightmaps = true
+

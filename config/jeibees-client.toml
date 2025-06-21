@@ -1,0 +1,11 @@
+#Set to false to disable display of mutation requirements
+showRequirements = true
+#Set to false to disable display of secret mutations
+showSecretMutations = true
+#Set to false to disable showing identified genome in recipes
+identifyGenome = true
+#List of classes of species to ignore in mutation recipes (e.g. bees, trees, butterflies)
+skipMutationsFor = []
+#List of classes of species to ignore in produce recipes (e.g. bees, trees, butterflies)
+skipProduceFor = ["butterflies"]
+

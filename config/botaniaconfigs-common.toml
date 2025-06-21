@@ -1,0 +1,21 @@
+
+[orechid]
+	#The delay (in ticks) between the Orechid working
+	#Default: 100
+	#Range: 1 ~ 32767
+	delay = 100
+	#The mana cost of the Orechid working
+	#Default: 17500
+	#Range: > 0
+	cost = 17500
+
+[orechid_ignem]
+	#The delay (in ticks) between the Orechid Ignem working
+	#Default: 100
+	#Range: 1 ~ 32767
+	delay = 100
+	#The mana cost of the Orechid Ignem working
+	#Default: 20000
+	#Range: > 0
+	cost = 20000
+

@@ -1,0 +1,586 @@
+"Removed Ore" = []
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockantimony"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 5
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockstibnite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 8
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockblackcoal"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 16
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockbrowncoal"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 12
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockazuriteore"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 6
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockchalcopyrite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 12
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockcopper"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 7
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockmalachiteore"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 6
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockcalaverite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 5
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockgold"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 4
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockhaematite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 9
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockmagnetite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 6
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockbogiron"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 12
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 4
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockbraunstein"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 9
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockpyrite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 12
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockilmenite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 8
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockgalena"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 14
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 4
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocklead"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 6
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockcinnabar"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 8
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockgarnierite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 6
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocknickel"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 4
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocknickeline"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 5
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockplatinum"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 2
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockakanthite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 5
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocksilver"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 4
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockstromeyerite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 4
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockcassiterite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 8
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockstannite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 9
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocksphalerite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 8
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockzincite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 6
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockagate"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 2
+	"Min Vein Level" = 1
+	"Max Vein Level" = 48
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockamethyst"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 3
+	"Min Vein Level" = 1
+	"Max Vein Level" = 48
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockaquamarine"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 2
+	"Min Vein Level" = 1
+	"Max Vein Level" = 48
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockazurite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 3
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockcitrine"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 4
+	"Min Vein Level" = 1
+	"Max Vein Level" = 48
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockdiamond"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 1
+	"Min Vein Level" = 1
+	"Max Vein Level" = 32
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockemerald"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 2
+	"Min Vein Level" = 1
+	"Max Vein Level" = 32
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockgarnet"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 2
+	"Min Vein Level" = 1
+	"Max Vein Level" = 32
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockjade"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 5
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockmalachite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 3
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockmorion"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 4
+	"Min Vein Level" = 1
+	"Max Vein Level" = 48
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockonyx"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 4
+	"Min Vein Level" = 1
+	"Max Vein Level" = 48
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockruby"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 2
+	"Min Vein Level" = 1
+	"Max Vein Level" = 32
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocksaphire"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 3
+	"Min Vein Level" = 1
+	"Max Vein Level" = 32
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocktopaz"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 3
+	"Min Vein Level" = 1
+	"Max Vein Level" = 48
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockslate"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 48
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 5
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockbasalt"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 36
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 4
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockgranite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 52
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 6
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocklimestone"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 28
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 4
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockquartzite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 18
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 5
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockgraphite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 8
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockbonestone"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 4
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocklapis"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 9
+	"Min Vein Level" = 1
+	"Max Vein Level" = 48
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockbitumen"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 12
+	"Min Vein Level" = 1
+	"Max Vein Level" = 64
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockbluestone"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 8
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 4
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockdiabase"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 18
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockmarble"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 8
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocksandstone"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 42
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 5
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocktuff"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 16
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 4
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockbromellite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 7
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 1
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockbismutite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 7
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 2
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockcobaltite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 6
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockwolframite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 7
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockcoppergloss"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 7
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 4
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockirongloss"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 7
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 4
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocksilvergloss"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 7
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 4
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocksulfur"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 12
+	"Min Vein Level" = 1
+	"Max Vein Level" = 64
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blocksaltpeter"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 7
+	"Min Vein Level" = 1
+	"Max Vein Level" = 64
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockmethane"
+	"Filler Name" = "minecraft:cave_air"
+	"Max Vein Size" = 3
+	"Min Vein Level" = 1
+	"Max Vein Level" = 52
+	"Spawn Rate" = 8
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockarsenopyrite"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 12
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 4
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockorpiment"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 14
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 4
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockrealgar"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 8
+	"Min Vein Level" = 1
+	"Max Vein Level" = 60
+	"Spawn Rate" = 3
+
+[["MatLib Ore"]]
+	"Ore Name" = "matlib:blockarsenic"
+	"Filler Name" = "minecraft:stone"
+	"Max Vein Size" = 7
+	"Min Vein Level" = 1
+	"Max Vein Level" = 128
+	"Spawn Rate" = 3
+

@@ -1,0 +1,8 @@
+
+#General
+[general]
+	#Should Example file be printed?
+	printExample = true
+	#Should script errors be printed in chat when player log in?
+	printErrors = true
+

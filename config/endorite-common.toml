@@ -1,0 +1,8 @@
+
+["Creature Spawning"]
+	"Can Enderlings Spawn?" = true
+	"Can Voidlings Spawn?" = true
+	"Can Ender Rams Spawn?" = true
+	"Can Ender Surges Spawn?" = true
+	"Can Ender Expellers Spawn?" = true
+

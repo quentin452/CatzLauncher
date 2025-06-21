@@ -1,0 +1,33 @@
+
+#
+# This is 1 of ZAWA's 10 habitat ranges. Each sub-range has its own list of biomes, and all of the sub-range's entities will spawn in those biomes.
+# Disable entities (or a species variant) by setting "enabled" under their category to false.
+# Use ONLY whole numbers greater than 0 for chance, min, and max!
+# "chance" is how common they spawn, a higher number is more common than a lower number. "min" and "max" adjusts their spawning group size.
+# !! If modded biomes are not generated, delete the entire "biomes" line for each sub-category and restart minecraft. !!
+#
+#
+[fast_fresh_water]
+	biomes = ["minecraft:river", "minecraft:frozen_river", "twilightforest:stream"]
+
+	[fast_fresh_water.salmon]
+		enabled = true
+		chance = 10
+		min = 6
+		max = 6
+
+	[fast_fresh_water.indian_gharial]
+		enabled = true
+		chance = 5
+		min = 1
+		max = 1
+
+[slow_fresh_water]
+	biomes = ["minecraft:swamp", "minecraft:swamp_hills", "twilightforest:swamp", "twilightforest:fire_swamp"]
+
+	[slow_fresh_water.flamingo]
+		enabled = true
+		chance = 15
+		min = 4
+		max = 6
+

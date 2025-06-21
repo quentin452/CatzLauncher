@@ -1,0 +1,48 @@
+
+#
+# This is 1 of ZAWA's 10 habitat ranges. Each sub-range has its own list of biomes, and all of the sub-range's entities will spawn in those biomes.
+# Disable entities (or a species variant) by setting "enabled" under their category to false.
+# Use ONLY whole numbers greater than 0 for chance, min, and max!
+# "chance" is how common they spawn, a higher number is more common than a lower number. "min" and "max" adjusts their spawning group size.
+# !! If modded biomes are not generated, delete the entire "biomes" line for each sub-category and restart minecraft. !!
+#
+#
+[polar_ocean]
+	biomes = ["minecraft:frozen_ocean", "minecraft:cold_ocean", "minecraft:deep_cold_ocean", "minecraft:deep_frozen_ocean"]
+
+[pelagic_ocean]
+	biomes = ["minecraft:ocean", "minecraft:deep_ocean", "minecraft:lukewarm_ocean", "minecraft:deep_lukewarm_ocean", "demon_realm:boiling_ocean", "weird_wonderful_wild:abyss", "twilightforest:lake"]
+
+	[pelagic_ocean.orca]
+		chance = 8
+		min = 3
+		max = 4
+		enabled = true
+
+	[pelagic_ocean.cod]
+		chance = 15
+		min = 6
+		max = 6
+		enabled = true
+
+[tropical_ocean]
+	biomes = ["minecraft:warm_ocean", "minecraft:deep_warm_ocean", "terraforged:warm_beach"]
+
+	[tropical_ocean.angelfish]
+		chance = 10
+		min = 4
+		max = 4
+		enabled = true
+
+	[tropical_ocean.gramma]
+		chance = 10
+		min = 2
+		max = 2
+		enabled = true
+
+	[tropical_ocean.clownfish]
+		chance = 10
+		min = 2
+		max = 3
+		enabled = true
+

@@ -1,0 +1,33 @@
+
+[spawnconfig]
+	#how many beast patients will spawn with every female, 1-20, default 2
+	#Range: 1 ~ 20
+	beast_patient_for_female = 2
+	#how many beast patients will spawn with every ashen blood, 1-20, default 2
+	#Range: 1 ~ 20
+	beast_patient_for_ashen_blood = 2
+	#how many female beast patients will spawn with every ashen blood, 1-20, default 1
+	#Range: 1 ~ 20
+	female_for_ashen_blood = 1
+	#decrease chance of a world boss actually spawning 1-100, default 25, higher value = lower chance
+	#Range: 1 ~ 100
+	boss_spawn_chance = 25
+	#how many huntsmen with a pitchfork in every huntsmen group, 1-20, default 1
+	#Range: 1 ~ 20
+	pitchfork_for_group = 1
+	#how many huntsmen with a sabre in every huntsmen group, 1-20, default 1
+	#Range: 1 ~ 20
+	sabre_for_group = 1
+	#how many dogs in every huntsmen group, 1-20, default 2
+	#Range: 1 ~ 20
+	dog_for_group = 2
+	#how many hunting dogs in every huntsmen group, 1-20, default 1
+	#Range: 1 ~ 20
+	hunting_dog_for_group = 1
+	#Will enemies hit allies in their attack area, default = false
+	allow_friendly_fire = false
+	#Set to true if you want hutsmen to behave like pillagers, default = false (NOT WORKING)
+	are_huntsmen_pillagers = false
+	#Set to true if you want beasts to not attack animals, default = false (NOT WORKING)
+	keep_animals_safe_from_beasts = false
+

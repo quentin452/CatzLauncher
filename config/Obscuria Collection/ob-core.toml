@@ -1,0 +1,9 @@
+
+[Gameplay]
+	#Chance to apply the Massacre effect to hostile mob (Page I+)
+	#Range: 0.0 ~ 1.0
+	monsterMassacreChance = 0.01
+	#Chance of bleeding on damage (only for entities with a tag forge:ob_system/bleeding), {damage * chance * lostHP%}
+	#Range: 0.0 ~ 10.0
+	bleedingChance = 0.1
+

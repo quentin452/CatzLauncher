@@ -1,0 +1,48 @@
+
+#Mapper Settings
+[mapper]
+	#Enables the creation of Death Waypoints
+	DeathWaypoints = true
+	#Enables the usage of Biome Colors on the mapper
+	BiomeColors = true
+
+#Settings for the Minimap
+[minimap]
+	#Alignment of the Minimap
+	#Allowed Values: TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTER, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT
+	alignment = "TOP_RIGHT"
+	#X Position of the Minimap
+	#Range: -500 ~ 500
+	posX = -65
+	#Y Position of the Minimap
+	#Range: -500 ~ 500
+	posY = 1
+	#Scale of the Minimap
+	#Range: 0.25 ~ 4.0
+	scale = 1.0
+	#Is Minimap visible?
+	visible = false
+	#Selected Style (don't change this manually)
+	style = "default"
+	#Set this to true and the minimap will spin in the direction you're facing
+	Spin = false
+
+#Settings for the Compass (Unimplemented right now)
+[compass]
+	#Alignment of the Compass
+	#Allowed Values: TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTER, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT
+	alignment = "TOP"
+	#X Position of the Compass
+	#Range: -500 ~ 500
+	posX = -128
+	#Y Position of the Compass
+	#Range: -500 ~ 500
+	posY = 1
+	#Scale of the Compass
+	#Range: 0.25 ~ 4.0
+	scale = 1.0
+	#Is Compass visible?
+	visible = false
+	#Selected Style (don't change this manually)
+	style = "default"
+

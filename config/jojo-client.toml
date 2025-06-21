@@ -1,0 +1,12 @@
+# Position of Energy, Stamina and Resolve bars in the HUD.
+#Allowed Values: TOP_LEFT, TOP_RIGHT, LEFT, RIGHT
+barsPosition = "TOP_LEFT"
+# Position of Power name, Attack and Ability hotbars in the HUD.
+#Allowed Values: TOP_LEFT, TOP_RIGHT, LEFT, RIGHT
+hotbarsPosition = "TOP_LEFT"
+# Enable hotkey settings for each individual attack and ability from 1 to 9.
+#  If your client is launched, changing the setting requires restarting the game.
+slotHotkeys = true
+# Enable shaders during Resolve effect.
+resolveShaders = true
+

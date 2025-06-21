@@ -1,0 +1,9 @@
+
+[misc]
+	#Print the MOTD from the net in chat on login [default:true]
+	motd = true
+	#Make explosion effects on respawn [default:true]
+	spawn_explosion = true
+	#Play custom background music [default:true]
+	custom_music = true
+

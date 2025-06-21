@@ -1,0 +1,14 @@
+#The time of the refresh interval. After each interval, the rotten flesh item will try to catalyze the plant.
+#Range: 20 ~ 6000
+refreshInterval = 100
+#The time before the item entity's expiration. The item entity whose age is larger than this will be cleared, just like what happens in vanilla.
+#Range: 20 ~ 36000
+expireTime = 6000
+#Should the possibility of catalysis be influenced by biome properties (temperature & humidity)?
+influencedByBiome = true
+#The possibility multiplier. The greater the value is, the more the possibility the plant is catalyzed.
+#Range: 0.0 ~ 1.7014117331926443E38
+possibilityMultiplier = 1.0
+#If true, will respect vanilla's bone meal catalysis criteria. An example is when you try to bone-meal a tree, It has a 45% chance of growing.
+respectVanillaCriteria = true
+

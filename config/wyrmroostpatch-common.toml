@@ -1,0 +1,18 @@
+
+["Breed Caps"]
+	#Rooststalker breed cap. Set to 0 to disable. Default: 5
+	#Range: 0 ~ 10000
+	"Rooststalker Breed Cap" = 5
+	#Alpine dragon breed cap. Set to 0 to disable. Default: 3
+	#Range: 0 ~ 10000
+	"Alpine Breed Cap" = 3
+	#Butterfly Leviathan breed cap. Set to 0 to disable. Default: 3
+	#Range: 0 ~ 10000
+	"Butterfly Leviathan Breed Cap" = 3
+	#Whether alpines, rooststalkers, and butterfly leviathans have a limit on the number of times they can breed. Default: true
+	"Enable Breed Caps" = true
+
+["Alpine Recoloring"]
+	#Enables recoloring alpines with Alpine Tinctures. Default: true
+	"Enable Alpine Recoloring" = true
+

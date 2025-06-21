@@ -1,0 +1,7 @@
+
+[Tooltips]
+	#Display equipment attributes in tooltips
+	"Equipment Icons" = true
+	#Display food properties in tooltips
+	"Food Icons" = true
+

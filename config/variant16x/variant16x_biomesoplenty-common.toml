@@ -1,0 +1,82 @@
+
+#'Variant16x: Biomes O' Plenty' Common Configuration File | Game Version: 1.16.5
+#'Variant16x: Biomes O' Plenty' Settings
+[variant16x_biomesoplenty]
+
+	#General Settings
+	#These options will OVERRIDE any Custom Settings!
+	[variant16x_biomesoplenty.general]
+		#Enables/Disables ALL Pressure Plate Variants
+		enablePressurePlates = true
+		#Enables/Disables ALL Button Variants
+		enableButtons = true
+		#Enables/Disables ALL Stairs Variants
+		enableStairs = true
+		#Enables/Disables ALL Wall Variants
+		enableWalls = true
+		#Enables/Disables ALL Fence Gate Variants
+		enableFenceGates = true
+		#Enables/Disables ALL Fence Variants
+		enableFences = true
+		#Enables/Disables ALL Slab Variants
+		enableSlabs = true
+
+	#Custom Settings
+	#These options allow for more in-depth configuring.
+	[variant16x_biomesoplenty.custom]
+
+		#Custom Wall Settings
+		[variant16x_biomesoplenty.custom.walls]
+			#Enables/Disables Sand Wall Variants
+			enableSandWalls = true
+			#Enables/Disables Sandstone Wall Variants
+			enableSandstoneWalls = true
+
+		#Custom Fence Settings
+		[variant16x_biomesoplenty.custom.fences]
+			#Enables/Disables Wood/Hyphae Fence Variants
+			enableWoodFences = true
+
+		#Custom Button Settings
+		[variant16x_biomesoplenty.custom.buttons]
+			#Enables/Disables Sand Button Variants
+			enableSandButtons = true
+			#Enables/Disables Sandstone Button Variants
+			enableSandstoneButtons = true
+			#Enables/Disables Wood/Hyphae Button Variants
+			enableWoodButtons = true
+			#Enables/Disables Mud Brick Button Variants
+			enableMudBrickButtons = true
+
+		#Custom Pressure Plate Settings
+		[variant16x_biomesoplenty.custom.pressurePlates]
+			#Enables/Disables Wood/Hyphae Pressure Plate Variants
+			enableWoodPressurePlates = true
+			#Enables/Disables Sandstone Pressure Plate Variants
+			enableSandstonePressurePlates = true
+			#Enables/Disables Sand Pressure Plate Variants
+			enableSandPressurePlates = true
+			#Enables/Disables Mud Brick Pressure Plate Variants
+			enableMudBrickPressurePlates = true
+
+		#Custom Stairs Settings
+		[variant16x_biomesoplenty.custom.stairs]
+			#Enables/Disables Wood/Hyphae Stairs Variants
+			enableWoodStairs = true
+			#Enables/Disables Sand Stairs Variants
+			enableSandStairs = true
+			#Enables/Disables Sandstone Stairs Variants
+			enableSandstoneStairs = true
+
+		#Custom Fence Gate Settings
+		[variant16x_biomesoplenty.custom.fenceGates]
+			#Enables/Disables Wood/Hyphae Fence Gate Variants
+			enableWoodFenceGates = true
+
+		#Custom Slab Settings
+		[variant16x_biomesoplenty.custom.slabs]
+			#Enables/Disables Wood/Hyphae Slab Variants
+			enableWoodSlabs = true
+			#Enables/Disables Sand Slab Variants
+			enableSandSlabs = true
+

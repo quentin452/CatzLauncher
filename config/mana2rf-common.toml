@@ -1,0 +1,9 @@
+#The amount of FE produced by one micromanapool (one millionth of a mana pool) of mana.
+#Range: 1 ~ 100
+conversion_rate = 10
+#The amount of FE that mana items will discharge into FE items per tick.
+#Range: 0 ~ 2000000
+item_discharge_speed = 10000
+#Does a mana item need to be right-clicked on a Mana Fluxfield before it can produce FE?
+fluxfield_gating = false
+

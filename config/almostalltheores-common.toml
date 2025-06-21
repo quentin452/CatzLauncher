@@ -1,0 +1,3093 @@
+
+#General settings
+[general]
+	#Set this to true if you only want to use this mod to tune vanilla ores spawning. Nothing from this mod will spawn in any dimension.
+	disableAatoGeneration = false
+	#Should blocks and items from this mod be hidden in JEI. Useful if you only use this mod to tune vanilla ores.
+	hideEverythingInJEI = false
+	#Activate the stone age. Disable a few smelting recipes so you have to build a refiner in order to have iron. It really changes the way you have to play early game. (default: false)
+	enableStoneAge = false
+	#If for some reason you don't want the mod to automatically enable ore generation for mods supported by the plug and play feature, set this to false WARNING : you will have to enable everything by yourself.
+	enablePlugAndPlay = true
+	#If you are a geologist or a mineralogist at heart, turn this on. No tooltips will be shown. Also recommended for hardcore players.
+	noTooltips = false
+	#Should platinum-group metals block only drop osmium. Useful if you don't need platinum and iridium (e.g. playing Mekanism). If you need those metals, set this to false.
+	lootOsmiumOnly = true
+
+#Harvest Levels. Wood, Stone, Iron, Diamond : 0, 1, 2, 3. Above 3 is modded materials stronger than diamond.
+[harvestlevels]
+	#Common PGMs (platinum, iridium, osmium) harvest level
+	#Range: 0 ~ 5
+	commonPGMsHarvestLevel = 3
+	#Rare PGMs (palladium, ruthenium, rhodium) harvest level
+	#Range: 0 ~ 5
+	rarePGMsHarvestLevel = 3
+	#Nitratine (salpetre ore) harvest level
+	#Range: 0 ~ 5
+	nitratineHarvestLevel = 1
+	#Iron ores harvest level. Only works with modded iron ores, i.e. hematite, limonite...
+	#Range: 0 ~ 5
+	ironHarvestLevel = 1
+	#Halite (salt ore) harvest level
+	#Range: 0 ~ 5
+	haliteHarvestLevel = 1
+	#Chromium ores harvest level
+	#Range: 0 ~ 5
+	chromiumHarvestLevel = 2
+	#Molybdenum ores harvest level
+	#Range: 0 ~ 5
+	molybdenumHarvestLevel = 2
+	#Mithril ores harvest level
+	#Range: 0 ~ 5
+	mithrilHarvestLevel = 3
+	#Copper ores harvest level
+	#Range: 0 ~ 5
+	copperHarvestLevel = 1
+	#Tin ores harvest level
+	#Range: 0 ~ 5
+	tinHarvestLevel = 2
+	#Zinc ores harvest level
+	#Range: 0 ~ 5
+	zincHarvestLevel = 2
+	#Lead ores harvest level
+	#Range: 0 ~ 5
+	leadHarvestLevel = 2
+	#Cadmium ores harvest level
+	#Range: 0 ~ 5
+	cadmiumHarvestLevel = 1
+	#Mercury ores harvest level
+	#Range: 0 ~ 5
+	mercuryHarvestLevel = 1
+	#Aluminium ores harvest level
+	#Range: 0 ~ 5
+	aluminiumHarvestLevel = 2
+	#Silver ores harvest level
+	#Range: 0 ~ 5
+	silverHarvestLevel = 2
+	#Manganese ores harvest level
+	#Range: 0 ~ 5
+	manganeseHarvestLevel = 2
+	#Titanium ores harvest level
+	#Range: 0 ~ 5
+	titaniumHarvestLevel = 2
+	#Tungsten ores harvest level
+	#Range: 0 ~ 5
+	tungstenHarvestLevel = 2
+	#Nickel ores harvest level
+	#Range: 0 ~ 5
+	nickelHarvestLevel = 2
+
+	#Uranium Ores harvest level
+	[harvestlevels.uraniumOresHarvestLevels]
+		#Carnotite harvest level
+		#Range: 0 ~ 5
+		carnotiteHarvestLevel = 2
+		#Uraninite harvest level
+		#Range: 0 ~ 5
+		uraniniteHarvestLevel = 3
+
+#Here you can blacklist biomes you don't want a group of ores to spawn in. You should put biomes registry names, e.g. minecraft:plains or whatevermod:whateverbiome. See github wiki for examples. Works in all biomes except Nether and End.
+[blacklists]
+	#Gold ore biomes blacklist
+	biomesBlacklistGoldOre = []
+	#Vanilla diamond ore biomes blacklist
+	biomesBlacklistDiamondOre = []
+	#AatO diamond ores biomes blacklist
+	biomesBlacklistAatODiamondOres = []
+	#Lapis lazuli ore biomes blacklist
+	biomesBlacklistLapislazuliOre = []
+	#Redstone ore biomes blacklist
+	biomesBlacklistRedstoneOre = []
+	#Copper ores biomes blacklist
+	biomesBlacklistCopperOres = []
+	#Iron ores biomes blacklist. Also works for vanilla iron ore if you enabled it.
+	biomesBlacklistIronOres = []
+	#Coal ores (anthracite, bituminous coal, lignite, peat) biomes blacklist. Also works for vanilla coal ore if you enabled it.
+	biomesBlacklistCoalOres = []
+	#Tin ores biomes blacklist
+	biomesBlacklistTinOres = []
+	#Sulfur ores biomes blacklist
+	biomesBlacklistSulphurOres = []
+	#NPK ores (used for making fertilizer) biomes blacklist
+	biomesBlacklistNPKOres = []
+	#Lead ores biomes blacklist
+	biomesBlacklistLeadOres = []
+	#Aluminium ores biomes blacklist
+	biomesBlacklistAluminumOres = []
+	#Zinc ores biomes blacklist
+	biomesBlacklistZincOres = []
+	#Cadmium ores biomes blacklist
+	biomesBlacklistCadmiumOres = []
+	#Mercury ores biomes blacklist
+	biomesBlacklistMercuryOres = []
+	#Silver ores biomes blacklist
+	biomesBlacklistSilverOres = []
+	#Nickel ores biomes blacklist
+	biomesBlacklistNickelOres = []
+	#Common PGMs (platinum, iridium, osmium) ores biomes blacklist
+	biomesBlacklistPGMs = []
+	#Rare PGMs (palladium, rhodium, ruthenium) ores biomes blacklist
+	biomesBlacklistRarePGMs = []
+	#Manganese ores biomes blacklist
+	biomesBlacklistManganeseOres = []
+	#Chromium ores biomes blacklist
+	biomesBlacklistChromiumOres = []
+	#Molybdenum ores biomes blacklist
+	biomesBlacklistMolybdenumOres = []
+	#Tungsten ores biomes blacklist
+	biomesBlacklistTungstenOres = []
+	#Vanadium ores biomes blacklist
+	biomesBlacklistVanadiumOres = []
+	#Niobium ores biomes blacklist
+	biomesBlacklistNiobiumOres = []
+	#Tantalum ores biomes blacklist
+	biomesBlacklistTantalumOres = []
+	#Titanium ores biomes blacklist
+	biomesBlacklistTitaniumOres = []
+	#Zirconium ores biomes blacklist
+	biomesBlacklistZirconiumOres = []
+	#Thorium ores biomes blacklist
+	biomesBlacklistThoriumOres = []
+	#Uranium ores biomes blacklist
+	biomesBlacklistUraniumOres = []
+	#Magnesium ores biomes blacklist
+	biomesBlacklistMagnesiumOres = []
+	#Calcium ores biomes blacklist
+	biomesBlacklistCalciumOres = []
+	#Strontium ores biomes blacklist
+	biomesBlacklistStrontiumOres = []
+	#Lithium ores biomes blacklist
+	biomesBlacklistLithiumOres = []
+	#Salt ore (halite) biomes blacklist
+	biomesBlacklistSaltOre = []
+	#Saltpetre ore (nitratine) biomes blacklist
+	biomesBlacklistSaltpetreOre = []
+	#Mithril ore biomes blacklist
+	biomesBlacklistMithrilOre = []
+	#Cobalt ores biomes blacklist
+	biomesBlacklistCobaltOres = []
+	#Graphite biomes blacklist
+	biomesBlacklistGraphite = []
+	#Chrysocolla (gem used to make a refiner) biomes blacklist
+	biomesBlacklistChrysocollaOre = []
+
+#Simplified overworld generation settings for modded ores.
+[overworldSimplified]
+	#Enable AatO diamond ores
+	enableAatODiamondOres = true
+	#Enable all sulphur ores. Including nether sulphur. (default: true)
+	enableSulphurOres = true
+	#Enable all selenium ores. (default: false)
+	enableSeleniumOres = false
+	#Enable all coal ores. (default: true)
+	enableCoalOres = true
+	#Enable graphite ore. (default: false)
+	enableGraphiteOre = false
+	#Enable all arsenic ores. (default: false)
+	enableArsenicOres = false
+	#Enable all antimony ores. (default: false)
+	enableAntimonyOres = false
+	#Enable all germanium ores. (default: false)
+	enableGermaniumOres = false
+	#Enable all bismuth ores. (default: false)
+	enableBismuthOres = false
+	#Enable all tin ores. (default: false)
+	enableTinOres = true
+	#Enable all lead ores. (default: false)
+	enableLeadOres = true
+	#Enable all aluminum ores. (default: false)
+	enableAluminumOres = true
+	#Enable all zinc ores. (default: false)
+	enableZincOres = true
+	#Enable all cadmium ores. (default: false)
+	enableCadmiumOres = false
+	#Enable all mercury ores. (default: false)
+	enableMercuryOres = false
+	#Enable all copper ores. (default: false)
+	enableCopperOres = true
+	#Enable all silver ores. (default: false)
+	enableSilverOres = true
+	#Enable all nickel ores. (default: false)
+	enableNickelOres = false
+	#Enable all cobalt ores. (default: false)
+	enableCobaltOres = false
+	#Enable all iron ores. (default: true)
+	enableIronOres = true
+	#Enable all manganese ores. (default: false)
+	enableManganeseOres = false
+	#Enable all chromium ores. (default: false)
+	enableChromiumOres = false
+	#Enable all molybdenum ores. (default: false)
+	enableMolybdenumOres = false
+	#Enable all tungsten ores. (default: false)
+	enableTungstenOres = false
+	#Enable all vanadium ores. (default: false)
+	enableVanadiumOres = false
+	#Enable all nionium ores. (default: false)
+	enableNiobiumOres = false
+	#Enable all tantalum ores. (default: false)
+	enableTantalumOres = false
+	#Enable all titanium ores. (default: false)
+	enableTitaniumOres = false
+	#Enable all zirconium ores. (default: false)
+	enableZirconiumOres = false
+	#Enable all thorium ores. (default: false)
+	enableThoriumOres = false
+	#Enable all uranium ores. (default: false)
+	enableUraniumOres = false
+	#Enable all magnesium ores. (default: false)
+	enableMagnesiumOres = false
+	#Enable all calcium ores. Includes gypsum and calcite (limestone). (default: false)
+	enableCalciumOres = false
+	#Enable all strontium ores. (default: false)
+	enableStrontiumOres = false
+	#Enable all lithium ores. (default: false)
+	enableLithiumOres = false
+	#Enable NPK ores (used for making fertilizer). (default: true)
+	enableNPKOres = true
+	#Enable mithril ore. (default: false)
+	enableMithrilOre = false
+	#Enable saltpetre ore. (default: true)
+	enableSaltpetreOre = true
+	#Enable salt ore. (default: true)
+	enableSaltOre = true
+	#Enable a few gems ore generation (Sapphire, Ruby, Spinel, Amethyst, Jade, Peridot, Topaz, Tanzanite, Onyx, Opal). (default: false)
+	enableSomeGemsOres = true
+	#Enable ALL gems. (default: false)
+	enableAllGems = false
+	#Enable commmon platinum-group metals (platinum, iridium, osmium). (default: false)
+	enablePGMsOres = true
+	#Enable rare platinum-group metals (ruthenium, rhodium, palladium). (default: false)
+	enableRarePGMsOres = false
+	#Enable rare-earth elements ores (Bastnasite La, Ce, Y, Nd, Monazite La, Ce, Nd, Samarskite Y, Thortveitite.). (default: false)
+	enableREEs = false
+
+#Expert overworld generation settings
+[overworldExpert]
+
+	#If you want vanilla's coal ore to spawn
+	[overworldExpert.coalore]
+		#Should vanilla coal ore spawn.
+		enableCoalOre = false
+		#Coal Ore Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCoalOre = 17
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCoalOre = 20
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCoalOre = 0
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCoalOre = 128
+
+	#If you want vanilla's iron ore to spawn
+	[overworldExpert.ironore]
+		#Should vanilla iron ore spawn.
+		enableIronOre = false
+		#Iron Ore Vein Size
+		#Range: 0 ~ 50
+		VeinSizeIronOre = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkIronOre = 20
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightIronOre = 0
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightIronOre = 64
+
+	[overworldExpert.emerald_ore]
+		#Enable emerald_ore generation
+		enableEmeraldOre = true
+
+	[overworldExpert.gold]
+		#Enable gold ore generation
+		enableGold = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeGold = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkGold = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightGold = 0
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightGold = 32
+
+	[overworldExpert.badlandsgold]
+		#Enable additional gold in badlands biomes
+		enableBadlandsGold = true
+		#Vein Size badlands gold
+		#Range: 0 ~ 50
+		VeinSizeBadlandsGold = 9
+		#Veins per chunk badlands gold
+		#Range: 0 ~ 50
+		VeinsPerChunkBadlandsGold = 20
+		#Minimum Height badlands gold
+		#Range: 0 ~ 255
+		MinHeightBadlandsGold = 32
+		#Maximum Height badlands gold
+		#Range: 0 ~ 255
+		MaxHeightBadlandsGold = 80
+
+	[overworldExpert.redstone]
+		#Enable redstone ore generation
+		enableRedstone = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeRedstone = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkRedstone = 8
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightRedstone = 0
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightRedstone = 16
+
+	[overworldExpert.diamond]
+		#Enable vanilla diamond ore generation
+		enableDiamond = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeDiamond = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkDiamond = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightDiamond = 0
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightDiamond = 16
+
+	[overworldExpert.lapis]
+		#Enable lapis lazuli ore generation
+		enableLapis = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeLapis = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkLapis = 1
+		#Depth average of lapis lazuli ores
+		#Range: 0 ~ 255
+		DepthAverageLapis = 16
+
+	[overworldExpert.dirt]
+		#Enable underground dirt pockets generation
+		enableDirt = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeDirt = 33
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkDirt = 10
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightDirt = 0
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightDirt = 255
+
+	[overworldExpert.gravel]
+		#Enable underground gravel generation
+		enableGravel = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeGravel = 33
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkGravel = 8
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightGravel = 0
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightGravel = 255
+
+	[overworldExpert.granite]
+		#Enable granite generation
+		enableGranite = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeGranite = 33
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkGranite = 10
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightGranite = 10
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightGranite = 80
+
+	[overworldExpert.diorite]
+		#Enable diorite generation
+		enableDiorite = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeDiorite = 33
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkDiorite = 10
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightDiorite = 10
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightDiorite = 80
+
+	[overworldExpert.andesite]
+		#Enable andesite generation
+		enableAndesite = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAndesite = 33
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAndesite = 10
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAndesite = 10
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAndesite = 80
+
+	[overworldExpert.infestedstone]
+		#Enable infested stone generation
+		enableInfestedStone = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeInfestedStone = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkInfestedStone = 7
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightInfestedStone = 0
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightInfestedStone = 64
+
+	[overworldExpert.pyrite]
+		#Enable pyrite generation
+		enablePyrite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePyrite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPyrite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPyrite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPyrite = 128
+
+	[overworldExpert.sulphur]
+		#Enable sulphur generation
+		enableSulphur = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeSulphur = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkSulphur = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightSulphur = 40
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightSulphur = 255
+
+	[overworldExpert.kimberlite]
+		#Enable Kimberlite generation (diamond ore)
+		enableKimberlite = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeKimberlite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkKimberlite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightKimberlite = 0
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightKimberlite = 16
+
+	[overworldExpert.lamproite]
+		#Enable Lamproite generation (diamond ore)
+		enableLamproite = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeLamproite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkLamproite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightLamproite = 0
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightLamproite = 16
+
+	[overworldExpert.clausthalite]
+		#Enable clausthalite generation
+		enableClausthalite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeClausthalite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkClausthalite = 8
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightClausthalite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightClausthalite = 60
+
+	[overworldExpert.guano]
+		#Enable guano generation
+		enableGuano = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeGuano = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkGuano = 5
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightGuano = 40
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightGuano = 255
+
+	[overworldExpert.phosphorite]
+		#Enable phosphorite generation
+		enablePhosphorite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePhosphorite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPhosphorite = 5
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPhosphorite = 40
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPhosphorite = 128
+
+	[overworldExpert.peat]
+		#Enable peat generation
+		enablePeat = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePeat = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPeat = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPeat = 50
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPeat = 128
+
+	[overworldExpert.lignite_ore]
+		#Enable lignite ore generation
+		enableLignite_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeLignite_ore = 15
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkLignite_ore = 7
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightLignite_ore = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightLignite_ore = 128
+
+	[overworldExpert.bituminous_coal_ore]
+		#Enable bituminous coal ore generation
+		enableBituminous_coal_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBituminous_coal_ore = 14
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBituminous_coal_ore = 7
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBituminous_coal_ore = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBituminous_coal_ore = 128
+
+	[overworldExpert.anthracite_ore]
+		#Enable anthracite ore generation
+		enableAnthracite_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAnthracite_ore = 12
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAnthracite_ore = 6
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAnthracite_ore = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAnthracite_ore = 128
+
+	[overworldExpert.graphite]
+		#Enable graphite generation
+		enableGraphite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeGraphite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkGraphite = 6
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightGraphite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightGraphite = 60
+
+	[overworldExpert.lollingite]
+		#Enable lollingite generation
+		enableLollingite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeLollingite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkLollingite = 6
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightLollingite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightLollingite = 60
+
+	[overworldExpert.realgar]
+		#Enable realgar generation
+		enableRealgar = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeRealgar = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkRealgar = 6
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightRealgar = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightRealgar = 60
+
+	[overworldExpert.orpiment]
+		#Enable orpiment generation
+		enableOrpiment = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeOrpiment = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkOrpiment = 6
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightOrpiment = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightOrpiment = 60
+
+	[overworldExpert.arsenopyrite]
+		#Enable arsenopyrite generation
+		enableArsenopyrite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeArsenopyrite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkArsenopyrite = 6
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightArsenopyrite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightArsenopyrite = 60
+
+	[overworldExpert.stibnite]
+		#Enable stibnite generation
+		enableStibnite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeStibnite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkStibnite = 5
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightStibnite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightStibnite = 60
+
+	[overworldExpert.germanite]
+		#Enable germanite generation
+		enableGermanite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeGermanite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkGermanite = 4
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightGermanite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightGermanite = 60
+
+	[overworldExpert.argutite]
+		#Enable argutite generation
+		enableArgutite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeArgutite = 4
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkArgutite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightArgutite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightArgutite = 60
+
+	[overworldExpert.bismuthinite]
+		#Enable bismuthinite generation
+		enableBismuthinite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBismuthinite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBismuthinite = 4
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBismuthinite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBismuthinite = 60
+
+	[overworldExpert.native_bismuth]
+		#Enable native bismuth generation
+		enableNative_bismuth = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNative_bismuth = 3
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNative_bismuth = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightNative_bismuth = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightNative_bismuth = 60
+
+	[overworldExpert.bismite]
+		#Enable bismite generation
+		enableBismite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBismite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBismite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBismite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBismite = 60
+
+	[overworldExpert.cassiterite]
+		#Enable cassiterite generation
+		enableCassiterite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCassiterite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCassiterite = 6
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCassiterite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCassiterite = 60
+
+	[overworldExpert.teallite]
+		#Enable teallite generation
+		enableTeallite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTeallite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkTeallite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTeallite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTeallite = 60
+
+	[overworldExpert.stannite]
+		#Enable stannite generation
+		enableStannite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeStannite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkStannite = 6
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightStannite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightStannite = 60
+
+	[overworldExpert.native_tin]
+		#Enable native tin generation
+		enableNative_tin = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNative_tin = 4
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNative_tin = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightNative_tin = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightNative_tin = 60
+
+	[overworldExpert.kesterite]
+		#Enable kesterite generation
+		enableKesterite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeKesterite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkKesterite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightKesterite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightKesterite = 50
+
+	[overworldExpert.galena]
+		#Enable galena generation
+		enableGalena = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeGalena = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkGalena = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightGalena = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightGalena = 50
+
+	[overworldExpert.cerussite]
+		#Enable cerussite generation
+		enableCerussite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCerussite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCerussite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCerussite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCerussite = 50
+
+	[overworldExpert.anglesite]
+		#Enable anglesite generation
+		enableAnglesite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAnglesite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAnglesite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAnglesite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAnglesite = 50
+
+	[overworldExpert.boulangerite]
+		#Enable boulangerite generation
+		enableBoulangerite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBoulangerite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBoulangerite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBoulangerite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBoulangerite = 50
+
+	[overworldExpert.pyromorphite]
+		#Enable pyromorphite generation
+		enablePyromorphite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePyromorphite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPyromorphite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPyromorphite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPyromorphite = 50
+
+	[overworldExpert.bauxite]
+		#Enable bauxite generation
+		enableBauxite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBauxite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBauxite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBauxite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBauxite = 75
+
+	[overworldExpert.nepheline]
+		#Enable nepheline generation
+		enableNepheline = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNepheline = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNepheline = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightNepheline = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightNepheline = 75
+
+	[overworldExpert.leucite]
+		#Enable leucite generation
+		enableLeucite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeLeucite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkLeucite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightLeucite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightLeucite = 75
+
+	[overworldExpert.sphalerite]
+		#Enable sphalerite generation
+		enableSphalerite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeSphalerite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkSphalerite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightSphalerite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightSphalerite = 50
+
+	[overworldExpert.smithsonite]
+		#Enable smithsonite generation
+		enableSmithsonite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeSmithsonite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkSmithsonite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightSmithsonite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightSmithsonite = 50
+
+	[overworldExpert.hemimorphite]
+		#Enable hemimorphite generation
+		enableHemimorphite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeHemimorphite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkHemimorphite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightHemimorphite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightHemimorphite = 50
+
+	[overworldExpert.franklinite]
+		#Enable franklinite generation
+		enableFranklinite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeFranklinite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkFranklinite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightFranklinite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightFranklinite = 50
+
+	[overworldExpert.zincite]
+		#Enable zincite generation
+		enableZincite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeZincite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkZincite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightZincite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightZincite = 50
+
+	[overworldExpert.hydrozincite]
+		#Enable hydrozincite generation
+		enableHydrozincite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeHydrozincite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkHydrozincite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightHydrozincite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightHydrozincite = 50
+
+	[overworldExpert.otavite]
+		#Enable otavite generation
+		enableOtavite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeOtavite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkOtavite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightOtavite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightOtavite = 45
+
+	[overworldExpert.greenockite]
+		#Enable greenockite generation
+		enableGreenockite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeGreenockite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkGreenockite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightGreenockite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightGreenockite = 45
+
+	[overworldExpert.cinnabar]
+		#Enable cinnabar generation
+		enableCinnabar = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCinnabar = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCinnabar = 4
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCinnabar = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCinnabar = 60
+
+	[overworldExpert.native_copper]
+		#Enable native copper generation
+		enableNative_copper = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNative_copper = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNative_copper = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightNative_copper = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightNative_copper = 65
+
+	[overworldExpert.chalcopyrite]
+		#Enable chalcopyrite generation
+		enableChalcopyrite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeChalcopyrite = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkChalcopyrite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightChalcopyrite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightChalcopyrite = 65
+
+	[overworldExpert.chalcocite]
+		#Enable chalcocite generation
+		enableChalcocite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeChalcocite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkChalcocite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightChalcocite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightChalcocite = 65
+
+	[overworldExpert.bornite]
+		#Enable bornite generation
+		enableBornite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBornite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBornite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBornite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBornite = 65
+
+	[overworldExpert.enargite]
+		#Enable enargite generation
+		enableEnargite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeEnargite = 4
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkEnargite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightEnargite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightEnargite = 65
+
+	[overworldExpert.tennantite]
+		#Enable tennantite generation
+		enableTennantite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTennantite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkTennantite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTennantite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTennantite = 65
+
+	[overworldExpert.tetrahedrite]
+		#Enable tetrahedrite generation
+		enableTetrahedrite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTetrahedrite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkTetrahedrite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTetrahedrite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTetrahedrite = 65
+
+	[overworldExpert.covellite]
+		#Enable covellite generation
+		enableCovellite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCovellite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCovellite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCovellite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCovellite = 65
+
+	[overworldExpert.azurite]
+		#Enable azurite generation
+		enableAzurite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAzurite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAzurite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAzurite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAzurite = 65
+
+	[overworldExpert.malachite]
+		#Enable malachite generation
+		enableMalachite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeMalachite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkMalachite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightMalachite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightMalachite = 65
+
+	[overworldExpert.cuprite]
+		#Enable cuprite generation
+		enableCuprite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCuprite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCuprite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCuprite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCuprite = 65
+
+	[overworldExpert.native_silver]
+		#Enable native silver generation
+		enableNative_silver = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNative_silver = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNative_silver = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightNative_silver = 10
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightNative_silver = 30
+
+	[overworldExpert.acanthite]
+		#Enable acanthite generation
+		enableAcanthite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAcanthite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAcanthite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAcanthite = 10
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAcanthite = 30
+
+	[overworldExpert.stephanite]
+		#Enable stephanite generation
+		enableStephanite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeStephanite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkStephanite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightStephanite = 10
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightStephanite = 30
+
+	[overworldExpert.proustite]
+		#Enable proustite generation
+		enableProustite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeProustite = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkProustite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightProustite = 10
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightProustite = 30
+
+	[overworldExpert.freibergite]
+		#Enable freibergite generation
+		enableFreibergite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeFreibergite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkFreibergite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightFreibergite = 10
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightFreibergite = 30
+
+	[overworldExpert.nickeline]
+		#Enable nickeline generation
+		enableNickeline = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNickeline = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNickeline = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightNickeline = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightNickeline = 40
+
+	[overworldExpert.pentlandite]
+		#Enable pentlandite generation
+		enablePentlandite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePentlandite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPentlandite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPentlandite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPentlandite = 40
+
+	[overworldExpert.nepouite]
+		#Enable nepouite generation
+		enableNepouite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNepouite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNepouite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightNepouite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightNepouite = 40
+
+	[overworldExpert.millerite]
+		#Enable millerite generation
+		enableMillerite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeMillerite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkMillerite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightMillerite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightMillerite = 40
+
+	[overworldExpert.gersdorffite]
+		#Enable gersdorffite generation
+		enableGersdorffite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeGersdorffite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkGersdorffite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightGersdorffite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightGersdorffite = 40
+
+	[overworldExpert.cobaltite]
+		#Enable cobaltite generation
+		enableCobaltite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCobaltite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCobaltite = 6
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCobaltite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCobaltite = 25
+
+	[overworldExpert.carrollite]
+		#Enable carrollite generation
+		enableCarrollite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCarrollite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCarrollite = 4
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCarrollite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCarrollite = 25
+
+	[overworldExpert.skutterudite]
+		#Enable skutterudite generation
+		enableSkutterudite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeSkutterudite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkSkutterudite = 4
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightSkutterudite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightSkutterudite = 25
+
+	[overworldExpert.hematite]
+		#Enable hematite generation
+		enableHematite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeHematite = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkHematite = 5
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightHematite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightHematite = 64
+
+	[overworldExpert.magnetite]
+		#Enable magnetite generation
+		enableMagnetite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeMagnetite = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkMagnetite = 5
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightMagnetite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightMagnetite = 64
+
+	[overworldExpert.limonite]
+		#Enable limonite generation
+		enableLimonite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeLimonite = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkLimonite = 5
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightLimonite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightLimonite = 64
+
+	[overworldExpert.siderite]
+		#Enable siderite generation
+		enableSiderite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeSiderite = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkSiderite = 5
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightSiderite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightSiderite = 64
+
+	[overworldExpert.telluric_iron]
+		#Enable telluric iron generation
+		enableTelluric_iron = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTelluric_iron = 1
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkTelluric_iron = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTelluric_iron = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTelluric_iron = 64
+
+	[overworldExpert.pyrolusite]
+		#Enable pyrolusite generation
+		enablePyrolusite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePyrolusite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPyrolusite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPyrolusite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPyrolusite = 60
+
+	[overworldExpert.rhodochrosite]
+		#Enable rhodochrosite generation
+		enableRhodochrosite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeRhodochrosite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkRhodochrosite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightRhodochrosite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightRhodochrosite = 60
+
+	[overworldExpert.hollandite]
+		#Enable hollandite generation
+		enableHollandite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeHollandite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkHollandite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightHollandite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightHollandite = 60
+
+	[overworldExpert.manganite]
+		#Enable manganite generation
+		enableManganite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeManganite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkManganite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightManganite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightManganite = 60
+
+	[overworldExpert.hausmannite]
+		#Enable hausmannite generation
+		enableHausmannite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeHausmannite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkHausmannite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightHausmannite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightHausmannite = 60
+
+	[overworldExpert.alabandite]
+		#Enable alabandite generation
+		enableAlabandite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAlabandite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAlabandite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAlabandite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAlabandite = 60
+
+	[overworldExpert.rhodonite]
+		#Enable rhodonite generation
+		enableRhodonite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeRhodonite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkRhodonite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightRhodonite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightRhodonite = 60
+
+	[overworldExpert.chromite]
+		#Enable chromite generation
+		enableChromite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeChromite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkChromite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightChromite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightChromite = 25
+
+	[overworldExpert.molybdenite]
+		#Enable molybdenite generation
+		enableMolybdenite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeMolybdenite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkMolybdenite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightMolybdenite = 15
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightMolybdenite = 35
+
+	[overworldExpert.wulfenite]
+		#Enable wulfenite generation
+		enableWulfenite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeWulfenite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkWulfenite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightWulfenite = 15
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightWulfenite = 35
+
+	[overworldExpert.scheelite]
+		#Enable scheelite generation
+		enableScheelite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeScheelite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkScheelite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightScheelite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightScheelite = 40
+
+	[overworldExpert.ferberite]
+		#Enable ferberite generation
+		enableFerberite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeFerberite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkFerberite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightFerberite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightFerberite = 40
+
+	[overworldExpert.hubnerite]
+		#Enable hubnerite generation
+		enableHubnerite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeHubnerite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkHubnerite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightHubnerite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightHubnerite = 40
+
+	[overworldExpert.vanadinite]
+		#Enable vanadinite generation
+		enableVanadinite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeVanadinite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkVanadinite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightVanadinite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightVanadinite = 25
+
+	[overworldExpert.descloizite]
+		#Enable descloizite generation
+		enableDescloizite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeDescloizite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkDescloizite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightDescloizite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightDescloizite = 25
+
+	[overworldExpert.columbite]
+		#Enable columbite generation
+		enableColumbite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeColumbite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkColumbite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightColumbite = 5
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightColumbite = 25
+
+	[overworldExpert.tantalite]
+		#Enable tantalite generation
+		enableTantalite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTantalite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkTantalite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTantalite = 10
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTantalite = 30
+
+	[overworldExpert.rutile]
+		#Enable rutile generation
+		enableRutile = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeRutile = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkRutile = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightRutile = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightRutile = 20
+
+	[overworldExpert.ilmenite]
+		#Enable ilmenite generation
+		enableIlmenite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeIlmenite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkIlmenite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightIlmenite = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightIlmenite = 20
+
+	[overworldExpert.anatase]
+		#Enable anatase generation
+		enableAnatase = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAnatase = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAnatase = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAnatase = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAnatase = 20
+
+	[overworldExpert.brookite]
+		#Enable brookite generation
+		enableBrookite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBrookite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBrookite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBrookite = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBrookite = 20
+
+	[overworldExpert.titanite]
+		#Enable titanite generation
+		enableTitanite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTitanite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkTitanite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTitanite = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTitanite = 20
+
+	[overworldExpert.zircon]
+		#Enable zircon generation
+		enableZircon = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeZircon = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkZircon = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightZircon = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightZircon = 35
+
+	[overworldExpert.thorite]
+		#Enable thorite generation
+		enableThorite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeThorite = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkThorite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightThorite = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightThorite = 35
+
+	[overworldExpert.carnotite]
+		#Enable carnotite generation
+		enableCarnotite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCarnotite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCarnotite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCarnotite = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCarnotite = 40
+
+	[overworldExpert.uraninite]
+		#Enable uraninite generation
+		enableUraninite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeUraninite = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkUraninite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightUraninite = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightUraninite = 40
+
+	[overworldExpert.torbernite]
+		#Enable torbernite generation
+		enableTorbernite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTorbernite = 5
+		#No comment
+		#Range: 0 ~ 50
+		VeinsPerChunkTorbernite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTorbernite = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTorbernite = 40
+
+	[overworldExpert.magnesite]
+		#Enable magnesite generation
+		enableMagnesite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeMagnesite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkMagnesite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightMagnesite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightMagnesite = 80
+
+	[overworldExpert.kieserite]
+		#Enable kieserite generation
+		enableKieserite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeKieserite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkKieserite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightKieserite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightKieserite = 80
+
+	[overworldExpert.brucite]
+		#Enable brucite generation
+		enableBrucite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBrucite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBrucite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBrucite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBrucite = 80
+
+	[overworldExpert.calcite]
+		#Enable calcite generation
+		enableCalcite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCalcite = 10
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCalcite = 5
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCalcite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCalcite = 128
+
+	[overworldExpert.gypsum]
+		#Enable gypsum generation
+		enableGypsum = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeGypsum = 10
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkGypsum = 5
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightGypsum = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightGypsum = 128
+
+	[overworldExpert.anhydrite]
+		#Enable anhydrite generation
+		enableAnhydrite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAnhydrite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAnhydrite = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAnhydrite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAnhydrite = 128
+
+	[overworldExpert.dolomite]
+		#Enable dolomite generation
+		enableDolomite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeDolomite = 10
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkDolomite = 5
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightDolomite = 30
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightDolomite = 128
+
+	[overworldExpert.strontianite]
+		#Enable strontianite generation
+		enableStrontianite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeStrontianite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkStrontianite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightStrontianite = 15
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightStrontianite = 30
+
+	[overworldExpert.celestine]
+		#Enable celestine generation
+		enableCelestine = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCelestine = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCelestine = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCelestine = 15
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCelestine = 30
+
+	[overworldExpert.polylithionite]
+		#Enable polylithionite generation
+		enablePolylithionite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePolylithionite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPolylithionite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPolylithionite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPolylithionite = 50
+
+	[overworldExpert.petalite]
+		#Enable petalite generation
+		enablePetalite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePetalite = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPetalite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPetalite = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPetalite = 50
+
+	[overworldExpert.carnallite]
+		#Enable carnallite generation
+		enableCarnallite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCarnallite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCarnallite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCarnallite = 45
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCarnallite = 128
+
+	[overworldExpert.sylvite]
+		#Enable sylvite generation
+		enableSylvite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeSylvite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkSylvite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightSylvite = 45
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightSylvite = 128
+
+	[overworldExpert.polyhalite]
+		#Enable polyhalite generation
+		enablePolyhalite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePolyhalite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPolyhalite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPolyhalite = 45
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPolyhalite = 128
+
+	[overworldExpert.kainite]
+		#Enable kainite generation
+		enableKainite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeKainite = 4
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkKainite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightKainite = 45
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightKainite = 128
+
+	[overworldExpert.langbeinite]
+		#Enable langbeinite generation
+		enableLangbeinite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeLangbeinite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkLangbeinite = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightLangbeinite = 45
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightLangbeinite = 128
+
+	[overworldExpert.nitratine]
+		#Enable nitratine generation
+		enableNitratine = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNitratine = 18
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNitratine = 10
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightNitratine = 42
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightNitratine = 65
+
+	[overworldExpert.halite]
+		#Enable halite generation
+		enableHalite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeHalite = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkHalite = 4
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightHalite = 40
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightHalite = 80
+
+	[overworldExpert.sapphire_ore]
+		#Enable sapphire generation
+		enableSapphire_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeSapphire_ore = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkSapphire_ore = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightSapphire_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightSapphire_ore = 16
+
+	[overworldExpert.ruby_ore]
+		#Enable ruby generation
+		enableRuby_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeRuby_ore = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkRuby_ore = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightRuby_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightRuby_ore = 16
+
+	[overworldExpert.spinel_ore]
+		#Enable spinel generation
+		enableSpinel_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeSpinel_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkSpinel_ore = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightSpinel_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightSpinel_ore = 25
+
+	[overworldExpert.amethyst_ore]
+		#Enable amethyst generation
+		enableAmethyst_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAmethyst_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAmethyst_ore = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAmethyst_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAmethyst_ore = 25
+
+	[overworldExpert.jade_ore]
+		#Enable jade generation
+		enableJade_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeJade_ore = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkJade_ore = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightJade_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightJade_ore = 30
+
+	[overworldExpert.tourmaline_ore]
+		#Enable tourmaline generation
+		enableTourmaline_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTourmaline_ore = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkTourmaline_ore = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTourmaline_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTourmaline_ore = 30
+
+	[overworldExpert.sugilite_ore]
+		#Enable sugilite generation
+		enableSugilite_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeSugilite_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkSugilite_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightSugilite_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightSugilite_ore = 35
+
+	[overworldExpert.peridot_ore]
+		#Enable peridot generation
+		enablePeridot_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePeridot_ore = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPeridot_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPeridot_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPeridot_ore = 45
+
+	[overworldExpert.agate_ore]
+		#Enable agate generation
+		enableAgate_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAgate_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAgate_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAgate_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAgate_ore = 50
+
+	[overworldExpert.carnelian_ore]
+		#Enable carnelian generation
+		enableCarnelian_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeCarnelian_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkCarnelian_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightCarnelian_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightCarnelian_ore = 50
+
+	[overworldExpert.chrysoprase_ore]
+		#Enable chrysoprase generation
+		enableChrysoprase_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeChrysoprase_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkChrysoprase_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightChrysoprase_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightChrysoprase_ore = 40
+
+	[overworldExpert.heliotrope_ore]
+		#Enable heliotrope generation
+		enableHeliotrope_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeHeliotrope_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkHeliotrope_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightHeliotrope_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightHeliotrope_ore = 50
+
+	[overworldExpert.topaz_ore]
+		#Enable topaz generation
+		enableTopaz_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTopaz_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkTopaz_ore = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTopaz_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTopaz_ore = 30
+
+	[overworldExpert.unakite_ore]
+		#Enable unakite generation
+		enableUnakite_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeUnakite_ore = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkUnakite_ore = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightUnakite_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightUnakite_ore = 40
+
+	[overworldExpert.tanzanite_ore]
+		#Enable tanzanite generation
+		enableTanzanite_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTanzanite_ore = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkTanzanite_ore = 4
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTanzanite_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTanzanite_ore = 40
+
+	[overworldExpert.hauyne_ore]
+		#Enable hauyne generation
+		enableHauyne_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeHauyne_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkHauyne_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightHauyne_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightHauyne_ore = 50
+
+	[overworldExpert.onyx_ore]
+		#Enable onyx generation
+		enableOnyx_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeOnyx_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkOnyx_ore = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightOnyx_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightOnyx_ore = 30
+
+	[overworldExpert.opal_ore]
+		#Enable opal generation
+		enableOpal_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeOpal_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkOpal_ore = 4
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightOpal_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightOpal_ore = 40
+
+	[overworldExpert.moonstone_ore]
+		#Enable moonstone generation
+		enableMoonstone_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeMoonstone_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkMoonstone_ore = 4
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightMoonstone_ore = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightMoonstone_ore = 50
+
+	[overworldExpert.turquoise_ore]
+		#Enable turquoise generation
+		enableTurquoise_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTurquoise_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkTurquoise_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTurquoise_ore = 20
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTurquoise_ore = 50
+
+	[overworldExpert.amazonite_ore]
+		#Enable amazonite generation
+		enableAmazonite_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAmazonite_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAmazonite_ore = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAmazonite_ore = 10
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAmazonite_ore = 30
+
+	[overworldExpert.chrysocolla_ore]
+		#Enable chrysocolla generation
+		enableChrysocolla_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeChrysocolla_ore = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkChrysocolla_ore = 5
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightChrysocolla_ore = 25
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightChrysocolla_ore = 50
+
+	[overworldExpert.almandine_ore]
+		#Enable almandine generation
+		enableAlmandine_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAlmandine_ore = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAlmandine_ore = 4
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAlmandine_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAlmandine_ore = 25
+
+	[overworldExpert.spessartine_ore]
+		#Enable spessartine generation
+		enableSpessartine_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeSpessartine_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkSpessartine_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightSpessartine_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightSpessartine_ore = 35
+
+	[overworldExpert.pyrope_ore]
+		#Enable pyrope generation
+		enablePyrope_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePyrope_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPyrope_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPyrope_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPyrope_ore = 35
+
+	[overworldExpert.tsavorite_ore]
+		#Enable tsavorite generation
+		enableTsavorite_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeTsavorite_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkTsavorite_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightTsavorite_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightTsavorite_ore = 35
+
+	[overworldExpert.andradite_ore]
+		#Enable andradite generation
+		enableAndradite_ore = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAndradite_ore = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAndradite_ore = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAndradite_ore = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAndradite_ore = 35
+
+	[overworldExpert.mithril]
+		#Enable mithril generation
+		enableMithril = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeMithril = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkMithril = 3
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightMithril = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightMithril = 35
+
+	[overworldExpert.additionalpeat]
+		#Enable additional peat generation in swamps
+		enableAdditionalPeat = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeAdditionalPeat = 18
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkAdditionalPeat = 9
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightAdditionalPeat = 48
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightAdditionalPeat = 70
+
+	#Common PGMs platinum group metals
+	[overworldExpert.pgms]
+		#Enable Common platinum group metals (platinum, osmium, iridium)
+		enablePGMs = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizePGMs = 5
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkPGMs = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightPGMs = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightPGMs = 12
+
+	#Rare PGMS platinum group metals
+	[overworldExpert.rarepgms]
+		#Enable rare platinum group metals (rhodium, palladium, ruthenium)
+		enableRarePGMs = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeRarePGMs = 4
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkRarePGMs = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightRarePGMs = 4
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightRarePGMs = 12
+
+	[overworldExpert.bastnasite_la]
+		#Enable Bastnasite La generation.
+		enableBastnasite_la = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBastnasite_la = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBastnasite_la = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBastnasite_la = 3
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBastnasite_la = 60
+
+	[overworldExpert.monazite_la]
+		#Enable Monazite La generation.
+		enableMonazite_la = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeMonazite_la = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkMonazite_la = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightMonazite_la = 3
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightMonazite_la = 60
+
+	[overworldExpert.bastnasite_ce]
+		#Enable Bastnasite Ce generation.
+		enableBastnasite_ce = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBastnasite_ce = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBastnasite_ce = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBastnasite_ce = 3
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBastnasite_ce = 60
+
+	[overworldExpert.monazite_ce]
+		#Enable Monazite Ce generation.
+		enableMonazite_ce = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeMonazite_ce = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkMonazite_ce = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightMonazite_ce = 3
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightMonazite_ce = 60
+
+	[overworldExpert.bastnasite_nd]
+		#Enable Bastnasite Nd generation.
+		enableBastnasite_nd = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBastnasite_nd = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBastnasite_nd = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBastnasite_nd = 3
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBastnasite_nd = 60
+
+	[overworldExpert.monazite_nd]
+		#Enable Monazite Nd generation.
+		enableMonazite_nd = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeMonazite_nd = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkMonazite_nd = 1
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightMonazite_nd = 3
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightMonazite_nd = 60
+
+	[overworldExpert.bastnasite_y]
+		#Enable Bastnasite Y generation.
+		enableBastnasite_y = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeBastnasite_y = 6
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkBastnasite_y = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightBastnasite_y = 3
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightBastnasite_y = 60
+
+	[overworldExpert.samarskite_y]
+		#Enable Samarskite Y generation.
+		enableSamarskite_y = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeSamarskite_y = 7
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkSamarskite_y = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightSamarskite_y = 3
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightSamarskite_y = 60
+
+	[overworldExpert.thortveitite]
+		#Enable Thortveitite generation.
+		enableThortveitite = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeThortveitite = 8
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkThortveitite = 2
+		#Minimum Height
+		#Range: 0 ~ 255
+		MinHeightThortveitite = 3
+		#Maximum Height
+		#Range: 0 ~ 255
+		MaxHeightThortveitite = 60
+
+	[overworldExpert.nethergold]
+		#Enable minecraft gold ore generation in nether. (default: true)
+		enableNetherGold = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNetherGold = 11
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNetherGold = 11
+		#Minimum Height
+		#Range: 0 ~ 128
+		MinHeightNetherGold = 10
+		#Maximum Height
+		#Range: 0 ~ 128
+		MaxHeightNetherGold = 110
+
+	[overworldExpert.netherquartz]
+		#Enable minecraft nether quartz ore generation in nether. (default: true)
+		enableNetherQuartz = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNetherQuartz = 14
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNetherQuartz = 16
+		#Minimum Height
+		#Range: 0 ~ 128
+		MinHeightNetherQuartz = 10
+		#Maximum Height
+		#Range: 0 ~ 128
+		MaxHeightNetherQuartz = 110
+
+	[overworldExpert.nethercoal]
+		#Enable coal ore generation in nether. (default: true)
+		enableNetherCoal = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNetherCoal = 16
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNetherCoal = 5
+		#Minimum Height
+		#Range: 0 ~ 128
+		MinHeightNetherCoal = 10
+		#Maximum Height
+		#Range: 0 ~ 128
+		MaxHeightNetherCoal = 110
+
+	[overworldExpert.nethermithril]
+		#Enable mithril ore generation in nether. (default: false)
+		enableNetherMithril = false
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNetherMithril = 9
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNetherMithril = 6
+		#Minimum Height
+		#Range: 0 ~ 128
+		MinHeightNetherMithril = 10
+		#Maximum Height
+		#Range: 0 ~ 128
+		MaxHeightNetherMithril = 110
+
+	[overworldExpert.nethersulphur]
+		#Enable sulphur ore generation in nether. The 'easy sulphur option' includes this ore. (default: true)
+		enableNetherSulphur = true
+		#Vein Size
+		#Range: 0 ~ 50
+		VeinSizeNetherSulphur = 15
+		#Veins per chunk
+		#Range: 0 ~ 50
+		VeinsPerChunkNetherSulphur = 11
+		#Minimum Height
+		#Range: 0 ~ 128
+		MinHeightNetherSulphur = 10
+		#Maximum Height
+		#Range: 0 ~ 128
+		MaxHeightNetherSulphur = 110
+
+#Debug options
+[debug]
+	#Enable all AatO ores in their relative dimensions. ALL of them. For testing purposes. (default: false)
+	All = false
+

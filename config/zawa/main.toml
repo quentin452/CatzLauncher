@@ -1,0 +1,49 @@
+
+[Options]
+	# Enable automatic naming for baby animals; this will give a placeholder name to the offspring of named animals.
+	# Set this to true if you operate a server that has a lag clearing feature that wipes un-named entities!
+	name_babies = false
+	# Enable or disable NPC Zookeeper spawns.
+	spawn_zookeepers = true
+
+[Timers]
+	# Gestation time is in minecraft ticks, and will be multiplied by double the entity's size stat (where tiny=1 and giant=5) plus one.
+	# For example, by default, a koala (small=2) will have a gestation time of 40,000 ticks; that is (8000 * (2 * 2 + 1)).
+	# Default: 8000
+	gestation_time = 8000
+	venom_cooldown = 24000
+	# Baby growth is in minecraft ticks, and will be multiplied by double the entity's size stat (where tiny=1 and giant=5) plus one.
+	# For example, by default, a baby koala (small=2) will have a growth timer of 80,000 ticks; that is (16000 * (2 * 2 + 1)).
+	# Default: 16000
+	baby_growth = 16000
+	# Breeding cooldown is in minecraft ticks, and will be multiplied by double the entity's size stat (where tiny=1 and giant=5) plus one.
+	# For example, by default, a female koala (small=2) will have a breeding cooldown of 120,000 ticks; that is (24000 * (2 * 2 + 1)).
+	# This only applies to the female on a successful breeding, unsuccessful attempts and males are always set to minecraft's default of 6000 ticks.
+	# Default: 24000
+	breeding_cooldown = 24000
+
+["Entity Stats"]
+
+	["Entity Stats".Enrichment]
+		# Depletion rate is in minecraft ticks, and is the same for all entities.
+		# For example, all entities will lose 1 enrichment point every 4800 ticks.
+		# Default: 4800
+		depletion_rate = 4800
+		enabled = true
+
+	["Entity Stats".Hunger]
+		# Depletion rate is in minecraft ticks, and will be divided by the entity's size stat; where tiny=1 and giant=5.
+		# For example, by default, a koala (small=2) will lose 1 hunger point every 12000 ticks.
+		# Default: 24000
+		depletion_rate = 24000
+		enabled = true
+		can_cause_death = true
+
+	["Entity Stats".Thirst]
+		# Depletion rate is in minecraft ticks, and will be divided by the entity's size stat; where tiny=1 and giant=5.
+		# For example, by default, a koala (small=2) will lose 1 thirst point every 8000 ticks.
+		# Default: 16000
+		depletion_rate = 16000
+		enabled = true
+		can_cause_death = true
+

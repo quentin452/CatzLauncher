@@ -1,0 +1,10 @@
+{
+	"x": -100,
+	"y": 0,
+	"width": 200,
+	"height": 20,
+	"texture": "packmenu:textures/gui/widgets.png",
+	"langKey": "menu.singleplayer",
+	"action": "OPEN_GUI",
+	"data": "SINGLEPLAYER"
+}

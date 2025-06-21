@@ -1,0 +1,9 @@
+
+[HaloterraConfigs]
+	#RayaPrime
+	Items = [["minecraft:carrot", "5", "5"], ["minecraft:iron_ore", "10", "20"], ["haloterra:lead_ore", "15", "20"], ["haloterra:lithium_ore", "8", "20"], ["minecraft:wheat_seeds", "16", "5"], ["minecraft:bone", "4", "8"], ["minecraft:oak_log", "16", "10"], ["minecraft:dark_oak_log", "16", "10"], ["minecraft:birch_log", "16", "10"], ["minecraft:acacia_log", "16", "12"], ["minecraft:sand", "16", "12"], ["minecraft:diamond", "1", "50"], ["minecraft:cactus", "4", "8"], ["minecraft:lava_bucket", "1", "12"], ["minecraft:dirt", "32", "12"], ["minecraft:coal", "8", "8"], ["minecraft:spawner", "1", "1200"], ["minecraft:clay", "8", "14"], ["haloterra:transistor", "9", "20"], ["haloterra:condensator", "8", "18"], ["minecraft:white_wool", "10", "15"], ["minecraft:redstone", "5", "8"], ["minecraft:cobblestone", "20", "12"], ["minecraft:obsidian", "2", "20"], ["minecraft:netherite_scrap", "1", "200"], ["minecraft:andesite", "15", "10"], ["haloterra:mrtomato", "1", "60"], ["haloterra:mrtomato_gold", "1", "120"]]
+	#Plaunt
+	Plants = [["minecraft:wheat_seeds", "minecraft:wheat"], ["minecraft:sugar_cane", "minecraft:sugar_cane"], ["minecraft:carrot", "minecraft:carrot"], ["minecraft:potato", "minecraft:potato"], ["minecraft:cactus", "minecraft:cactus"], ["minecraft:sweet_berries", "minecraft:sweet_berries"], ["minecraft:bamboo", "minecraft:bamboo"], ["minecraft:beetroot_seeds", "minecraft:beetroot"], ["haloterra:grape_seeds", "haloterra:grapes"]]
+	#Enable Story?
+	Enable_Story = false
+

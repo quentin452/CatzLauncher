@@ -1,0 +1,26 @@
+
+[generation]
+	#Generate slate [default:true]
+	slate = true
+	#Generate nettles [default:true]
+	nettles = true
+
+[optimisation]
+
+	[optimisation.viewed_block]
+		#Ticks between viewed block checks [default:2]
+		#Range: 0 ~ 20
+		delay = 2
+		#Range in which viewed block checks [default:50]
+		#Range: 0 ~ 64
+		range = 50
+
+[misc]
+
+	[misc.witch]
+		#Spawn a cloud of bats on witch death [default:true]
+		bats = true
+		#Chance that a cat will spawn on witch death [default:0.05]
+		#Range: 0.0 ~ 1.0
+		cat_chance = 0.05
+

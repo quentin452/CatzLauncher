@@ -1,0 +1,7 @@
+
+[spawnconfig]
+	#Will enemies drop coldblood dew items?
+	drop_blood_dew = true
+	#Will entities spawn blood particles when damaged?
+	spawn_blood_particles = true
+

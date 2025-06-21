@@ -1,0 +1,15 @@
+
+#'Variant16x' Server Configuration File | Game Version: 1.16.5
+#
+#'Variant16x' Settings
+[variant16x]
+
+	#Cape Settings
+	#These options are for a PER World/Server basis.
+	[variant16x.capes]
+		#Overrides OFFICIAL Minecraft Capes with 'Variant16x's' Capes | Default: false
+		overrideCapes = false
+		#A list of Player UUIDs that WON'T be affected by any overrides.
+		#Example: overrideCapesBlacklist = ["853c80ef-3c37-49fd-aa49-938b674adae6", "069a79f4-44e9-4726-a5be-fca90e38aaf5"]
+		overrideCapesBlacklist = []
+

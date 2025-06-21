@@ -1,0 +1,372 @@
+
+["Log messages"]
+	"Terraforged check message active" = true
+
+["Attack Damage"]
+
+	["Attack Damage"."Ultimate Weapons/Tools"]
+		"Damage of the Ultimate Sword" = 40
+		"Damage of the Ultimate Axe" = 42
+		"Damage of the Ultimate Pickaxe" = 38
+		"Damage of the Ultimate Shovel" = 39
+		"Damage of the Ultimate Hoe" = 1
+		#How much damage the Ultimate bow will add up to the base arrow damage
+		"Additional Damage of the Ultimate Bow Arrows" = 5.0
+		"Damage Multiplier of the Ultimate Bow's Power Enchantment" = 0.5
+
+	["Attack Damage"."Emerald Weapons/Tools"]
+		"Damage of the Emerald Sword" = 6
+		"Damage of the Emerald Axe" = 9
+		"Damage of the Emerald Pickaxe" = 4
+		"Damage of the Emerald Shovel" = 5
+		"Damage of the Emerald Hoe" = 1
+
+	["Attack Damage"."Ruby Weapons/Tools"]
+		"Damage of the Ruby Sword" = 20
+		"Damage of the Ruby Axe" = 22
+		"Damage of the Ruby Pickaxe" = 18
+		"Damage of the Ruby Shovel" = 19
+		"Damage of the Ruby Hoe" = 1
+
+	["Attack Damage"."Amethyst Weapons/Tools"]
+		"Damage of the Amethyst Sword" = 15
+		"Damage of the Amethyst Axe" = 17
+		"Damage of the Amethyst Pickaxe" = 13
+		"Damage of the Amethyst Shovel" = 14
+		"Damage of the Amethyst Hoe" = 1
+
+	["Attack Damage"."Tiger's Eye Weapons/Tools"]
+		"Damage of the Tiger's Eye Sword" = 12
+		"Damage of the Tiger's Eye Axe" = 14
+		"Damage of the Tiger's Eye Pickaxe" = 10
+		"Damage of the Tiger's Eye Shovel" = 11
+		"Damage of the Tiger's Eye Hoe" = 1
+
+	["Attack Damage"."Crystal Wood Weapons/Tools"]
+		"Damage of the Crystal Wood Sword" = 5
+		"Damage of the Crystal Wood Axe" = 9
+		"Damage of the Crystal Wood Pickaxe" = 3
+		"Damage of the Crystal Wood Shovel" = 3
+		"Damage of the Crystal Wood Hoe" = 1
+
+	["Attack Damage"."Kyanite Weapons/Tools"]
+		"Damage of the Kyanite Sword" = 6
+		"Damage of the Kyanite Axe" = 9
+		"Damage of the Kyanite Pickaxe" = 4
+		"Damage of the Kyanite Shovel" = 4
+		"Damage of the Kyanite Hoe" = 1
+
+	["Attack Damage"."Cat's Eye Weapons/Tools"]
+		"Damage of the Cat's Eye Sword" = 12
+		"Damage of the Cat's Eye Axe" = 14
+		"Damage of the Cat's Eye Pickaxe" = 10
+		"Damage of the Cat's Eye Shovel" = 11
+		"Damage of the Cat's Eye Hoe" = 1
+
+	["Attack Damage"."Pink Tourmaline Weapons/Tools"]
+		"Damage of the Pink Tourmaline Sword" = 11
+		"Damage of the Pink Tourmaline Axe" = 13
+		"Damage of the Pink Tourmaline Pickaxe" = 9
+		"Damage of the Pink Tourmaline Shovel" = 10
+		"Damage of the Pink Tourmaline Hoe" = 1
+
+	["Attack Damage"."Copper Weapons/Tools"]
+		"Damage of the Copper Sword" = 5
+		"Damage of the Copper Axe" = 9
+		"Damage of the Copper Pickaxe" = 3
+		"Damage of the Copper Shovel" = 4
+		"Damage of the Copper Hoe" = 1
+
+	["Attack Damage"."Tin Weapons/Tools"]
+		"Damage of the Tin Sword" = 6
+		"Damage of the Tin Axe" = 9
+		"Damage of the Tin Pickaxe" = 4
+		"Damage of the Tin Shovel" = 4
+		"Damage of the Tin Hoe" = 1
+
+	["Attack Damage"."Silver Weapons/Tools"]
+		"Damage of the Silver Sword" = 6
+		"Damage of the Silver Axe" = 9
+		"Damage of the Silver Pickaxe" = 4
+		"Damage of the Silver Shovel" = 5
+		"Damage of the Silver Hoe" = 1
+
+	["Attack Damage"."Platinum Weapons/Tools"]
+		"Damage of the Platinum Sword" = 10
+		"Damage of the Platinum Axe" = 12
+		"Damage of the Platinum Pickaxe" = 8
+		"Damage of the Platinum Shovel" = 9
+		"Damage of the Platinum Hoe" = 1
+
+	["Attack Damage"."Misc Weapons/Tools"]
+		"Damage of the Nightmare Sword" = 30
+		"Damage of the Basilisk Sword" = 25
+		"Damage of the Experience Sword" = 10
+		"Damage of the Poison Sword" = 10
+		"Damage of the Rat Sword" = 10
+		"Damage of the Fairy Sword" = 10
+		"Damage of the Mantis Claw" = 10
+		"Damage of the Big Hammer" = 15
+		"Damage of the Prismatic Reaper" = 29
+
+	["Attack Damage"."Big Weapons/Tools"]
+		"Damage of the Attitude Adjuster" = 65
+		"Damage of the Big Bertha" = 500
+		"Damage of the Battle Axe" = 84
+		"Damage of the Queen Scale Battle Axe" = 666
+		"Damage of the Royal Guardian Sword" = 750
+		"Damage of the Slayer Chainsaw" = 65
+
+[Functionality]
+
+	[Functionality.AI]
+
+		[Functionality.AI.Ent]
+
+			[Functionality.AI.Ent."Targeting System"]
+				#Define how the Ent will act according to its targets, where:
+				#RADIUS_CLOSEST: The Ent will target the closest entity within its attack radius.
+				#RADIUS_FARTHEST: The Ent will target the farthest entity within its attack radius.
+				#DYNAMIC_WEAKEST: The Ent will target the weakest entity (measured by base stats and gear) within its attack radius.
+				#DYNAMIC_STRONGEST: The Ent will target the strongest entity (measured by base stats and gear) within its attack radius.
+				#FIXED: The Ent will follow its initial target until the entity is eliminated, no matter the circumstances.
+				#HURT_BY: The Ent will automatically target another entity if said entity has hurt it in some way.
+				#RANDOMIZED: The Ent will randomly switch targets whenever it feels like it.
+				#RADIUS_CLOSEST_DYNAMIC_STRONGEST: The Ent will target the strongest entity that also happens to be the nearest to it.
+				#RADIUS_CLOSEST_DYNAMIC_WEAKEST: The Ent will target the weakest entity that also happens to be the nearest to it.
+				#RADIUS_FARTHEST_DYNAMIC_STRONGEST: The Ent will target the strongest entity that also happens to be the farthest from it.
+				#RADIUS_FARTHEST_DYNAMIC_WEAKEST: The Ent will target the weakest entity that also happens to be the farthest from it.
+				#RADIUS_CLOSEST_HURT_BY: The Ent will target the entity it is currently targeting, however, if it is hurt by an entity closer than its current target, it will switch targets to whoever hurt it (if they are close enough).
+				#RADIUS_FARTHEST_HURT_BY: The Ent will target the entity it is currently targeting, however, if it is hurt by an entity farther than its current target, it will switch targets to whoever hurt it (if they are far enough).
+				"Ent targeting system" = "RADIUS_CLOSEST_HURT_BY"
+
+		[Functionality.AI."Hercules Beetle"]
+
+			[Functionality.AI."Hercules Beetle"."Targeting System"]
+				#Define how the Hercules Beetle will act according to its targets, where:
+				#RADIUS_CLOSEST: The Hercules Beetle will target the closest entity within its attack radius.
+				#RADIUS_FARTHEST: The Hercules Beetle will target the farthest entity within its attack radius.
+				#DYNAMIC_WEAKEST: The Hercules Beetle will target the weakest entity (measured by base stats and gear) within its attack radius.
+				#DYNAMIC_STRONGEST: The Hercules Beetle will target the strongest entity (measured by base stats and gear) within its attack radius.
+				#FIXED: The Hercules Beetle will follow its initial target until the entity is eliminated, no matter the circumstances.
+				#HURT_BY: The Hercules Beetle will automatically target another entity if said entity has hurt it in some way.
+				#RANDOMIZED: The Hercules Beetle will randomly switch targets whenever it feels like it.
+				#RADIUS_CLOSEST_DYNAMIC_STRONGEST: The Hercules Beetle will target the strongest entity that also happens to be the nearest to it.
+				#RADIUS_CLOSEST_DYNAMIC_WEAKEST: The Hercules Beetle will target the weakest entity that also happens to be the nearest to it.
+				#RADIUS_FARTHEST_DYNAMIC_STRONGEST: The Hercules Beetle will target the strongest entity that also happens to be the farthest from it.
+				#RADIUS_FARTHEST_DYNAMIC_WEAKEST: The Hercules Beetle will target the weakest entity that also happens to be the farthest from it.
+				#RADIUS_CLOSEST_HURT_BY: The Hercules Beetle will target the entity it is currently targeting, however, if it is hurt by an entity closer than its current target, it will switch targets to whoever hurt it (if they are close enough).
+				#RADIUS_FARTHEST_HURT_BY: The Hercules Beetle will target the entity it is currently targeting, however, if it is hurt by an entity farther than its current target, it will switch targets to whoever hurt it (if they are far enough).
+				"Hercules Beetle targeting system" = "RADIUS_CLOSEST_HURT_BY"
+
+		[Functionality.AI."Robo Pounder"]
+
+			[Functionality.AI."Robo Pounder"."Targeting System"]
+				#Define how the Robo Pounder will act according to its targets, where:
+				#RADIUS_CLOSEST: The Robo Pounder will target the closest entity within its attack radius.
+				#RADIUS_FARTHEST: The Robo Pounder will target the farthest entity within its attack radius.
+				#DYNAMIC_WEAKEST: The Robo Pounder will target the weakest entity (measured by base stats and gear) within its attack radius.
+				#DYNAMIC_STRONGEST: The Robo Pounder will target the strongest entity (measured by base stats and gear) within its attack radius.
+				#FIXED: The Robo Pounder will follow its initial target until the entity is eliminated, no matter the circumstances.
+				#HURT_BY: The Robo Pounder will automatically target another entity if said entity has hurt it in some way.
+				#RANDOMIZED: The Robo Pounder will randomly switch targets whenever it feels like it.
+				#RADIUS_CLOSEST_DYNAMIC_STRONGEST: The Robo Pounder will target the strongest entity that also happens to be the nearest to it.
+				#RADIUS_CLOSEST_DYNAMIC_WEAKEST: The Robo Pounder will target the weakest entity that also happens to be the nearest to it.
+				#RADIUS_FARTHEST_DYNAMIC_STRONGEST: The Robo Pounder will target the strongest entity that also happens to be the farthest from it.
+				#RADIUS_FARTHEST_DYNAMIC_WEAKEST: The Robo Pounder will target the weakest entity that also happens to be the farthest from it.
+				#RADIUS_CLOSEST_HURT_BY: The Robo Pounder will target the entity it is currently targeting, however, if it is hurt by an entity closer than its current target, it will switch targets to whoever hurt it (if they are close enough).
+				#RADIUS_FARTHEST_HURT_BY: The Robo Pounder will target the entity it is currently targeting, however, if it is hurt by an entity farther than its current target, it will switch targets to whoever hurt it (if they are far enough).
+				"Robo Pounder targeting system" = "RADIUS_CLOSEST_HURT_BY"
+
+	[Functionality.Armor]
+
+		[Functionality.Armor."Ender Dragon Scale Armor"]
+			#How the elytra on the Ender Dragon Scale Armor will get damaged,
+			#where ARMOR means per hit, and ELYTRA means that it'll get damage every 20 ticks or so as you fly (basically the same as a normal elytra). 
+			#This has yet to be functional in a future update
+			"Ender Dragon Scale Armor elytra damage type" = "ELYTRA"
+			"Enable the Dragon Wings set bonus" = true
+
+		[Functionality.Armor."Emerald Armor"]
+			"Enable the Emerald set bonus" = true
+			#The multiplier by which villagers will discount their prices when a player is wearing a full emerald set. 
+			# This multiplier stacks per each player in the area. Formula: 1 = 12.5% Discount, 2 = 25% Discount, etc.
+			"Emerald Armor Set Discount Multiplier" = 4.0
+
+		[Functionality.Armor."Experience Armor"]
+			"Enable the Experience set bonus" = true
+			#The number you input here will affect how frequently XP orbs randomly spawn on you, should you be wearing the full Experience Armor set. 
+			# The larger the number, the less frequent XP orbs will spawn on you.
+			"The max amount of time (in ticks) between each XP orb spawn" = 5500
+			#The multiplier for XP dropped, either by killing mobs or by breaking blocks. This doesn't work on randomly spawning XP orbs from 
+			# the armor itself. Note that when killing a mob with the Experience Sword alongside the armor, the Experience Sword's multiplier 
+			# will be added onto the armor's multiplier.
+			"Experience Armor Set XP Multiplier" = 3
+
+		[Functionality.Armor."Lapis Armor"]
+			"Enable the Lapis set bonus" = true
+			#Modify/Substract from the enchantment level requirements for each enchantment row in the enchantment table. Note that if you attempt to expand or reduce 
+			# the size of the contents within the list, or define a number higher than the price listed in the enchantment table, the prices will automatically default to vanilla values. If you attempt 
+			# to define a NAN (not a number) value the game will crash. The first value is the modifier for the first row, the second value if the modifier for the 
+			#second row, and the third value is the modifier for the third row.
+			"Lapis Set Enchantment Level Requirement Modifiers" = [3, 8, 13]
+			#The power of each bookshelf around the enchantment table when a player with the full Lapis Armor Set is present. This effect stacks with each present player.
+			"Lapis Armor Set Bookshelf Power Moifier" = 2
+
+		[Functionality.Armor."Lava Eel Armor"]
+			"Enable the Lava Eel set bonus" = true
+
+	[Functionality."Tools/Weapons"]
+		#If disabled, auto-enchanted items will be able to be enchanted manually.
+		"Auto-enchant specific tools and weapons" = true
+
+		[Functionality."Tools/Weapons".Explosions]
+
+			[Functionality."Tools/Weapons".Explosions."Attitude Adjuster"]
+				"Attitude Adjuster explosion size" = 4
+				#NONE - The Attitude Adjuster will not affect the terrain.
+				#BREAK - The Attitude Adjuster will drop some blocks that it breaks.
+				#DESTROY - The Attitude Adjuster will destroy blocks and never drop them.
+				"Attitude Adjuster explosion type" = "BREAK"
+				"Fire from Attitude Adjuster explosion" = false
+
+			[Functionality."Tools/Weapons".Explosions."Ray Gun"]
+				"Ray Gun explosion size" = 6
+				#NONE - The Ray Gun will not affect the terrain.
+				#BREAK - The Ray Gun will drop some blocks that it breaks.
+				#DESTROY - The Ray Gun will destroy blocks and never drop them.
+				"Ray Gun explosion type" = "BREAK"
+				"Fire from Ray Gun explosion" = false
+
+			[Functionality."Tools/Weapons".Explosions."Thunder Staff"]
+				"Thunder Staff explosion size" = 4
+				#NONE - The Thunder Staff will not affect the terrain.
+				#BREAK - The Thunder Staff will drop some blocks that it breaks. (May not work due to lightning)
+				#DESTROY - The Thunder Staff will destroy blocks and never drop them.
+				"Thunder Staff explosion type" = "DESTROY"
+				"Fire from Thunder Staff explosion" = true
+
+		[Functionality."Tools/Weapons".Swords]
+
+			[Functionality."Tools/Weapons".Swords."Experience Sword"]
+				"Multiplier for XP dropped by killing mobs" = 2
+				"Enable Experience Sword Weapon Bonus" = true
+
+	[Functionality.Breeding]
+		#Will Enchanted Animals be Breedable?
+		"Enchanted Animal Breeding" = false
+
+	[Functionality.Textures]
+		#Will holiday special textures be obtainable?
+		"Obtainable Holiday Textures" = true
+
+	[Functionality."Ender Dragon"]
+		#Will the Ender Dragon Egg respawn after the first death?
+		"Ender Dragon Egg Respawn" = true
+		#Will the Ender Dragon drop her head?
+		"Ender Dragon Head Drop" = true
+
+	[Functionality."Update Checker"]
+		#Send messages when there is a new update?
+		"Show Update Messages" = true
+
+	[Functionality.Spawners]
+		#NO_BLOCKING - All Spawn Eggs can be used on a Spawner in Survival.
+		#BLOCK_ALL - All Spawn Eggs will be blocked from being used on a Spawner in Survival.
+		#BLOCK_CHAOS_AWAKENS - Only Spawn Eggs from Chaos Awakens will be blocked from being used on a Spawner in Survival.TAG_BLACKLISTED - Only Spawn Eggs which aren't tagged with the 'SPAWNER_SPAWN_EGG' tag can be used on a Spawner in Survival.TAG_WHITELISTED - Only Spawn Eggs which are tagged with the 'SPAWNER_SPAWN_EGG' tag can be used on a Spawner in Survival.
+		"Spawn Eggs on Spawners in Survival?" = "NO_BLOCKING"
+
+["World Generation"]
+	"Enable ore generation" = true
+	"Enable fossil generation" = true
+	"Enable marble generation in the mining dimension" = true
+	"Enable limestone generation in the mining dimension" = true
+	"Enable rhinestone generation in the mining dimension" = true
+	"Enable marble generation in the overworld" = false
+	"Enable limestone generation in the overworld" = false
+	"Enable rhinestone generation in the overworld" = false
+	"Enable infested ore generation" = true
+	"Enable DZ ore generation" = true
+	#Will DZ ores spawn in the Overworld?
+	"Overworld DZ Ores" = false
+	#Will Nests spawn in the Overworld or the Ant Dimensions?
+	"Ant Nest generation" = true
+
+	["World Generation"."Specific Ore Spawning"]
+		"Salt ore generation" = true
+		"Amethyst ore generation" = true
+		"Ruby ore generation" = true
+		"Tiger's Eye ore generation" = true
+		"Titanium ore generation" = true
+		"Uranium ore generation" = true
+		"Copper ore generation" = true
+		"Tin ore generation" = true
+		"Silver ore generation" = true
+		"Platinum ore generation" = true
+		"Sunstone ore generation" = true
+		"Bloodstone ore generation" = true
+		"Aluminum ore generation" = true
+
+	["World Generation".Structures]
+		#Will Acacia Ent Trees be generated?
+		"Generate Acacia Ent Trees" = true
+		#Will Birch Ent Trees be generated?
+		"Generate Birch Ent Trees" = true
+		#Will Crimson Ent Trees be generated?
+		"Generate Crimson Ent Trees" = true
+		#Will Dark Oak Ent Trees be generated?
+		"Generate Dark Oak Ent Trees" = true
+		#Will Jungle Ent Trees be generated?
+		"Generate Jungle Ent Trees" = true
+		#Will Oak Ent Trees be generated?
+		"Generate Oak Ent Trees" = true
+		#Will Spruce Ent Trees be generated?
+		"Generate Spruce Ent Trees" = true
+		#Will Warped Ent Trees be generated?
+		"Generate Warped Ent Trees" = true
+		#Will Wasp Nests be generated?
+		"Generate Wasp Nests" = true
+
+	["World Generation".Dimensioms]
+
+		["World Generation".Dimensioms."Mining Paradise"]
+
+			["World Generation".Dimensioms."Mining Paradise".Biomes]
+
+				["World Generation".Dimensioms."Mining Paradise".Biomes."Stalagmite Valley"]
+					#Enable/Disable ores generating on the stalagmites in Stalagmite Valley. Note that this may require a more powerful computer, 
+					#until further optimization is made.
+					"Enable Stalamite Ore Gen" = true
+
+[Dimensions]
+	#Disable the requirement of needing an empty inventory to enter the Crystal World (Termite Dimension)?
+	"Crystal World Requires Empty Inventory" = true
+	#Will the Brown Ant teleport you to its Dimension?
+	"Brown Ant Teleport" = true
+	#Will the Rainbow Ant teleport you to its Dimension?
+	"Rainbow Ant Teleport" = true
+	#Will the Red Ant teleport you to its Dimension?
+	"Red Ant Teleport" = true
+	#Will the Unstable Ant teleport you to its Dimension?
+	"Unstable Ant Teleport" = true
+	#Will the Termite teleport you to its Dimension?
+	"Termite Teleport" = true
+	#Will the Butterfly teleport you to its Dimension?
+	"Butterfly Teleport" = true
+
+[Entity]
+
+	[Entity."Wandering Trader"]
+		#Can the Wandering Trader sell Triffid Goo?
+		"Triffid Goo from Wandering Trader?" = true
+		#Can the Wandering Trader sell Uranium and Titanium?
+		"Uranium and Titanium from Wandering Trader?" = false
+
+	[Entity."Robo Warrior"]
+		"Robo Warrior explosion size" = 6
+		#NONE - The Robo Warrior will not affect the terrain.
+		#BREAK - The Robo Warrior will drop some blocks that it breaks.
+		#DESTROY - The Robo Warrior will destroy blocks and never drop them.
+		"Ray Gun explosion type" = "BREAK"
+		"Fire from Robo Warrior explosion" = false
+

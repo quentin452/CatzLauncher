@@ -1,0 +1,363 @@
+
+#Ultimate Unicorn Mod Configuration
+[ultimate_unicorn_mod]
+	#If true, Wand of Fireball items do nothing.
+	disable_fire_wand = false
+	#If true, magical horses will have higher max health, like in the old days.
+	use_old_horse_health_max = false
+	#Use alternate "fiery" skin for Typhon.
+	use_typhon_alternate_skin = false
+	#Max zombie minions allowed for Typhon to have summoned at once.
+	#Range: 0 ~ 100
+	max_zombie_minions = 5
+	#A set of URLs pointing to JSON-structured speech texts (like for the oracle) on the internet
+	speech_urls = []
+	#If true, Velvet, Mystical Healer will be unable to summon bunnies.
+	suppress_bunnies = false
+	#If true, a magic horse won't suffocate when its head is in a wall. Set to true if you have this kind of problems.
+	horses_cannot_suffocate = false
+	#Show Stirrups on Magical Horses.
+	show_stirrups = false
+	#If true, horses will attack zombie pigmen when not ridden.
+	horses_attack_pigmen = true
+	#If true, Wand of Call Lightning items do nothing.
+	disable_lightning_wand = false
+	#Turns off aura sparkles for unicorns.
+	suppress_auras = false
+	#If true, Nightmares will not make fire where they walk.
+	suppress_nightmare_fire = false
+	#This disables notifications.
+	disable_notifications = false
+	#If true, rearing horses can hurt players and other nice creatures.
+	horse_rearing_hurts_friendlies = true
+	#Region ID
+	#Range: 0 ~ 3
+	region_id = 3
+	#A set of file paths pointing to JSON files containing speech texts (like for the oracle)
+	speech_texts = []
+	#Output biomes names on startup.
+	output_biomes = false
+	#If true, horses will attack monsters they don't like when not ridden.
+	horses_attack_monsters = true
+	#Max bunnies allowed in Velvet 's entourage.
+	#Range: 0 ~ 100
+	max_bunnies = 5
+	#If true, Wand of Dropsies items do nothing.
+	disable_dropsy_wand = false
+	#If true, Kirin will not be able to use their breath weapon.
+	suppress_kirin_fire = false
+	#If true, custom horse powers cannot be used.
+	disable_all_custom_horse_powers = false
+	#If true, fire made by Nightmares doesn't hurt or spread.
+	gentle_nightmare_fire = true
+	#If true, unridden destriers and other big horses can break blocks when they rear (or Typhon charges).
+	unridden_horses_break_blocks = true
+	#If true, unridden destriers and other big horses can break leaves (and other wimpy things) by walking into them.
+	unridden_destriers_break_leaves = true
+
+	#entity: deer
+	[ultimate_unicorn_mod.deer]
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		deer_spawn_weight = 9
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		deer_spawn_max_in_group = 5
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		deer_spawn_probability = 70
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		deer_spawn_min_in_group = 2
+		#Biomes this entity type can spawn in.
+		deer_spawn_in_biomes = ["minecraft:snowy_taiga", "minecraft:snowy_taiga_hills", "minecraft:taiga_hills", "minecraft:taiga", "minecraft:forest", "minecraft:flower_forest", "minecraft:birch_forest", "minecraft:birch_forest_hills"]
+
+	#entity: kirin_secondary
+	[ultimate_unicorn_mod.kirin_secondary]
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		kirin_secondary_spawn_probability = 50
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		kirin_secondary_spawn_min_in_group = 1
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		kirin_secondary_spawn_max_in_group = 1
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		kirin_secondary_spawn_weight = 6
+		#Biomes this entity type can spawn in.
+		kirin_secondary_spawn_in_biomes = ["minecraft:badlands", "minecraft:frozen_ocean", "minecraft:shattered_savanna", "minecraft:shattered_savanna_plateau", "minecraft:eroded_badlands", "minecraft:desert_lakes"]
+
+	#entity: unicorn_secondary
+	[ultimate_unicorn_mod.unicorn_secondary]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		unicorn_secondary_spawn_min_in_group = 1
+		#Biomes this entity type can spawn in.
+		unicorn_secondary_spawn_in_biomes = ["minecraft:plains", "minecraft:dark_forest", "minecraft:dark_forest_hills"]
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		unicorn_secondary_spawn_probability = 60
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		unicorn_secondary_spawn_max_in_group = 2
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		unicorn_secondary_spawn_weight = 9
+
+	#entity: hippocamp
+	[ultimate_unicorn_mod.hippocamp]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		hippocamp_spawn_min_in_group = 2
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		hippocamp_spawn_weight = 9
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		hippocamp_spawn_max_in_group = 5
+		#Biomes this entity type can spawn in.
+		hippocamp_spawn_in_biomes = ["minecraft:ocean", "minecraft:deep_ocean", "minecraft:beach"]
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		hippocamp_spawn_probability = 85
+
+	#entity: asmidiske_secondary
+	[ultimate_unicorn_mod.asmidiske_secondary]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		asmidiske_secondary_spawn_min_in_group = 1
+		#Biomes this entity type can spawn in.
+		asmidiske_secondary_spawn_in_biomes = ["minecraft:flower_forest", "minecraft:sunflower_plains"]
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		asmidiske_secondary_spawn_weight = 1
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		asmidiske_secondary_spawn_max_in_group = 1
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		asmidiske_secondary_spawn_probability = 5
+
+	#entity: pegasus
+	[ultimate_unicorn_mod.pegasus]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		pegasus_spawn_max_in_group = 4
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		pegasus_spawn_probability = 50
+		#Biomes this entity type can spawn in.
+		pegasus_spawn_in_biomes = ["minecraft:beach", "minecraft:desert_hills", "minecraft:mountains", "minecraft:mountain_edge"]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		pegasus_spawn_min_in_group = 1
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		pegasus_spawn_weight = 9
+
+	#entity: destrier_secondary
+	[ultimate_unicorn_mod.destrier_secondary]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		destrier_secondary_spawn_max_in_group = 1
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		destrier_secondary_spawn_min_in_group = 1
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		destrier_secondary_spawn_weight = 8
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		destrier_secondary_spawn_probability = 45
+		#Biomes this entity type can spawn in.
+		destrier_secondary_spawn_in_biomes = ["minecraft:dark_forest"]
+
+	#entity: nightmare_secondary
+	[ultimate_unicorn_mod.nightmare_secondary]
+		#Biomes this entity type can spawn in.
+		nightmare_secondary_spawn_in_biomes = ["minecraft:mountains", "minecraft:gravelly_mountains", "minecraft:badlands"]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		nightmare_secondary_spawn_min_in_group = 1
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		nightmare_secondary_spawn_probability = 30
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		nightmare_secondary_spawn_weight = 10
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		nightmare_secondary_spawn_max_in_group = 1
+
+	#entity: asmidiske
+	[ultimate_unicorn_mod.asmidiske]
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		asmidiske_spawn_weight = 1
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		asmidiske_spawn_max_in_group = 1
+		#Biomes this entity type can spawn in.
+		asmidiske_spawn_in_biomes = ["minecraft:mountains", "minecraft:badlands_plateau"]
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		asmidiske_spawn_probability = 5
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		asmidiske_spawn_min_in_group = 1
+
+	#entity: deer_secondary
+	[ultimate_unicorn_mod.deer_secondary]
+		#Biomes this entity type can spawn in.
+		deer_secondary_spawn_in_biomes = ["minecraft:plains"]
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		deer_secondary_spawn_weight = 5
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		deer_secondary_spawn_max_in_group = 2
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		deer_secondary_spawn_probability = 50
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		deer_secondary_spawn_min_in_group = 1
+
+	#entity: destrier
+	[ultimate_unicorn_mod.destrier]
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		destrier_spawn_probability = 30
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		destrier_spawn_min_in_group = 1
+		#Biomes this entity type can spawn in.
+		destrier_spawn_in_biomes = ["minecraft:taiga", "minecraft:snowy_beach", "minecraft:snowy_taiga", "minecraft:taiga_hills", "minecraft:snowy_taiga_hills", "minecraft:frozen_river", "minecraft:snowy_tundra"]
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		destrier_spawn_weight = 9
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		destrier_spawn_max_in_group = 3
+
+	#entity: pegasus_secondary
+	[ultimate_unicorn_mod.pegasus_secondary]
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		pegasus_secondary_spawn_probability = 40
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		pegasus_secondary_spawn_min_in_group = 1
+		#Biomes this entity type can spawn in.
+		pegasus_secondary_spawn_in_biomes = ["minecraft:plains"]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		pegasus_secondary_spawn_max_in_group = 3
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		pegasus_secondary_spawn_weight = 10
+
+	#entity: kirin
+	[ultimate_unicorn_mod.kirin]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		kirin_spawn_max_in_group = 2
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		kirin_spawn_weight = 8
+		#Biomes this entity type can spawn in.
+		kirin_spawn_in_biomes = ["minecraft:ice_spikes", "minecraft:mountains", "minecraft:mountain_edge", "minecraft:savanna_plateau", "minecraft:jungle_hills", "minecraft:tall_birch_forest"]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		kirin_spawn_min_in_group = 1
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		kirin_spawn_probability = 50
+
+	#entity: nightmare
+	[ultimate_unicorn_mod.nightmare]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		nightmare_spawn_min_in_group = 1
+		#Biomes this entity type can spawn in.
+		nightmare_spawn_in_biomes = ["minecraft:desert", "minecraft:desert_hills", "minecraft:desert_lakes"]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		nightmare_spawn_max_in_group = 3
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		nightmare_spawn_probability = 38
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		nightmare_spawn_weight = 9
+
+	#entity: hippocamp_secondary
+	[ultimate_unicorn_mod.hippocamp_secondary]
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		hippocamp_secondary_spawn_probability = 75
+		#Biomes this entity type can spawn in.
+		hippocamp_secondary_spawn_in_biomes = ["minecraft:river", "minecraft:swamp", "minecraft:swamp_hills", "minecraft:warm_ocean", "minecraft:lukewarm_ocean", "minecraft:cold_ocean"]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		hippocamp_secondary_spawn_min_in_group = 1
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		hippocamp_secondary_spawn_max_in_group = 2
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		hippocamp_secondary_spawn_weight = 9
+
+	#entity: unicorn
+	[ultimate_unicorn_mod.unicorn]
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		unicorn_spawn_weight = 9
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		unicorn_spawn_probability = 70
+		#Biomes this entity type can spawn in.
+		unicorn_spawn_in_biomes = ["minecraft:forest", "minecraft:birch_forest", "minecraft:birch_forest_hills", "minecraft:tall_birch_forest"]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		unicorn_spawn_min_in_group = 2
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		unicorn_spawn_max_in_group = 4
+
+	#entity: hippogriff
+	[ultimate_unicorn_mod.hippogriff]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		hippogriff_spawn_max_in_group = 2
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		hippogriff_spawn_weight = 5
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		hippogriff_spawn_probability = 50
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		hippogriff_spawn_min_in_group = 1
+		#Biomes this entity type can spawn in.
+		hippogriff_spawn_in_biomes = ["minecraft:snowy_taiga_hills", "minecraft:taiga_hills", "minecraft:savanna_plateau", "minecraft:mountains", "minecraft:mountain_edge", "minecraft:dark_forest_hills"]
+
+	#entity: hippogriff_secondary
+	[ultimate_unicorn_mod.hippogriff_secondary]
+		#Weighted value that determines how often a group of this entity will spawn in its biome compared to other creatures.
+		#Range: 0 ~ 500
+		hippogriff_secondary_spawn_weight = 5
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		hippogriff_secondary_spawn_max_in_group = 1
+		#Biomes this entity type can spawn in.
+		hippogriff_secondary_spawn_in_biomes = ["minecraft:bamboo_jungle", "minecraft:bamboo_jungle_hills", "minecraft:badlands"]
+		#Percent probability the entity type will spawn in its biome.
+		#Range: 0 ~ 20
+		hippogriff_secondary_spawn_min_in_group = 1
+		#Probability value (0-100%) that determines if a group of this entity will spawn, and can be used to reduce how often they spawn.
+		#Range: 0 ~ 100
+		hippogriff_secondary_spawn_probability = 50
+

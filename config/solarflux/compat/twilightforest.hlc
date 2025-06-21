@@ -1,0 +1,30 @@
+~ Saved With Hammer Lib 16.4.32
+
++C:General={
+  +B:Enabled=true
+
+}
+
+
++C:Solar Panels={
+  +C:Solar Panel Carminite={
+    +L:Capacity=64000000
+
+    +L:Generation Rate=8192
+
+    +L:Transfer Rate=65536
+
+  }
+
+  +C:Solar Panel Fiery={
+    +L:Capacity=32000000
+
+    +L:Generation Rate=2048
+
+    +L:Transfer Rate=16348
+
+  }
+
+}
+
+
