@@ -8,94 +8,14 @@ from tkinter import ttk, messagebox, filedialog, simpledialog
 from datetime import datetime
 import requests
 from minecraft_launcher_lib.utils import get_minecraft_directory
-from utils import download_file_with_progress,ensure_requirements, install_modpack, check_update, check_all_modpack_updates, update_modpack_info, install_forge_if_needed, update_installed_info
+from utils import download_file_with_progress,ensure_requirements, install_modpack, check_update, check_all_modpack_updates, update_modpack_info, install_forge_if_needed, update_installed_info, refresh_ms_token, exchange_code_for_token, authenticate_with_xbox, authenticate_with_xsts, login_with_minecraft, get_minecraft_profile
 from minecraft_launcher_lib.command import get_minecraft_command
 import sys
 import subprocess
 import importlib
+import functools
 
 ensure_requirements()
-
-# --- Début des nouvelles fonctions de connexion ---
-
-def refresh_ms_token(refresh_token):
-    """Rafraîchit le token d'accès Microsoft en utilisant un refresh token."""
-    url = "https://login.live.com/oauth20_token.srf"
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    data = {
-        "client_id": "00000000402b5328",
-        "grant_type": "refresh_token",
-        "refresh_token": refresh_token,
-        "redirect_uri": "https://login.live.com/oauth20_desktop.srf",
-    }
-    response = requests.post(url, headers=headers, data=data)
-    response.raise_for_status()
-    return response.json()
-
-def exchange_code_for_token(auth_code):
-    """Échange le code d'authentification contre des tokens Microsoft."""
-    url = "https://login.live.com/oauth20_token.srf"
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    data = {
-        "client_id": "00000000402b5328",
-        "grant_type": "authorization_code",
-        "code": auth_code,
-        "redirect_uri": "https://login.live.com/oauth20_desktop.srf",
-        "scope": "XboxLive.signin offline_access"
-    }
-    response = requests.post(url, headers=headers, data=data)
-    response.raise_for_status()
-    return response.json()
-
-def authenticate_with_xbox(access_token):
-    """S'authentifie auprès de Xbox Live."""
-    url = "https://user.auth.xboxlive.com/user/authenticate"
-    headers = {"Content-Type": "application/json", "Accept": "application/json"}
-    data = {
-        "Properties": {
-            "AuthMethod": "RPS",
-            "SiteName": "user.auth.xboxlive.com",
-            "RpsTicket": f"d={access_token}"
-        },
-        "RelyingParty": "http://auth.xboxlive.com",
-        "TokenType": "JWT"
-    }
-    response = requests.post(url, headers=headers, json=data)
-    response.raise_for_status()
-    return response.json()
-
-def authenticate_with_xsts(xbl_token):
-    """Obtient un token XSTS pour accéder aux services Minecraft."""
-    url = "https://xsts.auth.xboxlive.com/xsts/authorize"
-    headers = {"Content-Type": "application/json", "Accept": "application/json"}
-    data = {
-        "Properties": {
-            "SandboxId": "RETAIL",
-            "UserTokens": [xbl_token]
-        },
-        "RelyingParty": "rp://api.minecraftservices.com/",
-        "TokenType": "JWT"
-    }
-    response = requests.post(url, headers=headers, json=data)
-    response.raise_for_status()
-    return response.json()
-
-def login_with_minecraft(user_hash, xsts_token):
-    """Se connecte à Minecraft avec le token XSTS."""
-    url = "https://api.minecraftservices.com/authentication/login_with_xbox"
-    headers = {"Content-Type": "application/json"}
-    data = {"identityToken": f"XBL3.0 x={user_hash};{xsts_token}"}
-    response = requests.post(url, headers=headers, json=data)
-    response.raise_for_status()
-    return response.json()
-
-def get_minecraft_profile(minecraft_token):
-    """Récupère le profil du joueur (nom, UUID)."""
-    url = "https://api.minecraftservices.com/minecraft/profile"
-    headers = {"Authorization": f"Bearer {minecraft_token}"}
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    return response.json()
 
 # --- Nouvelle fonction utilitaire pour trouver le .jar ---
 def find_main_jar(directory):
@@ -162,6 +82,13 @@ def load_modpacks(modpack_url):
         except Exception as e2:
             print(f"Erreur lors du chargement du fichier local modpacks.json: {e2}")
             return []
+
+def run_in_thread(fn):
+    """Decorator to run a function in a daemon thread."""
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        threading.Thread(target=lambda: fn(*args, **kwargs), daemon=True).start()
+    return wrapper
 
 class MinecraftLauncher(tk.Tk):
     def __init__(self):
@@ -466,12 +393,10 @@ class MinecraftLauncher(tk.Tk):
             self.login_btn.config(state=tk.NORMAL)
             self.logout_btn.config(state=tk.DISABLED)
 
+    @run_in_thread
     def check_modpack_updates(self):
         """Vérification automatique des mises à jour au démarrage"""
-        # Vérifier les mises à jour à chaque lancement
-        threading.Thread(target=self._check_updates, daemon=True).start()
-        
-        # Vérifier s'il y a des notifications de mise à jour
+        self._check_updates()
         self.check_update_notifications()
 
     def check_update_notifications(self):
@@ -499,9 +424,10 @@ class MinecraftLauncher(tk.Tk):
             except Exception as e:
                 print(f"Erreur lors de la lecture de la notification: {e}")
 
+    @run_in_thread
     def manual_check_updates(self):
         """Vérification manuelle des mises à jour"""
-        threading.Thread(target=self._check_updates, daemon=True).start()
+        self._check_updates()
 
     def _check_updates(self):
         try:
@@ -546,56 +472,40 @@ class MinecraftLauncher(tk.Tk):
             messagebox.showerror("Erreur", f"Impossible de vérifier les mises à jour: {str(e)}")
             self.status_var.set("Erreur lors de la vérification")
 
+    @run_in_thread
     def auto_update_all(self):
         """Mise à jour automatique de tous les modpacks"""
-        def update_thread():
-            try:
-                self.status_var.set("Mise à jour automatique en cours...")
-                
-                # Charger les modpacks
-                modpacks = load_modpacks(self.config["modpack_url"])
-                
-                if not modpacks:
-                    self.status_var.set("Aucun modpack trouvé")
-                    return
-                
-                # Vérifier les mises à jour pour chaque modpack
-                updates_available = []
-                for modpack in modpacks:
-                    has_update, reason = check_update(modpack["url"], modpack.get("last_modified", ""))
-                    if has_update:
-                        updates_available.append({
-                            'modpack': modpack,
-                            'reason': reason
-                        })
-                
-                if not updates_available:
-                    self.status_var.set("Aucune mise à jour nécessaire")
-                    return
-                
-                # Installer chaque mise à jour
-                for i, update in enumerate(updates_available):
-                    modpack = update['modpack']
-                    self.status_var.set(f"Mise à jour de {modpack['name']}... ({i+1}/{len(updates_available)})")
-                    
-                    try:
-                        self.install_modpack(modpack)
-                        
-                        # Mettre à jour les informations dans modpacks.json
-                        new_timestamp = datetime.now().isoformat()
-                        update_modpack_info(modpack, new_timestamp)
-                        
-                    except Exception as e:
-                        messagebox.showerror("Erreur", f"Erreur lors de la mise à jour de {modpack['name']}: {str(e)}")
-                
-                self.status_var.set("Mises à jour terminées!")
-                self.refresh_modpack_list()
-                
-            except Exception as e:
-                messagebox.showerror("Erreur", f"Erreur lors de la mise à jour automatique: {str(e)}")
-                self.status_var.set("Erreur lors de la mise à jour")
-        
-        threading.Thread(target=update_thread, daemon=True).start()
+        self._auto_update_all()
+
+    def _auto_update_all(self):
+        try:
+            self.status_var.set("Mise à jour automatique en cours...")
+            modpacks = load_modpacks(self.config["modpack_url"])
+            if not modpacks:
+                self.status_var.set("Aucun modpack trouvé")
+                return
+            updates_available = []
+            for modpack in modpacks:
+                has_update, reason = check_update(modpack["url"], modpack.get("last_modified", ""))
+                if has_update:
+                    updates_available.append({'modpack': modpack, 'reason': reason})
+            if not updates_available:
+                self.status_var.set("Aucune mise à jour nécessaire")
+                return
+            for i, update in enumerate(updates_available):
+                modpack = update['modpack']
+                self.status_var.set(f"Mise à jour de {modpack['name']}... ({i+1}/{len(updates_available)})")
+                try:
+                    self.install_modpack(modpack)
+                    new_timestamp = datetime.now().isoformat()
+                    update_modpack_info(modpack, new_timestamp)
+                except Exception as e:
+                    messagebox.showerror("Erreur", f"Erreur lors de la mise à jour de {modpack['name']}: {str(e)}")
+            self.status_var.set("Mises à jour terminées!")
+            self.refresh_modpack_list()
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Erreur lors de la mise à jour automatique: {str(e)}")
+            self.status_var.set("Erreur lors de la mise à jour")
 
     def refresh_modpack_list(self):
         """Rafraîchit la liste des modpacks dans l'interface"""
@@ -610,126 +520,87 @@ class MinecraftLauncher(tk.Tk):
             print(f"Erreur lors du rafraîchissement de la liste: {e}")
             messagebox.showerror("Erreur", f"Impossible de charger les modpacks: {str(e)}")
 
+    @run_in_thread
     def install_modpack(self, modpack_data):
-        def install_thread():
+        try:
+            self.status_var.set("Téléchargement en cours...")
+            self.progress["value"] = 0 # Réinitialiser la barre
+            install_path = os.path.join(get_minecraft_directory(), "modpacks")
+            os.makedirs(install_path, exist_ok=True)
+            backup_dir = os.path.join(install_path, "backups")
+            os.makedirs(backup_dir, exist_ok=True)
+            def progress_callback(current, total):
+                if total > 0:
+                    self.progress["value"] = (current / total) * 100
+            install_modpack(
+                modpack_data["url"],
+                install_path,
+                modpack_data["name"],
+                backup_dir,
+                progress_callback
+            )
+            self.progress["value"] = 100
+            new_timestamp = datetime.now().isoformat()
             try:
-                self.status_var.set("Téléchargement en cours...")
-                self.progress["value"] = 0 # Réinitialiser la barre
-                
-                install_path = os.path.join(get_minecraft_directory(), "modpacks")
-                os.makedirs(install_path, exist_ok=True)
-                
-                # Sauvegarder l'ancienne version
-                backup_dir = os.path.join(install_path, "backups")
-                os.makedirs(backup_dir, exist_ok=True)
-                
-                # Télécharger et installer
-                def progress_callback(current, total):
-                    if total > 0:
-                        self.progress["value"] = (current / total) * 100
-                    else:
-                        # Si la taille est inconnue, on ne fait rien pour éviter le crash.
-                        # La barre restera à 0, mais le téléchargement se poursuit.
-                        pass
-                
-                install_modpack(
-                    modpack_data["url"],
-                    install_path,
-                    modpack_data["name"],
-                    backup_dir,
-                    progress_callback
-                )
-                
-                # S'assurer que la barre de progression est à 100% à la fin
-                self.progress["value"] = 100
-                
-                # Mettre à jour les informations d'installation avec plus de détails
-                new_timestamp = datetime.now().isoformat()
-                
-                # Récupérer l'ETag et la taille du fichier (non bloquant si ça échoue)
-                try:
-                    response = requests.head(modpack_data["url"])
-                    etag = response.headers.get('ETag', '').strip('"')
-                    file_size = int(response.headers.get('Content-Length', 0))
-                except:
-                    etag = None
-                    file_size = None
-                
-                update_installed_info(modpack_data["url"], new_timestamp, etag, file_size)
-                
-                self.status_var.set("Installation terminée!")
-            except Exception as e:
-                messagebox.showerror("Erreur", str(e))
-                self.status_var.set("Prêt") # Réinitialiser le statut
-                self.progress["value"] = 0   # Réinitialiser la barre
-        
-        threading.Thread(target=install_thread, daemon=True).start()
+                response = requests.head(modpack_data["url"])
+                etag = response.headers.get('ETag', '').strip('"')
+                file_size = int(response.headers.get('Content-Length', 0))
+            except:
+                etag = None
+                file_size = None
+            update_installed_info(modpack_data["url"], new_timestamp, etag, file_size)
+            self.status_var.set("Installation terminée!")
+        except Exception as e:
+            messagebox.showerror("Erreur", str(e))
+            self.status_var.set("Prêt")
+            self.progress["value"] = 0
+
+    @run_in_thread
+    def _launch_game_thread(self, modpack, modpack_profile_dir):
+        try:
+            self.status_var.set("Préparation du lancement...")
+            forge_version_id = f"{modpack['version']}-forge-{modpack['forge_version']}"
+            self.status_var.set(f"Vérification de Forge {forge_version_id}...")
+            minecraft_dir = get_minecraft_directory()
+            install_forge_if_needed(forge_version_id, minecraft_dir)
+            options = {
+                "username": self.auth_data['name'],
+                "uuid": self.auth_data['id'],
+                "token": self.auth_data['access_token'],
+                "executablePath": self.config.get("java_path", "javaw.exe"),
+                "jvmArguments": self.config["java_args"].split() if self.config.get("java_args") else [],
+                "gameDirectory": modpack_profile_dir
+            }
+            self.status_var.set("Génération de la commande...")
+            minecraft_command = get_minecraft_command(forge_version_id, minecraft_dir, options)
+            self.status_var.set("Lancement de Minecraft...")
+            subprocess.run(minecraft_command, cwd=modpack_profile_dir)
+            self.status_var.set("Prêt")
+        except Exception as e:
+            self.status_var.set("Erreur lors du lancement.")
+            messagebox.showerror("Erreur de Lancement", str(e))
 
     def launch_game(self):
         if not self.auth_data:
             messagebox.showwarning("Connexion", "Veuillez vous connecter d'abord !")
             return
-        
         selected = self.modpack_listbox.curselection()
         if not selected:
             messagebox.showwarning("Sélection", "Veuillez sélectionner un modpack !")
             return
-        
-        # Récupérer les données du modpack
         try:
-            # On charge toujours depuis le fichier local pour la robustesse
             with open("modpacks.json", 'r', encoding='utf-8') as f:
                 modpacks = json.load(f)
             modpack = modpacks[selected[0]]
         except Exception as e:
             messagebox.showerror("Erreur", f"Impossible de charger les modpacks : {e}")
             return
-        
         modpack_profile_dir = os.path.join(get_minecraft_directory(), "modpacks", modpack["name"])
-        
         if not os.path.exists(modpack_profile_dir):
             messagebox.showinfo("Installation", f"Le modpack {modpack['name']} va être installé.")
             self.install_modpack(modpack)
             return
-
-        def launch_thread():
-            try:
-                self.status_var.set("Préparation du lancement...")
-
-                # Étape 1: Construire l'ID de la version Forge (ex: "1.16.5-forge-36.2.42")
-                forge_version_id = f"{modpack['version']}-forge-{modpack['forge_version']}"
-
-                # Étape 2: Installer Forge si nécessaire
-                self.status_var.set(f"Vérification de Forge {forge_version_id}...")
-                minecraft_dir = get_minecraft_directory()
-                install_forge_if_needed(forge_version_id, minecraft_dir)
-
-                # Étape 3: Construire les options de lancement
-                options = {
-                    "username": self.auth_data['name'],
-                    "uuid": self.auth_data['id'],
-                    "token": self.auth_data['access_token'],
-                    "executablePath": self.config.get("java_path", "javaw.exe"),
-                    "jvmArguments": self.config["java_args"].split() if self.config.get("java_args") else [],
-                    "gameDirectory": modpack_profile_dir
-                }
-
-                # Étape 4: Obtenir la commande de lancement de la bibliothèque
-                self.status_var.set("Génération de la commande...")
-                minecraft_command = get_minecraft_command(forge_version_id, minecraft_dir, options)
-
-                # Étape 5: Lancer le jeu
-                self.status_var.set("Lancement de Minecraft...")
-                import subprocess
-                subprocess.run(minecraft_command, cwd=modpack_profile_dir) # Utiliser run et spécifier le CWD
-                self.status_var.set("Prêt")
-
-            except Exception as e:
-                self.status_var.set("Erreur lors du lancement.")
-                messagebox.showerror("Erreur de Lancement", str(e))
-
-        # Lancer le processus dans un thread pour ne pas geler l'interface
-        threading.Thread(target=launch_thread, daemon=True).start()
+        self._launch_game_thread(modpack, modpack_profile_dir)
 
 if __name__ == "__main__":
     app = MinecraftLauncher()

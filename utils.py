@@ -404,3 +404,82 @@ def get_file_hash(file_path):
         for chunk in iter(lambda: f.read(4096), b""):
             hash_sha256.update(chunk)
     return hash_sha256.hexdigest()
+
+def refresh_ms_token(refresh_token):
+    """Refresh Microsoft access token using a refresh token."""
+    url = "https://login.live.com/oauth20_token.srf"
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    data = {
+        "client_id": "00000000402b5328",
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+        "redirect_uri": "https://login.live.com/oauth20_desktop.srf",
+    }
+    response = requests.post(url, headers=headers, data=data)
+    response.raise_for_status()
+    return response.json()
+
+def exchange_code_for_token(auth_code):
+    """Exchange auth code for Microsoft tokens."""
+    url = "https://login.live.com/oauth20_token.srf"
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    data = {
+        "client_id": "00000000402b5328",
+        "grant_type": "authorization_code",
+        "code": auth_code,
+        "redirect_uri": "https://login.live.com/oauth20_desktop.srf",
+        "scope": "XboxLive.signin offline_access"
+    }
+    response = requests.post(url, headers=headers, data=data)
+    response.raise_for_status()
+    return response.json()
+
+def authenticate_with_xbox(access_token):
+    """Authenticate with Xbox Live."""
+    url = "https://user.auth.xboxlive.com/user/authenticate"
+    headers = {"Content-Type": "application/json", "Accept": "application/json"}
+    data = {
+        "Properties": {
+            "AuthMethod": "RPS",
+            "SiteName": "user.auth.xboxlive.com",
+            "RpsTicket": f"d={access_token}"
+        },
+        "RelyingParty": "http://auth.xboxlive.com",
+        "TokenType": "JWT"
+    }
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+def authenticate_with_xsts(xbl_token):
+    """Get XSTS token for Minecraft services."""
+    url = "https://xsts.auth.xboxlive.com/xsts/authorize"
+    headers = {"Content-Type": "application/json", "Accept": "application/json"}
+    data = {
+        "Properties": {
+            "SandboxId": "RETAIL",
+            "UserTokens": [xbl_token]
+        },
+        "RelyingParty": "rp://api.minecraftservices.com/",
+        "TokenType": "JWT"
+    }
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+def login_with_minecraft(user_hash, xsts_token):
+    """Login to Minecraft with XSTS token."""
+    url = "https://api.minecraftservices.com/authentication/login_with_xbox"
+    headers = {"Content-Type": "application/json"}
+    data = {"identityToken": f"XBL3.0 x={user_hash};{xsts_token}"}
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+    return response.json()
+
+def get_minecraft_profile(minecraft_token):
+    """Get Minecraft player profile (name, UUID)."""
+    url = "https://api.minecraftservices.com/minecraft/profile"
+    headers = {"Authorization": f"Bearer {minecraft_token}"}
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()
