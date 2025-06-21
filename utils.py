@@ -335,49 +335,6 @@ def update_installed_info(url, timestamp, etag=None, file_size=None):
     with open(INSTALLED_FILE, 'w') as f:
         json.dump(installed_data, f, indent=4)
 
-def check_all_modpack_updates(modpacks_url):
-    """
-    Vérifie automatiquement les mises à jour pour tous les modpacks.
-    Retourne une liste des modpacks qui ont des mises à jour.
-    """
-    try:
-        # Charger la liste des modpacks
-        response = requests.get(modpacks_url, timeout=10)
-        response.raise_for_status()
-        modpacks = response.json()
-        
-        # Charger les données d'installation locales pour comparer les URLs
-        installed_data = {}
-        if os.path.exists(INSTALLED_FILE):
-            with open(INSTALLED_FILE, 'r') as f:
-                installed_data = json.load(f)
-        
-        updates_available = []
-        
-        for modpack in modpacks:
-            url = modpack['url']
-            last_modified = modpack.get('last_modified', '')
-            
-            # Récupérer l'ancienne URL stockée localement (si elle existe)
-            old_url = None
-            if url in installed_data:
-                # Si l'URL actuelle est dans les données installées, pas de changement
-                old_url = url
-            
-            has_update, reason = check_update(url, last_modified, old_url=old_url)
-            
-            if has_update:
-                updates_available.append({
-                    'modpack': modpack,
-                    'reason': reason
-                })
-        
-        return updates_available
-        
-    except requests.RequestException as e:
-        print(f"Erreur lors du chargement des modpacks: {e}")
-        return []
-
 def update_modpack_info(modpack, new_timestamp):
     """Met à jour les informations d'un modpack dans modpacks.json"""
     try:
