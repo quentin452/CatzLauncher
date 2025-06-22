@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QProgressBar, QListWidget, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
     QInputDialog, QTabWidget, QFrame, QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
-    QListWidgetItem, QStackedWidget, QSizePolicy, QComboBox, QFormLayout, QScrollArea
+    QListWidgetItem, QStackedWidget, QSizePolicy, QComboBox, QFormLayout, QScrollArea, QSlider
 )
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient
 from PyQt5.QtWidgets import QApplication
@@ -577,6 +577,28 @@ class MinecraftLauncher(QMainWindow):
         self.java_args_edit = QLineEdit(self.config.get("java_args", ""))
         form_layout.addRow(QLabel("🔧 Arguments JVM:"), self.java_args_edit)
 
+        # Max Memory Slider
+        try:
+            import psutil
+            total_gb = int(psutil.virtual_memory().total / (1024 ** 3))
+            total_gb = min(total_gb, 64)  # Cap at 64 GB for sanity
+        except ImportError:
+            total_gb = 16
+        self.max_memory_slider = QSlider(Qt.Horizontal)
+        self.max_memory_slider.setMinimum(1)
+        self.max_memory_slider.setMaximum(total_gb)
+        self.max_memory_slider.setValue(min(int(self.config.get("max_memory", 4)), total_gb))
+        self.max_memory_slider.setTickInterval(1)
+        self.max_memory_slider.setTickPosition(QSlider.TicksBelow)
+        self.max_memory_label = QLabel(f"RAM Max: {self.max_memory_slider.value()} Go (/{total_gb} Go)")
+        def update_mem_label(val):
+            self.max_memory_label.setText(f"RAM Max: {val} Go (/{total_gb} Go)")
+        self.max_memory_slider.valueChanged.connect(update_mem_label)
+        mem_layout = QHBoxLayout()
+        mem_layout.addWidget(self.max_memory_slider)
+        mem_layout.addWidget(self.max_memory_label)
+        form_layout.addRow(QLabel("🧠 Mémoire Max (Go):"), mem_layout)
+
         layout.addWidget(form_container)
 
         # Auto-update checkbox
@@ -673,6 +695,7 @@ class MinecraftLauncher(QMainWindow):
         self.config["java_args"] = self.java_args_edit.text()
         self.config["auto_check_updates"] = self.auto_check_cb.isChecked()
         self.config["theme"] = self.theme_selector.currentText()
+        self.config["max_memory"] = self.max_memory_slider.value()
         
         # Gérer la sauvegarde du token séparément et de manière sécurisée
         new_token = self.github_token_edit.text()
@@ -1093,7 +1116,7 @@ class MinecraftLauncher(QMainWindow):
                 "uuid": self.auth_data['profile']['id'],
                 "token": self.auth_data['access_token'],
                 "executablePath": self.config.get("java_path") or "javaw.exe",
-                "jvmArguments": self.config.get("java_args", "").split(),
+                "jvmArguments": self._get_jvm_args_with_memory(),
                 "gameDirectory": modpack_profile_dir
             }
 
@@ -1111,6 +1134,16 @@ class MinecraftLauncher(QMainWindow):
             print(f"Erreur de Lancement: {e}")
         finally:
             self.play_btn.setEnabled(True)
+
+    def _get_jvm_args_with_memory(self):
+        # Compose JVM arguments with max memory from config
+        args = self.config.get("java_args", "").split()
+        has_xmx = any(a.startswith("-Xmx") for a in args)
+        has_xms = any(a.startswith("-Xms") for a in args)
+        if not has_xmx and not has_xms:
+            max_mem = int(self.config.get("max_memory", 4))
+            args.append(f"-Xmx{max_mem}G")
+        return args
 
     def toggle_maximize_restore(self):
         if self.isMaximized():
