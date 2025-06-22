@@ -2,11 +2,11 @@
 
 /* ===== MAIN WINDOW ===== */
 QMainWindow {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-        stop:0 #1a1a2e,
-        stop:0.3 #16213e,
-        stop:0.7 #0f3460,
-        stop:1 #533483);
+    background-image: url('assets/background.png');
+    background-position: center; 
+    background-repeat: no-repeat; 
+    background-size: cover;
+    background-color: #1a1a2e; /* Fallback color */
 }
 
 /* ===== TAB WIDGET ===== */
