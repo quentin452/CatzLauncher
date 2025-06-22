@@ -215,24 +215,19 @@ def restore_player_data(modpack_profile_dir, saved_items):
             
             print(f"Restauration de {item} pour le modpack")
 
-def install_forge_if_needed(version_id, minecraft_directory):
-    """
-    Installe Forge si nécessaire.
-    """
-    try:
-        versions_path = os.path.join(minecraft_directory, "versions")
-        version_path = os.path.join(versions_path, version_id)
-        if not os.path.exists(version_path):
-            print(f"Version Forge {version_id} non trouvée. Installation en cours...")
-            install_forge_version(version_id, minecraft_directory)
-            print(f"Forge {version_id} installé avec succès.")
-        else:
-            print(f"La version Forge {version_id} est déjà installée.")
-    except Exception as e:
-        print(f"Erreur lors de l'installation de Forge : {e}")
-        import traceback
-        traceback.print_exc()
-        raise e
+def install_forge_if_needed(mc_version, forge_version, minecraft_directory):
+    from minecraft_launcher_lib.forge import install_forge_version
+    versions_path = os.path.join(minecraft_directory, "versions")
+    forge_folder = f"{mc_version}-forge-{forge_version}"
+    version_path = os.path.join(versions_path, forge_folder)
+    if not os.path.exists(version_path):
+        print(f"Version Forge {forge_folder} non trouvée. Installation en cours...")
+        forge_versionid = f"{mc_version}-{forge_version}"
+        print("DEBUG", forge_versionid, type(forge_versionid))
+        install_forge_version(forge_versionid, minecraft_directory)
+        print(f"Forge {forge_folder} installé avec succès.")
+    else:
+        print(f"La version Forge {forge_folder} est déjà installée.")
 
 def extract_mb_from_string(mb_string):
     """

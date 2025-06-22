@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient
 from PyQt5.QtWidgets import QApplication
 
-from minecraft_launcher_lib.utils import get_minecraft_directory
+from minecraft_launcher_lib.utils import (get_minecraft_directory)
 from minecraft_launcher_lib.command import get_minecraft_command
 from src.utils import (
     ensure_requirements, install_modpack_files_fresh, check_update,
@@ -1083,11 +1083,10 @@ class MinecraftLauncher(QMainWindow):
             minecraft_dir = get_minecraft_directory()
             modpack_profile_dir = os.path.join(minecraft_dir, "modpacks", modpack["name"])
 
-            # Installation de Forge si nécessaire (double-vérification utile)
-            forge_launch_id = f"{modpack['version']}-forge-{modpack['forge_version']}"
-            if not os.path.exists(os.path.join(minecraft_dir, "versions", forge_launch_id)):
-                 self.signals.status.emit(f"Installation de Forge {forge_launch_id}...")
-                 install_forge_if_needed(forge_launch_id, minecraft_dir)
+            forge_version = modpack['forge_version']
+            if not os.path.exists(os.path.join(minecraft_dir, "versions", f"{modpack['version']}-forge-{forge_version}")):
+                self.signals.status.emit(f"Installation de Forge {modpack['version']}-forge-{forge_version}...")
+                install_forge_if_needed(modpack['version'], forge_version, minecraft_dir)
 
             options = {
                 "username": self.auth_data['profile']['name'],
@@ -1098,9 +1097,8 @@ class MinecraftLauncher(QMainWindow):
                 "gameDirectory": modpack_profile_dir
             }
 
-            self.signals.status.emit("Génération de la commande...")
+            forge_launch_id = f"{modpack['version']}-forge-{modpack['forge_version']}"
             minecraft_command = get_minecraft_command(forge_launch_id, minecraft_dir, options)
-            minecraft_command = [arg for arg in minecraft_command if arg]
 
             self.signals.status.emit("Lancement de Minecraft...")
 
