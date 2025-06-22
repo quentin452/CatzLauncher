@@ -56,6 +56,9 @@ class ParticleSystem(QWidget):
         
     def mouse_move_event(self, pos):
         """Handle mouse movement to update particle emission position."""
+        if not self.window() or not self.window().isActiveWindow():
+            return
+
         self.mouse_pos = pos
         current_time = time.time()
         
@@ -65,6 +68,9 @@ class ParticleSystem(QWidget):
     
     def emit_particles(self, pos, count=3):
         """Emit new particles at the given position."""
+        if not self.window() or not self.window().isActiveWindow():
+            return
+            
         for _ in range(count):
             particle = Particle(
                 pos.x(), pos.y(),
@@ -77,6 +83,12 @@ class ParticleSystem(QWidget):
     
     def update_particles(self):
         """Update all particles and remove dead ones."""
+        if not self.window() or not self.window().isActiveWindow():
+            if self.particles: # Clear only if there are particles
+                self.particles.clear()
+                self.update() # Schedule a repaint to clear them from screen
+            return
+
         current_time = time.time()
         dt = 0.016  # Approximate delta time for 60 FPS
         
@@ -118,12 +130,14 @@ class AnimatedButton(QWidget):
         self.hovered = False
         self.pressed = False
         self.particles = []
-        self.animation = QPropertyAnimation(self, b"geometry")
-        self.animation.setDuration(200)
-        self.animation.setEasingCurve(QEasingCurve.OutCubic)
         
         self.setMinimumSize(120, 40)
         self.setCursor(Qt.PointingHandCursor)
+
+        # Timer pour l'animation des particules
+        self.particle_timer = QTimer(self)
+        self.particle_timer.timeout.connect(self.update_particles)
+        self.particle_timer.start(16) # ~60 FPS
         
     def setText(self, text):
         """Set the button text."""
@@ -166,6 +180,9 @@ class AnimatedButton(QWidget):
             
     def emit_particles(self, count=5):
         """Emit particles from the button."""
+        if not self.window() or not self.window().isActiveWindow():
+            return
+
         for _ in range(count):
             particle = Particle(
                 random.randint(0, self.width()),
@@ -176,7 +193,26 @@ class AnimatedButton(QWidget):
                 life=random.uniform(0.5, 1.0)
             )
             self.particles.append(particle)
-            
+
+    def update_particles(self):
+        """Met à jour les particules et repeint le widget si nécessaire."""
+        if not self.window() or not self.window().isActiveWindow():
+            if self.particles:
+                self.particles.clear()
+                self.update()
+            return
+
+        if not self.particles:
+            return
+
+        alive_particles = [p for p in self.particles if p.update(0.016)]
+        
+        if len(alive_particles) != len(self.particles):
+            self.particles = alive_particles
+            self.update()
+        elif self.particles:
+            self.update()
+
     def paintEvent(self, event):
         """Paint the button with animations."""
         painter = QPainter(self)
@@ -212,8 +248,8 @@ class AnimatedButton(QWidget):
         painter.drawText(text_rect, Qt.AlignCenter, self.text)
         
         # Draw particles
-        for particle in self.particles[:]:
-            if particle.update(0.016):
+        if self.particles:
+            for particle in self.particles:
                 gradient = QRadialGradient(particle.x, particle.y, particle.size)
                 color = QColor(particle.color)
                 color.setAlpha(particle.alpha)
@@ -224,8 +260,6 @@ class AnimatedButton(QWidget):
                 painter.setPen(Qt.NoPen)
                 painter.drawEllipse(int(particle.x - particle.size), int(particle.y - particle.size), 
                                   int(particle.size * 2), int(particle.size * 2))
-            else:
-                self.particles.remove(particle)
 
 class LoadingSpinner(QWidget):
     """An animated loading spinner with particle effects."""
@@ -240,6 +274,9 @@ class LoadingSpinner(QWidget):
         
     def update_animation(self):
         """Update the spinner animation."""
+        if not self.window() or not self.window().isActiveWindow():
+            return # Ne fait rien si la fenêtre n'est pas active
+
         self.angle = (self.angle + 10) % 360
         
         # Emit particles occasionally
@@ -250,6 +287,9 @@ class LoadingSpinner(QWidget):
         
     def emit_particles(self):
         """Emit particles from the spinner."""
+        if not self.window() or not self.window().isActiveWindow():
+            return
+
         center_x = self.width() / 2
         center_y = self.height() / 2
         radius = min(self.width(), self.height()) / 4
@@ -295,17 +335,18 @@ class LoadingSpinner(QWidget):
             painter.drawLine(int(x1), int(y1), int(x2), int(y2))
         
         # Draw particles
-        for particle in self.particles[:]:
-            if particle.update(0.05):
-                gradient = QRadialGradient(particle.x, particle.y, particle.size)
-                color = QColor(particle.color)
-                color.setAlpha(particle.alpha)
-                gradient.setColorAt(0, color)
-                gradient.setColorAt(1, QColor(0, 0, 0, 0))
-                
-                painter.setBrush(QBrush(gradient))
-                painter.setPen(Qt.NoPen)
-                painter.drawEllipse(int(particle.x - particle.size), int(particle.y - particle.size), 
-                                  int(particle.size * 2), int(particle.size * 2))
-            else:
-                self.particles.remove(particle) 
+        if self.window() and self.window().isActiveWindow():
+            for particle in self.particles[:]:
+                if particle.update(0.05):
+                    gradient = QRadialGradient(particle.x, particle.y, particle.size)
+                    color = QColor(particle.color)
+                    color.setAlpha(particle.alpha)
+                    gradient.setColorAt(0, color)
+                    gradient.setColorAt(1, QColor(0, 0, 0, 0))
+                    
+                    painter.setBrush(QBrush(gradient))
+                    painter.setPen(Qt.NoPen)
+                    painter.drawEllipse(int(particle.x - particle.size), int(particle.y - particle.size), 
+                                      int(particle.size * 2), int(particle.size * 2))
+                else:
+                    self.particles.remove(particle) 
