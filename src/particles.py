@@ -2,7 +2,7 @@ import math
 import random
 import time
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal, QPoint, QPropertyAnimation, QEasingCurve, Qt
-from PyQt5.QtWidgets import QWidget, QLabel
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 from PyQt5.QtGui import QPainter, QColor, QPen, QBrush, QPixmap, QRadialGradient
 
 class Particle:
@@ -118,64 +118,40 @@ class ParticleSystem(QWidget):
             painter.drawEllipse(int(particle.x - particle.size), int(particle.y - particle.size), 
                               int(particle.size * 2), int(particle.size * 2))
 
-class AnimatedButton(QWidget):
-    """A button with hover animations and particle effects."""
+class AnimatedButton(QPushButton):
+    """A button with hover animations and particle effects that respects QSS."""
     
-    clicked = pyqtSignal()
+    # The 'clicked' signal is inherited from QPushButton.
     
     def __init__(self, text="", parent=None):
-        super().__init__(parent)
-        self.text = text
-        self.hovered = False
-        self.pressed = False
+        super().__init__(text, parent)
         self.particles = []
         
-        self.setMinimumSize(120, 40)
         self.setCursor(Qt.PointingHandCursor)
 
-        # Timer pour l'animation des particules
+        # Timer for particle animation
         self.particle_timer = QTimer(self)
         self.particle_timer.timeout.connect(self.update_particles)
         self.particle_timer.start(16) # ~60 FPS
         
-    def setText(self, text):
-        """Set the button text."""
-        self.text = text
-        self.update()
-        
-    def text(self):
-        """Get the button text."""
-        return self.text
-        
-    def setEnabled(self, enabled):
-        """Set the button enabled state."""
-        super().setEnabled(enabled)
-        self.update()
+    # setText, text, and setEnabled are inherited.
         
     def enterEvent(self, event):
         """Handle mouse enter event."""
-        self.hovered = True
+        super().enterEvent(event)
         self.emit_particles()
-        self.update()
         
     def leaveEvent(self, event):
         """Handle mouse leave event."""
-        self.hovered = False
-        self.update()
+        super().leaveEvent(event)
         
     def mousePressEvent(self, event):
         """Handle mouse press event."""
+        super().mousePressEvent(event)
         if event.button() == Qt.LeftButton:
-            self.pressed = True
             self.emit_particles(count=8)
-            self.update()
             
-    def mouseReleaseEvent(self, event):
-        """Handle mouse release event."""
-        if event.button() == Qt.LeftButton and self.pressed:
-            self.pressed = False
-            self.clicked.emit()
-            self.update()
+    # mouseReleaseEvent is inherited and correctly handles the click signal.
             
     def emit_particles(self, count=5):
         """Emit particles from the button."""
@@ -213,40 +189,14 @@ class AnimatedButton(QWidget):
             self.update()
 
     def paintEvent(self, event):
-        """Paint the button with animations."""
+        """Paint the button using QSS and then draw particles on top."""
+        # Let the base QPushButton draw itself first. This will apply the QSS styles.
+        super().paintEvent(event)
+        
+        # Now, draw our particles over the button.
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         
-        # Background gradient
-        gradient = QRadialGradient(self.width()/2, self.height()/2, self.width()/2)
-        
-        if self.pressed:
-            gradient.setColorAt(0, QColor(80, 80, 120))
-            gradient.setColorAt(1, QColor(60, 60, 100))
-        elif self.hovered:
-            gradient.setColorAt(0, QColor(100, 100, 140))
-            gradient.setColorAt(1, QColor(80, 80, 120))
-        else:
-            gradient.setColorAt(0, QColor(70, 70, 110))
-            gradient.setColorAt(1, QColor(50, 50, 90))
-        
-        painter.setBrush(QBrush(gradient))
-        painter.setPen(QPen(QColor(120, 120, 160), 2))
-        
-        # Draw rounded rectangle
-        painter.drawRoundedRect(self.rect(), 8, 8)
-        
-        # Draw text
-        painter.setPen(QColor(255, 255, 255))
-        font = painter.font()
-        font.setPointSize(10)
-        font.setBold(True)
-        painter.setFont(font)
-        
-        text_rect = self.rect()
-        painter.drawText(text_rect, Qt.AlignCenter, self.text)
-        
-        # Draw particles
         if self.particles:
             for particle in self.particles:
                 gradient = QRadialGradient(particle.x, particle.y, particle.size)
