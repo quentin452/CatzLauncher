@@ -17,11 +17,16 @@ import urllib.error
 import urllib.parse
 import keyring
 import keyring.errors
+from PyQt5.QtWidgets import QMessageBox
 
 # Placeholder functions for GUI integration
 def show_error(title, message):
     """Placeholder for GUI error dialog"""
-    print(f"ERROR [{title}]: {message}")
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Critical)
+    msg.setWindowTitle(title)
+    msg.setText(message)
+    msg.exec_()
 
 def show_message(title, message):
     """Placeholder for GUI message dialog"""
@@ -686,32 +691,28 @@ def is_modpack_installed(modpack_name):
     except (json.JSONDecodeError, IOError):
         return False
 
-def refresh_ms_token(refresh_token):
-    """Refresh Microsoft access token using a refresh token."""
-    url = "https://login.live.com/oauth20_token.srf"
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+def refresh_ms_token(refresh_token, client_id):
+    """Refreshes the Microsoft token."""
+    print("DEBUG: Refreshing Microsoft token...")
     data = {
-        "client_id": "00000000402b5328",
-        "grant_type": "refresh_token",
+        "client_id": client_id,
         "refresh_token": refresh_token,
-        "redirect_uri": "https://login.live.com/oauth20_desktop.srf",
+        "grant_type": "refresh_token"
     }
-    response = requests.post(url, headers=headers, data=data)
+    response = requests.post("https://login.live.com/oauth20_token.srf", data=data)
     response.raise_for_status()
     return response.json()
 
-def exchange_code_for_token(auth_code):
-    """Exchange auth code for Microsoft tokens."""
-    url = "https://login.live.com/oauth20_token.srf"
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+def exchange_code_for_token(auth_code, client_id):
+    """Exchanges the authentication code for a token."""
+    print("DEBUG: Exchanging code for token...")
     data = {
-        "client_id": "00000000402b5328",
-        "grant_type": "authorization_code",
+        "client_id": client_id,
         "code": auth_code,
-        "redirect_uri": "https://login.live.com/oauth20_desktop.srf",
-        "scope": "XboxLive.signin offline_access"
+        "grant_type": "authorization_code",
+        "redirect_uri": "https://login.live.com/oauth20_desktop.srf"
     }
-    response = requests.post(url, headers=headers, data=data)
+    response = requests.post("https://login.live.com/oauth20_token.srf", data=data)
     response.raise_for_status()
     return response.json()
 
@@ -1235,3 +1236,19 @@ def install_or_update_modpack_github(url, install_dir, modpack_name, estimated_m
             if os.path.exists(modpack_dir):
                 shutil.rmtree(modpack_dir)
             return False
+
+def is_connected_to_internet(host="http://www.google.com", timeout=3):
+    """
+    Vérifie la connexion Internet en tentant d'atteindre un hôte.
+    """
+    try:
+        # Utiliser un site connu pour être très stable
+        requests.head(host, timeout=timeout)
+        print("DEBUG: Connexion Internet vérifiée avec succès.")
+        return True
+    except (requests.ConnectionError, requests.Timeout):
+        print("DEBUG: Aucune connexion Internet détectée.")
+        return False
+    except Exception as e:
+        print(f"DEBUG: Erreur inattendue lors de la vérification de la connexion: {e}")
+        return False

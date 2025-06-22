@@ -25,7 +25,7 @@ from src.utils import (
     install_forge_if_needed, update_installed_info, refresh_ms_token,
     exchange_code_for_token, authenticate_with_xbox, authenticate_with_xsts,
     login_with_minecraft, get_minecraft_profile, is_modpack_installed,
-    save_github_token, load_github_token
+    save_github_token, load_github_token, is_connected_to_internet
 )
 from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
 
@@ -60,6 +60,34 @@ def load_json_file(path, fallback=None):
 def save_json_file(path, data):
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
+
+def load_azure_client_id():
+    """
+    Charge le Client ID depuis azure_config.json ou crée le fichier s'il n'existe pas.
+    """
+    config_path = "azure_config.json"
+    placeholder = "VOTRE_CLIENT_ID_AZURE_ICI"
+    
+    if not os.path.exists(config_path):
+        print(f"INFO: Le fichier '{config_path}' n'a pas été trouvé. Création du fichier par défaut.")
+        config_data = {
+            "//": "Veuillez remplacer la valeur ci-dessous par votre 'ID d'application (client)' depuis le portail Azure.",
+            "client_id": placeholder
+        }
+        save_json_file(config_path, config_data)
+        return None  # Retourne None pour indiquer qu'il doit être configuré
+
+    try:
+        config = load_json_file(config_path, {})
+        client_id = config.get("client_id")
+
+        if not client_id or client_id == placeholder:
+            return None # L'ID n'est pas configuré
+        
+        return client_id
+    except json.JSONDecodeError:
+        print(f"ERREUR: Le fichier '{config_path}' est malformé. Veuillez le corriger.")
+        return None
 
 class AnimatedTabWidget(QTabWidget):
     """Enhanced tab widget with smooth transitions and particle effects."""
@@ -241,6 +269,8 @@ class MinecraftLauncher(QMainWindow):
         ensure_requirements()
         os.makedirs(self.SAVE_DIR, exist_ok=True)
 
+        self.client_id = load_azure_client_id()
+
         self.setWindowTitle("CatzLauncher - Modpack Launcher")
         self.setWindowIcon(QIcon('assets/logo.png'))
         self.setMinimumSize(900, 700)
@@ -276,6 +306,9 @@ class MinecraftLauncher(QMainWindow):
             
         # Start fade-in animation
         self.fade_animation.start()
+
+        if not self.client_id:
+            self.show_client_id_error()
 
     def mouseMoveEvent(self, event):
         """Track mouse movement for particle effects."""
@@ -796,12 +829,26 @@ class MinecraftLauncher(QMainWindow):
             self.token_status_label.setText("❌ Aucun token n'est actuellement sauvegardé. Recommandé.")
             self.token_status_label.setStyleSheet("color: #FFC107; font-size: 11px;")
 
+    def show_client_id_error(self):
+        """Affiche une erreur si le Client ID n'est pas configuré."""
+        error_msg = ("L'ID Client Azure n'est pas configuré.\n\n"
+                     "Veuillez remplir le fichier `azure_config.json` à la racine du projet "
+                     "avec votre propre 'ID d'application (client)' pour que la connexion fonctionne.")
+        QMessageBox.warning(self, "Configuration Requise", error_msg)
+        # On pourrait aussi désactiver le bouton de login
+        self.login_btn.setEnabled(False)
+        self.login_btn.setText("🔐 Configuration Requise")
+        self.login_btn.setToolTip("Veuillez configurer l'ID Client dans azure_config.json")
+
     def microsoft_login(self):
         """Start Microsoft login, handling user interaction in the main thread."""
-        client_id = "00000000402b5328"  # Public client ID for Minecraft
+        if not self.client_id:
+            self.show_client_id_error()
+            return
+            
         redirect_uri = "https://login.live.com/oauth20_desktop.srf"
         scope = "XboxLive.signin offline_access"
-        login_url = f"https://login.live.com/oauth20_authorize.srf?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&scope={scope}"
+        login_url = f"https://login.live.com/oauth20_authorize.srf?client_id={self.client_id}&response_type=code&redirect_uri={redirect_uri}&scope={scope}"
 
         try:
             webbrowser.open(login_url)
@@ -844,10 +891,10 @@ class MinecraftLauncher(QMainWindow):
         try:
             if refresh_token:
                 self.signals.status.emit("🔄 Actualisation du token...")
-                ms_token_data = refresh_ms_token(refresh_token)
+                ms_token_data = refresh_ms_token(refresh_token, self.client_id)
             elif auth_code:
                 self.signals.status.emit("🔐 Échange du code...")
-                ms_token_data = exchange_code_for_token(auth_code)
+                ms_token_data = exchange_code_for_token(auth_code, self.client_id)
             else:
                 self.signals.login_error.emit("Aucun code ou token fourni.")
                 return
@@ -1143,6 +1190,11 @@ class MinecraftLauncher(QMainWindow):
             
     def launch_game(self):
         """Vérifie si le modpack est installé, puis lance le jeu ou l'installation."""
+        if not is_connected_to_internet():
+            QMessageBox.critical(self, "Hors Ligne", 
+                                 "Une connexion Internet est requise pour vérifier l'authentification et lancer le jeu.")
+            return
+
         if not self.auth_data:
             QMessageBox.warning(self, "Connexion Requise", "Veuillez vous connecter avant de jouer.")
             return
@@ -1206,7 +1258,10 @@ class MinecraftLauncher(QMainWindow):
             minecraft_command = [arg for arg in minecraft_command if arg]
 
             self.signals.status.emit("Lancement de Minecraft...")
-            subprocess.run(minecraft_command, cwd=modpack_profile_dir)
+
+            process = subprocess.Popen(minecraft_command, cwd=modpack_profile_dir)
+            process.wait()  
+
             self.signals.status.emit("Prêt")
         except Exception as e:
             self.signals.status.emit("Erreur de lancement")
