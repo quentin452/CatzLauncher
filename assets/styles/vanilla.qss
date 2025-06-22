@@ -384,25 +384,18 @@ QMainWindow.high-contrast QLineEdit {
 
 /* ===== COMBOBOX SPECIFIC STYLING ===== */
 QComboBox::drop-down {
-    subcontrol-origin: padding;
-    subcontrol-position: top right;
-    width: 35px;
-
-    /* A subtle separator line */
-    border-left: 1px solid rgba(100, 100, 140, 0.5);
-
-    /* Match the parent's border radius */
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-}
-
-QComboBox::drop-down:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    width: 0px;
+    border: none;
 }
 
 QComboBox::down-arrow {
-    width: 14px;
-    height: 14px;
+    width: 0;
+    height: 0;
+    image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wIAAgMBApBDK4sAAAAASUVORK5CYII=");
+}
+QComboBox::down-arrow:on {
+    width: 0;
+    height: 0;
 }
 
 QComboBox QAbstractItemView {
