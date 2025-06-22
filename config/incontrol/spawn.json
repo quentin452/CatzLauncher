@@ -2,8 +2,7 @@
     {
         "mod": "bloodandmadness",
         "dimension": [
-                        "minecraft:overworld",
-
+                        "minecraft:overworld"
                     ],
                     "result": "allow"
     }
