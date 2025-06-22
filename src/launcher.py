@@ -1109,13 +1109,16 @@ class MinecraftLauncher(QMainWindow):
             # Utiliser la nouvelle logique delta pour les modpacks GitHub
             if 'github.com' in modpack_data["url"] and '/archive/refs/heads/' in modpack_data["url"]:
                 from src.utils import install_or_update_modpack_github
-                install_or_update_modpack_github(
+                success = install_or_update_modpack_github(
                     modpack_data["url"],
                     install_dir,
                     modpack_data["name"],
                     modpack_data.get("estimated_mb", 200), 
                     lambda cur, tot: self.signals.progress.emit(int(cur / tot * 100) if tot > 0 else 0)
                 )
+                
+                if not success:
+                    raise Exception(f"L'installation de '{modpack_data['name']}' a échoué.")
             else:
                 # Installation classique pour les autres types d'URL
                 install_modpack_files_fresh(
@@ -1130,8 +1133,10 @@ class MinecraftLauncher(QMainWindow):
             self.signals.status.emit("Installation terminée!")
             self.signals.installation_finished.emit()
         except Exception as e:
-            self.signals.error_dialog.emit("Erreur d'installation", str(e))
-            self.signals.status.emit("Erreur")
+            error_msg = f"Erreur lors de l'installation de '{modpack_data['name']}': {str(e)}"
+            print(f"ERROR [Échec de l'installation]: {error_msg}")
+            self.signals.error_dialog.emit("Erreur d'installation", error_msg)
+            self.signals.status.emit("Erreur d'installation")
         finally:
             self.play_btn.setEnabled(True)
             self.signals.progress.emit(0)

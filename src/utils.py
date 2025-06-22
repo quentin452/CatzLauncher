@@ -1147,20 +1147,30 @@ def install_or_update_modpack_github(url, install_dir, modpack_name, estimated_m
     Gère l'installation complète et les mises à jour delta.
     """
     try:
+        print(f"DEBUG: Début de install_or_update_modpack_github pour '{modpack_name}'")
+        print(f"DEBUG: URL = {url}")
+        print(f"DEBUG: Install dir = {install_dir}")
+        
         remote_commit = get_github_last_commit(url)
         if isinstance(remote_commit, str): # C'est un message d'erreur
-            show_error("Erreur GitHub", remote_commit)
+            print(f"ERROR: Erreur GitHub - {remote_commit}")
             return False
+        else:
+            print(f"DEBUG: Commit distant récupéré: {remote_commit['sha'][:8]} - {remote_commit['message']}")
+            
     except Exception as e:
-        show_error("Erreur de Connexion", f"Impossible de contacter GitHub: {e}")
+        print(f"ERROR: Impossible de contacter GitHub: {e}")
         return False
 
     is_installed = is_modpack_installed(modpack_name)
+    print(f"DEBUG: Modpack installé = {is_installed}")
     
     # S'il est installé, vérifier les mises à jour
     if is_installed:
         local_commit = get_local_github_commit(modpack_name)
+        print(f"DEBUG: Commit local = {local_commit}")
         update_available = check_github_update(url, local_commit) # Utilise la fonction dédiée
+        print(f"DEBUG: Mise à jour disponible = {update_available}")
         
         if update_available:
             print(f"Mise à jour disponible pour '{modpack_name}'.")
@@ -1172,6 +1182,7 @@ def install_or_update_modpack_github(url, install_dir, modpack_name, estimated_m
                      raise ValueError("Le commit local est invalide ou manquant. Une réinstallation complète est nécessaire.")
 
                 all_changes = get_cumulative_changes(url, local_commit['sha'], new_sha)
+                print(f"DEBUG: Changements détectés = {all_changes}")
                 
                 if all_changes:
                     update_successful = update_modpack_delta(
@@ -1186,34 +1197,38 @@ def install_or_update_modpack_github(url, install_dir, modpack_name, estimated_m
                     if update_successful:
                         save_local_github_commit(modpack_name, remote_commit)
                         print(f"'{modpack_name}' mis à jour avec succès vers le commit {new_sha[:7]}.")
-                        show_message("Mise à jour terminée", f"Le modpack '{modpack_name}' a été mis à jour avec succès.")
                         return True
                     else:
                         print(f"Échec de la mise à jour delta pour '{modpack_name}'.")
-                        show_error("Échec de la mise à jour", f"La mise à jour de '{modpack_name}' a échoué. Vous pouvez essayer de le réinstaller.")
                         return False
                 else:
                     print("Impossible d'obtenir la liste des changements. La mise à jour delta est annulée.")
-                    show_error("Erreur de mise à jour", "Impossible d'obtenir la liste des changements depuis GitHub.")
                     return False
 
             except Exception as e:
                 print(f"Erreur majeure durant le processus de mise à jour delta: {e}")
-                show_error("Erreur de mise à jour", f"Une réinstallation complète est requise. Erreur: {e}")
                 return False
         
         else:
              print(f"'{modpack_name}' est déjà à jour.")
-             show_message("À jour", f"Le modpack '{modpack_name}' est déjà à la dernière version.")
              return True
     else:
         print(f"Installation complète de '{modpack_name}'...")
-        if install_modpack_files_fresh(url, install_dir, modpack_name, estimated_mb, progress_callback):
-            save_local_github_commit(modpack_name, remote_commit)
-            show_message("Installation terminée", f"Le modpack '{modpack_name}' a été installé avec succès.")
-            return True
-        else:
-            show_error("Échec de l'installation", f"L'installation de '{modpack_name}' a échoué.")
+        try:
+            success = install_modpack_files_fresh(url, install_dir, modpack_name, estimated_mb, progress_callback)
+            if success:
+                save_local_github_commit(modpack_name, remote_commit)
+                print(f"'{modpack_name}' a été installé avec succès.")
+                return True
+            else:
+                print(f"L'installation de '{modpack_name}' a échoué.")
+                # Nettoyer les fichiers potentiellement corrompus
+                modpack_dir = os.path.join(install_dir, modpack_name)
+                if os.path.exists(modpack_dir):
+                    shutil.rmtree(modpack_dir)
+                return False
+        except Exception as e:
+            print(f"Exception lors de l'installation de '{modpack_name}': {e}")
             # Nettoyer les fichiers potentiellement corrompus
             modpack_dir = os.path.join(install_dir, modpack_name)
             if os.path.exists(modpack_dir):
