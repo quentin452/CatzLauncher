@@ -466,7 +466,6 @@ class MinecraftLauncher(QMainWindow):
         token_layout.addWidget(token_label)
         
         self.github_token_edit = QLineEdit()
-        self.github_token_edit.setPlaceholderText("Coller un nouveau token pour (écraser et) sauvegarder")
         self.github_token_edit.setEchoMode(QLineEdit.Password)
         token_layout.addWidget(self.github_token_edit)
         
