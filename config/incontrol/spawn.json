@@ -24,7 +24,8 @@
                         "aoa3:shyrelands",
                         "aoa3:vox_ponds",
                         "twilightforest:twilightforest",
-                        "twilightforest:skylight_forest"
+                        "twilightforest:skylight_forest",
+                        "levinide:lantern"
 
                     ],
                     "result": "deny"
