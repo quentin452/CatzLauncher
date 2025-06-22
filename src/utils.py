@@ -436,6 +436,7 @@ def install_modpack_files_fresh(url, install_dir, modpack_name, estimated_mb, pr
             json.dump(installed_data, f, indent=4)
             
         print(f"'{modpack_name}' a été installé avec succès.")
+        return True 
 
     except Exception as e:
         print(f"ERREUR FATALE lors de l'installation de '{modpack_name}': {e}")
