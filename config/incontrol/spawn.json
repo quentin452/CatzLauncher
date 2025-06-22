@@ -22,7 +22,10 @@
                         "aoa3:precasia",
                         "aoa3:runandor",
                         "aoa3:shyrelands",
-                        "aoa3:vox_ponds"
+                        "aoa3:vox_ponds",
+                        "twilightforest:twilightforest",
+                        "twilightforest:skylight_forest"
+
                     ],
                     "result": "deny"
     }
