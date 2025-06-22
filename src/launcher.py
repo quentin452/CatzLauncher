@@ -8,10 +8,12 @@ import webbrowser
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import traceback
+from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QProgressBar, QListWidget, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
-    QInputDialog, QTabWidget, QFrame, QGraphicsDropShadowEffect, QGraphicsOpacityEffect
+    QInputDialog, QTabWidget, QFrame, QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
+    QListWidgetItem
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QPropertyAnimation, QEasingCurve, QTimer, QParallelAnimationGroup
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient
@@ -38,6 +40,7 @@ class WorkerSignals(QObject):
     installation_finished = pyqtSignal()
     modpack_list_refreshed = pyqtSignal(list)
     error_dialog = pyqtSignal(str, str)
+    single_update_found = pyqtSignal(dict)  # Nouveau signal pour les updates individuels
 
 def run_in_thread(fn):
     @functools.wraps(fn)
@@ -141,6 +144,67 @@ class AnimatedProgressBar(QProgressBar):
             painter.setPen(Qt.NoPen)
             painter.drawEllipse(int(particle.x - particle.size), int(particle.y - particle.size), 
                               int(particle.size * 2), int(particle.size * 2))
+
+class ModpackListItem(QWidget):
+    """Widget personnalisé pour afficher un modpack avec un bouton de vérification d'update."""
+    
+    def __init__(self, modpack_data, parent=None):
+        super().__init__(parent)
+        self.modpack_data = modpack_data
+        
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(8, 4, 8, 4)
+        layout.setSpacing(10)
+        
+        # Label avec le nom et la version
+        self.name_label = QLabel(f"{modpack_data['name']} - {modpack_data['version']}")
+        self.name_label.setStyleSheet("""
+            QLabel {
+                color: white;
+                font-size: 14px;
+                font-weight: bold;
+                background: transparent;
+                border: none;
+            }
+        """)
+        layout.addWidget(self.name_label)
+        
+        layout.addStretch()
+        
+        # Bouton de vérification d'update
+        self.check_update_btn = AnimatedButton("🔄")
+        self.check_update_btn.setFixedSize(35, 35)
+        self.check_update_btn.setToolTip("Vérifier les mises à jour pour ce modpack")
+        self.check_update_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(60, 60, 80, 0.8);
+                border: 2px solid rgba(100, 100, 140, 0.5);
+                border-radius: 17px;
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: rgba(80, 80, 120, 0.8);
+                border: 2px solid rgba(120, 150, 255, 0.5);
+            }
+            QPushButton:pressed {
+                background-color: rgba(100, 150, 255, 0.8);
+                border: 2px solid rgba(150, 200, 255, 0.8);
+            }
+        """)
+        layout.addWidget(self.check_update_btn)
+    
+    def set_checking_state(self, checking=True):
+        """Change l'état du bouton pendant la vérification."""
+        if checking:
+            self.check_update_btn.setText("⏳")
+            self.check_update_btn.setEnabled(False)
+            self.check_update_btn.setToolTip("Vérification en cours...")
+        else:
+            self.check_update_btn.setText("🔄")
+            self.check_update_btn.setEnabled(True)
+            self.check_update_btn.setToolTip("Vérifier les mises à jour pour ce modpack")
 
 class AnimatedListWidget(QListWidget):
     """Enhanced list widget with hover effects and animations."""
@@ -590,6 +654,7 @@ class MinecraftLauncher(QMainWindow):
         self.signals.installation_finished.connect(self.refresh_modpack_list)
         self.signals.modpack_list_refreshed.connect(self.update_modpack_list_ui)
         self.signals.error_dialog.connect(self.show_error_dialog)
+        self.signals.single_update_found.connect(self.handle_single_update_found)
 
     def _apply_styles(self):
         """Apply beautiful modern styling to the entire application."""
@@ -974,7 +1039,61 @@ class MinecraftLauncher(QMainWindow):
         """Update modpack list UI with animations."""
         self.modpack_list.clear()
         for pack in modpacks:
-            self.modpack_list.addItem(f"{pack['name']} - {pack['version']}")
+            # Créer un item vide
+            list_item = QListWidgetItem()
+            list_item.setSizeHint(QSize(100, 60))  
+            self.modpack_list.addItem(list_item)
+            
+            # Créer un widget personnalisé pour chaque modpack
+            item_widget = ModpackListItem(pack)
+            self.modpack_list.setItemWidget(list_item, item_widget)
+            
+            # Créer une fonction locale pour capturer correctement la variable pack
+            def create_click_handler(modpack_data):
+                def click_handler():
+                    self.check_single_modpack_update(modpack_data)
+                return click_handler
+            
+            # Connecter le signal du bouton directement à la méthode de vérification
+            item_widget.check_update_btn.clicked.connect(create_click_handler(pack))
+
+    def check_single_modpack_update(self, modpack_data):
+        """Vérifie les mises à jour pour un seul modpack."""
+        # Trouver le widget correspondant et changer son état
+        for i in range(self.modpack_list.count()):
+            item = self.modpack_list.item(i)
+            widget = self.modpack_list.itemWidget(item)
+            if widget and widget.modpack_data['name'] == modpack_data['name']:
+                widget.set_checking_state(True)
+                break
+        
+        # Lancer la vérification dans un thread
+        self._do_check_single_modpack_update(modpack_data)
+
+    @run_in_thread
+    def _do_check_single_modpack_update(self, modpack_data):
+        """Vérifie les mises à jour pour un seul modpack dans un thread."""
+        try:
+            self.signals.status.emit(f"🔍 Vérification de {modpack_data['name']}...")
+            
+            update_needed, reason = check_update(modpack_data['name'], modpack_data['url'], modpack_data.get('last_modified'))
+            
+            if update_needed:
+                self.signals.single_update_found.emit(modpack_data)
+                self.signals.status.emit(f"✅ Mise à jour disponible pour {modpack_data['name']}")
+            else:
+                self.signals.status.emit(f"✅ {modpack_data['name']} est à jour")
+                
+        except Exception as e:
+            self.signals.status.emit(f"❌ Erreur lors de la vérification de {modpack_data['name']}: {e}")
+        finally:
+            # Remettre le bouton dans son état normal
+            for i in range(self.modpack_list.count()):
+                item = self.modpack_list.item(i)
+                widget = self.modpack_list.itemWidget(item)
+                if widget and widget.modpack_data['name'] == modpack_data['name']:
+                    widget.set_checking_state(False)
+                    break
 
     @run_in_thread
     def install_modpack(self, modpack_data, minecraft_directory):
@@ -1088,3 +1207,16 @@ class MinecraftLauncher(QMainWindow):
     def show_error_dialog(self, title, message):
         """Shows a critical error message box in the main thread."""
         QMessageBox.critical(self, title, message)
+
+    def handle_single_update_found(self, modpack_data):
+        """Handle the signal for a single update found."""
+        # Afficher une boîte de dialogue pour proposer l'installation de la mise à jour
+        reply = QMessageBox.question(
+            self, "Mise à jour disponible",
+            f"Une mise à jour est disponible pour '{modpack_data['name']}'.\n\nVoulez-vous l'installer maintenant ?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes
+        )
+        
+        if reply == QMessageBox.Yes:
+            self.start_installation(modpack_data)
