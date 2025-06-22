@@ -275,7 +275,7 @@ class MinecraftLauncher(QMainWindow):
         self.client_id = load_azure_client_id()
 
         self.setWindowTitle("CatzLauncher - Modpack Launcher")
-        self.setWindowIcon(QIcon('assets/logo.png'))
+        self.setWindowIcon(QIcon('assets/textures/logo.png'))
         self.setMinimumSize(900, 700)
         
         # Set window flags for modern, frameless look
@@ -352,7 +352,7 @@ class MinecraftLauncher(QMainWindow):
         layout.setSpacing(20)
 
         logo_label = QLabel()
-        pixmap = QPixmap('assets/logo.png')
+        pixmap = QPixmap('assets/textures/logo.png')
         logo_label.setPixmap(pixmap.scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         logo_label.setAlignment(Qt.AlignCenter)
         
@@ -418,7 +418,7 @@ class MinecraftLauncher(QMainWindow):
         
         # Logo
         logo_label = QLabel()
-        logo_pixmap = QPixmap('assets/logo.png')
+        logo_pixmap = QPixmap('assets/textures/logo.png')
         if not logo_pixmap.isNull():
             logo_pixmap = logo_pixmap.scaled(60, 60, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             logo_label.setPixmap(logo_pixmap)

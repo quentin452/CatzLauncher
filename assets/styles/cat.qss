@@ -2,9 +2,7 @@
 
 /* ===== MAIN WINDOW ===== */
 QMainWindow {
-    background-image: url('assets/background.png');
-    background-position: center; 
-    background-repeat: no-repeat; 
+    border-image: url('assets/textures/medieval_background.png') 0 0 0 0 stretch stretch;
     background-color: #f5e0c5; /* Creamy beige background */
 }
 
