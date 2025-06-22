@@ -71,12 +71,18 @@ QLabel.title {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 QLabel.title-small {
     color: white;
     font-size: 16px;
     font-weight: bold;
+}
+
+QLabel.title, QLabel.status {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 QLabel.title-large {
@@ -284,6 +290,7 @@ QLabel.modpack-name {
 
 /* ===== UPDATE BUTTON ===== */
 QPushButton.update-btn {
+    transition: all 0.3s ease;
     background-color: rgba(60, 60, 80, 0.8);
     border: 2px solid rgba(100, 100, 140, 0.5);
     border-radius: 17px;

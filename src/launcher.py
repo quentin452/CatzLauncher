@@ -8,12 +8,13 @@ import webbrowser
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import traceback
+from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QPropertyAnimation, QEasingCurve, QTimer, QParallelAnimationGroup, QPoint
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QProgressBar, QListWidget, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
     QInputDialog, QTabWidget, QFrame, QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
-    QListWidgetItem, QStackedWidget
+    QListWidgetItem, QStackedWidget, QSizePolicy
 )
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient
 from PyQt5.QtWidgets import QApplication
@@ -32,7 +33,7 @@ from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
 def load_qss_stylesheet():
     """Load the QSS stylesheet from file."""
     try:
-        qss_file = os.path.join(os.path.dirname(__file__), "style.qss")
+        qss_file = os.path.join(os.path.dirname(__file__), "../assets/styles/vanilla.qss")
         with open(qss_file, 'r', encoding='utf-8') as f:
             return f.read()
     except Exception as e:
@@ -533,12 +534,15 @@ class MinecraftLauncher(QMainWindow):
         java_layout.addLayout(java_input_layout)
         layout.addWidget(java_frame)
 
-        # GitHub Token
         token_frame = QFrame()
         token_frame.setProperty("class", "config-frame")
         token_layout = QVBoxLayout(token_frame)
         
         token_label = QLabel("🔑 Token d'accès personnel GitHub:")
+        font = token_label.font()
+        metrics = QFontMetrics(font)
+        token_label.setFixedHeight(metrics.height() + 6)
+        token_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
         token_label.setProperty("class", "config-label")
         token_layout.addWidget(token_label)
         
@@ -547,7 +551,7 @@ class MinecraftLauncher(QMainWindow):
         token_layout.addWidget(self.github_token_edit)
         
         self.token_status_label = QLabel()
-        self.update_token_status_label() # Initialise le statut
+        self.update_token_status_label()
         token_layout.addWidget(self.token_status_label)
         
         layout.addWidget(token_frame)
