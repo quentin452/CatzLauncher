@@ -8,15 +8,15 @@ import webbrowser
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import traceback
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QPropertyAnimation, QEasingCurve, QTimer, QParallelAnimationGroup, QPoint
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QProgressBar, QListWidget, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
     QInputDialog, QTabWidget, QFrame, QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
     QListWidgetItem, QStackedWidget
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QPropertyAnimation, QEasingCurve, QTimer, QParallelAnimationGroup
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient
+from PyQt5.QtWidgets import QApplication
 
 from minecraft_launcher_lib.utils import get_minecraft_directory
 from minecraft_launcher_lib.command import get_minecraft_command
@@ -268,8 +268,9 @@ class MinecraftLauncher(QMainWindow):
         self.setWindowIcon(QIcon('assets/logo.png'))
         self.setMinimumSize(900, 700)
         
-        # Set window flags for modern look
-        self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint | Qt.WindowMaximizeButtonHint)
+        # Set window flags for modern, frameless look
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
+        self.drag_pos = None
         
         # Enable mouse tracking for particle effects
         self.setMouseTracking(True)
@@ -316,8 +317,8 @@ class MinecraftLauncher(QMainWindow):
         main_layout.setSpacing(0)
         
         # Header with logo and title
-        header = self._create_header()
-        main_layout.addWidget(header)
+        self.header = self._create_header()
+        main_layout.addWidget(self.header)
         
         # QStackedWidget for switching between loading and main content
         self.stacked_widget = QStackedWidget()
@@ -429,6 +430,22 @@ class MinecraftLauncher(QMainWindow):
         self.header_spinner.setFixedSize(40, 40)
         self.header_spinner.hide()
         layout.addWidget(self.header_spinner)
+
+        # Custom window controls
+        controls_layout = QHBoxLayout()
+        self.minimize_btn = QPushButton("—")
+        self.maximize_btn = QPushButton("▢")
+        self.close_btn = QPushButton("✕")
+        
+        self.minimize_btn.setProperty("class", "window-control-btn")
+        self.maximize_btn.setProperty("class", "window-control-btn")
+        self.close_btn.setProperty("class", "window-control-btn close-btn")
+
+        controls_layout.addWidget(self.minimize_btn)
+        controls_layout.addWidget(self.maximize_btn)
+        controls_layout.addWidget(self.close_btn)
+        
+        layout.addLayout(controls_layout)
         
         return header
 
@@ -598,6 +615,11 @@ class MinecraftLauncher(QMainWindow):
         self.save_settings_btn.clicked.connect(self.save_settings)
         self.login_btn.clicked.connect(self.microsoft_login)
         self.logout_btn.clicked.connect(self.logout)
+
+        # Window controls
+        self.minimize_btn.clicked.connect(self.showMinimized)
+        self.maximize_btn.clicked.connect(self.toggle_maximize_restore)
+        self.close_btn.clicked.connect(self.close)
 
         # Worker signals
         self.signals.progress.connect(self.progress.setValue)
@@ -1074,6 +1096,58 @@ class MinecraftLauncher(QMainWindow):
             print(f"Erreur de Lancement: {e}")
         finally:
             self.play_btn.setEnabled(True)
+
+    def toggle_maximize_restore(self):
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()
+            
+    # --- Window Dragging and Native Interactions ---
+    def mousePressEvent(self, event):
+        """ Captures the initial position and offset to start dragging. """
+        self.particle_system.mouse_move_event(event.pos())
+        if event.button() == Qt.LeftButton and self.header.underMouse():
+            if self.isMaximized():
+                # When maximized, the offset is based on the global cursor position
+                self.drag_offset = event.globalPos()
+            else:
+                # When normal, the offset is based on the window's top-left corner
+                self.drag_offset = event.pos()
+            event.accept()
+        else:
+            self.drag_offset = None
+            super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        self.particle_system.mouse_move_event(event.pos())
+
+        if event.buttons() == Qt.LeftButton and self.drag_offset is not None:
+            if self.isMaximized():
+                if (event.globalPos() - self.drag_offset).manhattanLength() > QApplication.startDragDistance():
+                    self.showNormal()
+                    QApplication.processEvents() 
+                    cursor_x_ratio = event.globalPos().x() / self.screen().geometry().width()
+                    self.drag_offset = QPoint(int(self.width() * cursor_x_ratio), event.pos().y())
+                else:
+                    return
+
+            if not self.isMaximized() and event.globalPos().y() <= 1:
+                self.showMaximized()
+                return
+
+            self.move(event.globalPos() - self.drag_offset)
+            local_mouse_pos = self.mapFromGlobal(event.globalPos())
+            self.last_mouse_pos = local_mouse_pos
+            event.accept()
+        else:
+            super().mouseMoveEvent(event)
+
+
+    def mouseReleaseEvent(self, event):
+        """ Stops dragging. """
+        self.drag_offset = None
+        event.accept()
 
     def show_error_dialog(self, title, message):
         """Shows a critical error message box in the main thread."""

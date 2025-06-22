@@ -261,6 +261,27 @@ QLabel.modpack-name {
     border: none;
 }
 
+/* ===== WINDOW CONTROLS ===== */
+.window-control-btn {
+    background-color: transparent;
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 5px 10px;
+    min-width: 30px;
+}
+
+.window-control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+}
+
+.close-btn:hover {
+    background-color: rgba(232, 17, 35, 0.8);
+    border-radius: 5px;
+}
+
 /* ===== UPDATE BUTTON ===== */
 QPushButton.update-btn {
     background-color: rgba(60, 60, 80, 0.8);
