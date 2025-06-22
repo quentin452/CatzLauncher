@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QProgressBar, QListWidget, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
     QInputDialog, QTabWidget, QFrame, QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
-    QListWidgetItem, QStackedWidget, QSizePolicy
+    QListWidgetItem, QStackedWidget, QSizePolicy, QComboBox, QFormLayout, QScrollArea
 )
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient
 from PyQt5.QtWidgets import QApplication
@@ -30,15 +30,24 @@ from src.utils import (
 )
 from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
 
-def load_qss_stylesheet():
+def load_qss_stylesheet(theme_name="vanilla.qss"):
     """Load the QSS stylesheet from file."""
     try:
-        qss_file = os.path.join(os.path.dirname(__file__), "../assets/styles/vanilla.qss")
+        styles_dir = os.path.join(os.path.dirname(__file__), "../assets/styles/")
+        qss_file = os.path.join(styles_dir, theme_name)
         with open(qss_file, 'r', encoding='utf-8') as f:
             return f.read()
     except Exception as e:
-        print(f"Warning: Could not load QSS file: {e}")
+        print(f"Warning: Could not load QSS file {theme_name}: {e}")
         return ""
+
+def get_available_themes():
+    """Returns a list of available .qss theme files."""
+    try:
+        styles_dir = os.path.join(os.path.dirname(__file__), "../assets/styles/")
+        return [f for f in os.listdir(styles_dir) if f.endswith('.qss')]
+    except FileNotFoundError:
+        return []
 
 def apply_css_class(widget, css_class):
     """Apply a CSS class to a widget and force stylesheet reapplication."""
@@ -271,7 +280,7 @@ class MinecraftLauncher(QMainWindow):
         
         # Set window flags for modern, frameless look
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
-        self.drag_pos = None
+        self.drag_offset = None
         
         # Enable mouse tracking for particle effects
         self.setMouseTracking(True)
@@ -502,84 +511,85 @@ class MinecraftLauncher(QMainWindow):
 
     def _create_config_tab(self):
         tab = QWidget()
-        layout = QVBoxLayout(tab)
-        layout.setContentsMargins(30, 30, 30, 30)
+        # Main layout for the tab, holding the scroll area and the save button
+        main_layout = QVBoxLayout(tab)
+        main_layout.setContentsMargins(15, 15, 15, 15)
+        main_layout.setSpacing(10)
+
+        # Scroll Area
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setProperty("class", "transparent")
+        scroll_area.setFrameShape(QFrame.NoFrame)
+        main_layout.addWidget(scroll_area)
+
+        # Widget to contain the scrolling content
+        scroll_content = QWidget()
+        scroll_content.setProperty("class", "transparent")
+        scroll_area.setWidget(scroll_content)
+        
+        # Layout for the scrolling content
+        layout = QVBoxLayout(scroll_content)
+        layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(20)
 
         # Title
         title_label = QLabel("⚙️ Configuration")
-        title_font = QFont()
-        title_font.setPointSize(18)
-        title_font.setBold(True)
-        title_label.setFont(title_font)
         title_label.setProperty("class", "title")
         layout.addWidget(title_label)
-
-        # Java Path with enhanced styling
-        java_frame = QFrame()
-        java_frame.setProperty("class", "config-frame")
-        java_layout = QVBoxLayout(java_frame)
         
-        java_label = QLabel("📁 Chemin Java:")
-        java_label.setProperty("class", "config-label")
-        java_layout.addWidget(java_label)
+        # Use a container widget for the form for styling purposes
+        form_container = QWidget()
+        form_container.setObjectName("configFormContainer")
         
-        java_input_layout = QHBoxLayout()
+        form_layout = QFormLayout(form_container)
+        form_layout.setSpacing(15)
+        form_layout.setContentsMargins(15, 15, 15, 15)
+        form_layout.setRowWrapPolicy(QFormLayout.WrapAllRows)
+        
+        # --- Form Rows ---
+        
+        # Java Path
+        java_path_layout = QHBoxLayout()
         self.java_path_edit = QLineEdit(self.config.get("java_path", ""))
-        java_input_layout.addWidget(self.java_path_edit)
-        
         self.browse_java_btn = AnimatedButton("📂 Parcourir")
-        self.browse_java_btn.setFixedHeight(35)
-        java_input_layout.addWidget(self.browse_java_btn)
-        java_layout.addLayout(java_input_layout)
-        layout.addWidget(java_frame)
+        java_path_layout.addWidget(self.java_path_edit)
+        java_path_layout.addWidget(self.browse_java_btn)
+        form_layout.addRow(QLabel("📁 Chemin Java:"), java_path_layout)
 
-        token_frame = QFrame()
-        token_frame.setProperty("class", "config-frame")
-        token_layout = QVBoxLayout(token_frame)
-        
-        token_label = QLabel("🔑 Token d'accès personnel GitHub:")
-        font = token_label.font()
-        metrics = QFontMetrics(font)
-        token_label.setFixedHeight(metrics.height() + 6)
-        token_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        token_label.setProperty("class", "config-label")
-        token_layout.addWidget(token_label)
-        
+        # Theme Selector
+        self.theme_selector = QComboBox()
+        self.populate_themes()
+        form_layout.addRow(QLabel("🎨 Thème de l'application:"), self.theme_selector)
+
+        # GitHub Token
         self.github_token_edit = QLineEdit()
+        self.github_token_edit.setPlaceholderText("Coller un nouveau token pour le sauvegarder")
         self.github_token_edit.setEchoMode(QLineEdit.Password)
-        token_layout.addWidget(self.github_token_edit)
+        form_layout.addRow(QLabel("🔑 Token d'accès personnel GitHub:"), self.github_token_edit)
         
+        # Token Status Label (spans across columns)
         self.token_status_label = QLabel()
         self.update_token_status_label()
-        token_layout.addWidget(self.token_status_label)
+        form_layout.addRow(self.token_status_label)
         
-        layout.addWidget(token_frame)
-
         # JVM Arguments
-        args_frame = QFrame()
-        args_frame.setProperty("class", "config-frame")
-        args_layout = QVBoxLayout(args_frame)
-        
-        args_label = QLabel("🔧 Arguments JVM:")
-        args_label.setProperty("class", "config-label")
-        args_layout.addWidget(args_label)
-        
         self.java_args_edit = QLineEdit(self.config.get("java_args", ""))
-        args_layout.addWidget(self.java_args_edit)
-        layout.addWidget(args_frame)
+        form_layout.addRow(QLabel("🔧 Arguments JVM:"), self.java_args_edit)
 
-        # Auto-update checkbox with enhanced styling
+        layout.addWidget(form_container)
+
+        # Auto-update checkbox
         self.auto_check_cb = QCheckBox("🔄 Vérifier automatiquement les mises à jour au démarrage")
         self.auto_check_cb.setChecked(self.config.get("auto_check_updates", True))
         layout.addWidget(self.auto_check_cb)
 
         layout.addStretch()
         
-        # Save button
+        # Save button (outside the scroll area)
         self.save_settings_btn = AnimatedButton("💾 Sauvegarder la Configuration")
         self.save_settings_btn.setFixedHeight(50)
-        layout.addWidget(self.save_settings_btn)
+        main_layout.addWidget(self.save_settings_btn)
 
         return tab
 
@@ -639,7 +649,8 @@ class MinecraftLauncher(QMainWindow):
 
     def _apply_styles(self):
         """Apply beautiful modern styling to the entire application."""
-        self.setStyleSheet(load_qss_stylesheet())
+        theme = self.config.get("theme", "vanilla.qss")
+        self.setStyleSheet(load_qss_stylesheet(theme))
 
     def load_config(self):
         """Load configuration from file."""
@@ -661,6 +672,7 @@ class MinecraftLauncher(QMainWindow):
         self.config["java_path"] = self.java_path_edit.text()
         self.config["java_args"] = self.java_args_edit.text()
         self.config["auto_check_updates"] = self.auto_check_cb.isChecked()
+        self.config["theme"] = self.theme_selector.currentText()
         
         # Gérer la sauvegarde du token séparément et de manière sécurisée
         new_token = self.github_token_edit.text()
@@ -670,6 +682,7 @@ class MinecraftLauncher(QMainWindow):
         
         self.update_token_status_label() # Mettre à jour le statut affiché
         self.save_config()
+        self._apply_styles() # Re-apply styles to reflect theme change instantly
         
         # Show success animation
         self.status_label.setText("✅ Configuration sauvegardée !")
@@ -1169,3 +1182,14 @@ class MinecraftLauncher(QMainWindow):
         
         if reply == QMessageBox.Yes:
             self.start_installation(modpack_data)
+
+    def populate_themes(self):
+        """Populates the theme selector combobox."""
+        self.theme_selector.clear()
+        themes = get_available_themes()
+        current_theme = self.config.get("theme", "vanilla.qss")
+        
+        for theme in themes:
+            self.theme_selector.addItem(theme)
+            if theme == current_theme:
+                self.theme_selector.setCurrentText(theme)

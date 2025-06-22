@@ -5,7 +5,6 @@ QMainWindow {
     background-image: url('assets/background.png');
     background-position: center; 
     background-repeat: no-repeat; 
-    background-size: cover;
     background-color: #1a1a2e; /* Fallback color */
 }
 
@@ -71,13 +70,13 @@ QLabel.title {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 QLabel.title-small {
     color: white;
     font-size: 16px;
     font-weight: bold;
+    margin-bottom: 10px;
 }
 
 QLabel.title, QLabel.status {
@@ -187,14 +186,23 @@ QLabel.status-disconnected {
     border: 1px solid rgba(100, 100, 140, 0.3);
 }
 
-/* ===== FRAMES ===== */
-QFrame.config-frame {
+/* ===== CONFIGURATION FORM ===== */
+#configFormContainer {
     background-color: rgba(40, 40, 60, 0.8);
     border: 2px solid rgba(100, 100, 140, 0.5);
     border-radius: 10px;
-    padding: 15px;
+    padding: 20px;
 }
 
+#configFormContainer QLabel {
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    padding-top: 8px; /* Vertically align with inputs */
+    background-color: transparent;
+}
+
+/* ===== FRAMES ===== */
 QFrame.account-frame {
     background-color: rgba(40, 40, 60, 0.8);
     border: 2px solid rgba(100, 100, 140, 0.5);
@@ -210,16 +218,17 @@ QLabel.config-label {
 }
 
 /* ===== LINE EDITS ===== */
-QLineEdit {
+QLineEdit, QComboBox {
     background-color: rgba(60, 60, 80, 0.8);
     border: 2px solid rgba(100, 100, 140, 0.5);
     border-radius: 8px;
     color: white;
-    padding: 25px;
+    padding: 8px;
     font-size: 12px;
+    min-height: 20px; /* Ensure a minimum height */
 }
 
-QLineEdit:focus {
+QLineEdit:focus, QComboBox:focus {
     border: 2px solid rgba(100, 150, 255, 0.8);
 }
 
@@ -371,4 +380,34 @@ QMainWindow.high-contrast QLineEdit {
     background-color: #ffffff;
     color: #000000;
     border: 2px solid #000000;
+}
+
+/* ===== COMBOBOX SPECIFIC STYLING ===== */
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 35px;
+
+    /* A subtle separator line */
+    border-left: 1px solid rgba(100, 100, 140, 0.5);
+
+    /* Match the parent's border radius */
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+QComboBox::drop-down:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+QComboBox::down-arrow {
+    width: 14px;
+    height: 14px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #2c2c3e;
+    border: 1px solid rgba(100, 150, 255, 0.8);
+    selection-background-color: rgba(100, 150, 255, 0.8);
+    color: #f0f0f0;
 } 
