@@ -1,7 +1,0 @@
-requests
-minecraft-launcher-lib
-mega.py
-pillow
-bs4
-cloudscraper
-# tkinter is part of the Python standard library (usually included by default) 
