@@ -570,7 +570,6 @@ def check_update(name, url, last_modified):
         
         # Vérification GitHub si disponible
         if 'github.com' in url and local_info.get('github_commit') and local_info['github_commit'].get('sha'):
-            print(f"DEBUG: SHA local = {local_info['github_commit']['sha']}")
             update_available = check_github_update(url, local_info['github_commit'])
             if update_available:
                 return True, "Mise à jour GitHub disponible"
@@ -693,7 +692,6 @@ def is_modpack_installed(modpack_name):
 
 def refresh_ms_token(refresh_token, client_id):
     """Refreshes the Microsoft token."""
-    print("DEBUG: Refreshing Microsoft token...")
     data = {
         "client_id": client_id,
         "refresh_token": refresh_token,
@@ -705,7 +703,6 @@ def refresh_ms_token(refresh_token, client_id):
 
 def exchange_code_for_token(auth_code, client_id):
     """Exchanges the authentication code for a token."""
-    print("DEBUG: Exchanging code for token...")
     data = {
         "client_id": client_id,
         "code": auth_code,
@@ -1149,33 +1146,23 @@ def install_or_update_modpack_github(url, install_dir, modpack_name, estimated_m
     Gère l'installation complète et les mises à jour delta.
     """
     try:
-        print(f"DEBUG: Début de install_or_update_modpack_github pour '{modpack_name}'")
-        print(f"DEBUG: URL = {url}")
-        print(f"DEBUG: Install dir = {install_dir}")
-        
         remote_commit = get_github_last_commit(url)
         if isinstance(remote_commit, str): # C'est un message d'erreur
             print(f"ERROR: Erreur GitHub - {remote_commit}")
             return False
-        else:
-            print(f"DEBUG: Commit distant récupéré: {remote_commit['sha'][:8]} - {remote_commit['message']}")
             
     except Exception as e:
         print(f"ERROR: Impossible de contacter GitHub: {e}")
         return False
 
     is_installed = is_modpack_installed(modpack_name)
-    print(f"DEBUG: Modpack installé = {is_installed}")
     
     # S'il est installé, vérifier les mises à jour
     if is_installed:
         local_commit = get_local_github_commit(modpack_name)
-        print(f"DEBUG: Commit local = {local_commit}")
         update_available = check_github_update(url, local_commit) # Utilise la fonction dédiée
-        print(f"DEBUG: Mise à jour disponible = {update_available}")
         
         if update_available:
-            print(f"Mise à jour disponible pour '{modpack_name}'.")
             
             try:
                 new_sha = remote_commit['sha']
@@ -1184,7 +1171,6 @@ def install_or_update_modpack_github(url, install_dir, modpack_name, estimated_m
                      raise ValueError("Le commit local est invalide ou manquant. Une réinstallation complète est nécessaire.")
 
                 all_changes = get_cumulative_changes(url, local_commit['sha'], new_sha)
-                print(f"DEBUG: Changements détectés = {all_changes}")
                 
                 if all_changes:
                     update_successful = update_modpack_delta(
@@ -1244,11 +1230,8 @@ def is_connected_to_internet(host="http://www.google.com", timeout=3):
     try:
         # Utiliser un site connu pour être très stable
         requests.head(host, timeout=timeout)
-        print("DEBUG: Connexion Internet vérifiée avec succès.")
         return True
     except (requests.ConnectionError, requests.Timeout):
-        print("DEBUG: Aucune connexion Internet détectée.")
         return False
     except Exception as e:
-        print(f"DEBUG: Erreur inattendue lors de la vérification de la connexion: {e}")
         return False
