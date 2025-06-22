@@ -19,10 +19,11 @@ from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLin
 from minecraft_launcher_lib.utils import get_minecraft_directory
 from minecraft_launcher_lib.command import get_minecraft_command
 from src.utils import (
-    ensure_requirements, install_modpack_files, check_update,
+    ensure_requirements, install_modpack_files_fresh, check_update,
     install_forge_if_needed, update_installed_info, refresh_ms_token,
     exchange_code_for_token, authenticate_with_xbox, authenticate_with_xsts,
-    login_with_minecraft, get_minecraft_profile, is_modpack_installed
+    login_with_minecraft, get_minecraft_profile, is_modpack_installed,
+    save_github_token, load_github_token
 )
 from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
 
@@ -435,6 +436,27 @@ class MinecraftLauncher(QMainWindow):
         java_layout.addLayout(java_input_layout)
         layout.addWidget(java_frame)
 
+        # GitHub Token
+        token_frame = QFrame()
+        token_frame.setStyleSheet(java_frame.styleSheet())
+        token_layout = QVBoxLayout(token_frame)
+        
+        token_label = QLabel("🔑 Token d'accès personnel GitHub:")
+        token_label.setStyleSheet(java_label.styleSheet())
+        token_layout.addWidget(token_label)
+        
+        self.github_token_edit = QLineEdit()
+        self.github_token_edit.setPlaceholderText("Coller un nouveau token pour (écraser et) sauvegarder")
+        self.github_token_edit.setEchoMode(QLineEdit.Password)
+        self.github_token_edit.setStyleSheet(self.java_path_edit.styleSheet())
+        token_layout.addWidget(self.github_token_edit)
+        
+        self.token_status_label = QLabel()
+        self.update_token_status_label() # Initialise le statut
+        token_layout.addWidget(self.token_status_label)
+        
+        layout.addWidget(token_frame)
+
         # JVM Arguments
         args_frame = QFrame()
         args_frame.setStyleSheet("""
@@ -654,6 +676,14 @@ class MinecraftLauncher(QMainWindow):
         self.config["java_path"] = self.java_path_edit.text()
         self.config["java_args"] = self.java_args_edit.text()
         self.config["auto_check_updates"] = self.auto_check_cb.isChecked()
+        
+        # Gérer la sauvegarde du token séparément et de manière sécurisée
+        new_token = self.github_token_edit.text()
+        if new_token:
+            save_github_token(new_token)
+            self.github_token_edit.clear() # Vider le champ après sauvegarde
+        
+        self.update_token_status_label() # Mettre à jour le statut affiché
         self.save_config()
         
         # Show success animation
@@ -691,6 +721,15 @@ class MinecraftLauncher(QMainWindow):
         else:
             self.login_btn.show()
             self.logout_btn.hide()
+
+    def update_token_status_label(self):
+        """Met à jour le label de statut du token."""
+        if load_github_token():
+            self.token_status_label.setText("✅ Un token est sauvegardé de manière sécurisée.")
+            self.token_status_label.setStyleSheet("color: #4CAF50; font-size: 11px;")
+        else:
+            self.token_status_label.setText("❌ Aucun token n'est actuellement sauvegardé. Recommandé.")
+            self.token_status_label.setStyleSheet("color: #FFC107; font-size: 11px;")
 
     def microsoft_login(self):
         """Start Microsoft login, handling user interaction in the main thread."""
@@ -960,7 +999,7 @@ class MinecraftLauncher(QMainWindow):
                 )
             else:
                 # Installation classique pour les autres types d'URL
-                install_modpack_files(
+                install_modpack_files_fresh(
                     modpack_data["url"],
                     install_dir,
                     modpack_data["name"],

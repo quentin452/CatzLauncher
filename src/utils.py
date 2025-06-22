@@ -15,10 +15,110 @@ import re
 import urllib.request
 import urllib.error
 import urllib.parse
+import keyring
+import keyring.errors
+
+# Placeholder functions for GUI integration
+def show_error(title, message):
+    """Placeholder for GUI error dialog"""
+    print(f"ERROR [{title}]: {message}")
+
+def show_message(title, message):
+    """Placeholder for GUI message dialog"""
+    print(f"INFO [{title}]: {message}")
+
+def save_local_github_commit(modpack_name, commit_info):
+    """Saves the GitHub commit information locally"""
+    installed_data = get_installed_modpacks()
+    if modpack_name in installed_data:
+        installed_data[modpack_name]['github_commit'] = commit_info
+        with open(INSTALLED_FILE, 'w') as f:
+            json.dump(installed_data, f, indent=4)
+
+def get_cumulative_changes(repo_url, old_sha, new_sha):
+    """Gets cumulative changes between two commits using GitHub API compare endpoint"""
+    try:
+        if 'github.com' in repo_url and '/archive/refs/heads/' in repo_url:
+            start_marker = '/archive/refs/heads/'
+            start_pos = repo_url.find(start_marker)
+            if start_pos != -1:
+                branch_start = start_pos + len(start_marker)
+                branch_end = repo_url.find('.zip', branch_start)
+                if branch_end != -1:
+                    parts = repo_url.split('/')
+                    owner = parts[3]
+                    repo = parts[4]
+                    
+                    api_url = f"https://api.github.com/repos/{owner}/{repo}/compare/{old_sha}...{new_sha}"
+                    headers = _get_github_auth_headers()
+                    
+                    response = requests.get(api_url, headers=headers, timeout=15)
+                    response.raise_for_status()
+                    
+                    compare_data = response.json()
+                    files = compare_data.get('files', [])
+                    
+                    changes = {'added': [], 'modified': [], 'removed': []}
+                    
+                    for file_info in files:
+                        filename = file_info['filename']
+                        status = file_info['status']
+                        
+                        if status == 'added':
+                            changes['added'].append(filename)
+                        elif status == 'modified':
+                            changes['modified'].append(filename)
+                        elif status == 'removed':
+                            changes['removed'].append(filename)
+                        elif status == 'renamed':
+                            changes['removed'].append(file_info['previous_filename'])
+                            changes['added'].append(filename)
+                    
+                    return changes
+    except Exception as e:
+        print(f"Error getting cumulative changes: {e}")
+        return None
+    
+    return None
 
 SAVE_DIR = os.path.join(os.getcwd(), "saves")
 os.makedirs(SAVE_DIR, exist_ok=True)
 INSTALLED_FILE = os.path.join(SAVE_DIR, "installed_modpacks.json")
+CONFIG_FILE = os.path.join(SAVE_DIR, "launcher_config.json")
+SERVICE_NAME = "CatzLauncher.GitHubToken"
+
+def save_github_token(token):
+    """Saves the GitHub token securely in the system's keyring."""
+    try:
+        if token and token.strip():
+            keyring.set_password(SERVICE_NAME, "github_token", token)
+            print("Token GitHub sauvegardé de manière sécurisée.")
+        else:
+            # If the token is empty, delete it from the keyring
+            try:
+                keyring.delete_password(SERVICE_NAME, "github_token")
+                print("Token GitHub supprimé du stockage sécurisé.")
+            except keyring.errors.PasswordDeleteError:
+                # Ignore if it wasn't there to begin with
+                pass
+    except Exception as e:
+        print(f"ERREUR: Impossible de sauvegarder le token dans le stockage sécurisé: {e}")
+
+def load_github_token():
+    """Loads the GitHub token from the system's keyring."""
+    try:
+        return keyring.get_password(SERVICE_NAME, "github_token")
+    except Exception as e:
+        print(f"ERREUR: Impossible de charger le token depuis le stockage sécurisé: {e}")
+        return None
+
+def _get_github_auth_headers():
+    """Charge le token GitHub depuis le stockage sécurisé et retourne les headers."""
+    headers = {'User-Agent': 'CatzLauncher'}
+    token = load_github_token()
+    if token:
+        headers['Authorization'] = f"token {token}"
+    return headers
 
 def ensure_requirements():
     """
@@ -28,6 +128,7 @@ def ensure_requirements():
         ("requests", "requests"),
         ("minecraft_launcher_lib", "minecraft-launcher-lib"),
         ("mega", "mega.py"),
+        ("keyring", "keyring"),
         # Suppression des dépendances inutiles
         # ("bs4", "beautifulsoup4"),
         # ("cloudscraper", "cloudscraper"),
@@ -233,7 +334,11 @@ def install_modpack_files_fresh(url, install_dir, modpack_name, estimated_mb, pr
     temp_zip = os.path.join(install_dir, "temp_modpack.zip")
 
     print(f"Installation fraîche de '{modpack_name}'...")
-    remove_from_installed_log(modpack_name)
+    
+    # Sauvegarder les informations existantes si elles existent
+    installed_data = get_installed_modpacks()
+    existing_info = installed_data.get(modpack_name, {})
+    
     if os.path.isdir(modpack_profile_dir):
         shutil.rmtree(modpack_profile_dir)
     os.makedirs(modpack_profile_dir, exist_ok=True)
@@ -314,7 +419,22 @@ def install_modpack_files_fresh(url, install_dir, modpack_name, estimated_mb, pr
                 print("Impossible de récupérer les informations du commit GitHub")
 
         timestamp = datetime.now().isoformat()
-        add_to_installed_log(modpack_name, "1.0.0", timestamp, modpack_profile_dir, commit_info)
+        
+        # Mettre à jour les informations d'installation en conservant first_install si existant
+        installed_data[modpack_name] = {
+            "version": "1.0.0",
+            "timestamp": timestamp,
+            "path": modpack_profile_dir,
+            "first_install": existing_info.get('first_install', True)  # Conserver la valeur existante
+        }
+        
+        # Ajouter les informations du commit si disponibles
+        if commit_info:
+            installed_data[modpack_name]["github_commit"] = commit_info
+        
+        with open(INSTALLED_FILE, 'w') as f:
+            json.dump(installed_data, f, indent=4)
+            
         print(f"'{modpack_name}' a été installé avec succès.")
 
     except Exception as e:
@@ -431,6 +551,7 @@ def check_update(name, url, last_modified):
     """
     Vérifie si une mise à jour est disponible pour un modpack (clé = nom).
     Utilise la vérification GitHub si disponible, sinon les méthodes classiques.
+    Returns: (bool, str) - (update_needed, reason)
     """
     try:
         installed_data = {}
@@ -444,7 +565,11 @@ def check_update(name, url, last_modified):
         # Vérification GitHub si disponible
         if 'github.com' in url and local_info.get('github_commit') and local_info['github_commit'].get('sha'):
             print(f"DEBUG: SHA local = {local_info['github_commit']['sha']}")
-            return check_github_update(url, local_info['github_commit'])
+            update_available = check_github_update(url, local_info['github_commit'])
+            if update_available:
+                return True, "Mise à jour GitHub disponible"
+            else:
+                return False, "Aucune mise à jour GitHub disponible"
         
         # Méthodes classiques pour les autres types d'URL
         if url != local_info.get('url'):
@@ -659,7 +784,8 @@ def add_to_installed_log(modpack_name, version, timestamp, install_dir, commit_i
     installed[modpack_name] = {
         "version": version,
         "timestamp": timestamp,
-        "path": install_dir
+        "path": install_dir,
+        "first_install": True  # Marquer comme première installation
     }
     
     # Ajouter les informations du commit si disponibles
@@ -696,7 +822,7 @@ def get_github_last_commit(repo_url):
                     
                     # API GitHub pour récupérer le dernier commit de la branche
                     api_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{branch}"
-                    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+                    headers = _get_github_auth_headers()
                     
                     response = requests.get(api_url, headers=headers, timeout=10)
                     response.raise_for_status()
@@ -716,23 +842,24 @@ def get_github_last_commit(repo_url):
 def check_github_update(url, last_commit_info):
     """
     Vérifie si une mise à jour est disponible en comparant les commits GitHub.
+    Returns: True if update available, False otherwise
     """
     try:
         if not last_commit_info or 'github.com' not in url:
-            return False, "Pas d'information de commit GitHub"
+            return False
         
         current_commit = get_github_last_commit(url)
         if not current_commit:
-            return False, "Impossible de récupérer le commit actuel"
+            return False
         
         if current_commit['sha'] != last_commit_info['sha']:
-            return True, f"Nouveau commit: {current_commit['sha'][:8]} - {current_commit['message']}"
+            return True
         
-        return False, "Aucune mise à jour disponible"
+        return False
         
     except Exception as e:
         print(f"Erreur lors de la vérification GitHub: {e}")
-        return False, f"Erreur de vérification: {e}"
+        return False
 
 def get_commits_between(repo_url, old_sha, new_sha):
     """
@@ -754,9 +881,9 @@ def get_commits_between(repo_url, old_sha, new_sha):
                     
                     # API GitHub pour récupérer les commits entre les deux SHA
                     api_url = f"https://api.github.com/repos/{owner}/{repo}/compare/{old_sha}...{new_sha}"
-                    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+                    headers = _get_github_auth_headers()
                     
-                    response = requests.get(api_url, headers=headers, timeout=10)
+                    response = requests.get(api_url, headers=headers, timeout=15)
                     response.raise_for_status()
                     
                     compare_data = response.json()
@@ -794,7 +921,7 @@ def analyze_commit_changes(repo_url, commit_sha):
                     
                     # API GitHub pour récupérer les détails du commit
                     api_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{commit_sha}"
-                    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+                    headers = _get_github_auth_headers()
                     
                     response = requests.get(api_url, headers=headers, timeout=10)
                     response.raise_for_status()
@@ -818,6 +945,10 @@ def analyze_commit_changes(repo_url, commit_sha):
                             changes['modified'].append(filename)
                         elif status == 'removed':
                             changes['removed'].append(filename)
+                        elif status == 'renamed':
+                            # Un renommage est une suppression de l'ancien + un ajout du nouveau
+                            changes['removed'].append(file_info['previous_filename'])
+                            changes['added'].append(filename)
                     
                     return changes
                     
@@ -862,50 +993,62 @@ def analyze_all_commits(repo_url, commits):
         'removed': list(all_changes['removed'])
     }
 
-def download_single_file_from_github(repo_url, file_path, destination_path):
+def get_github_file_size(repo_url, file_path, commit_sha):
     """
-    Télécharge un fichier spécifique depuis GitHub.
+    Récupère la taille d'un fichier spécifique depuis GitHub en utilisant un SHA de commit précis.
     """
     try:
-        if 'github.com' in repo_url and '/archive/refs/heads/' in repo_url:
-            # Extraire les informations du repo
-            start_marker = '/archive/refs/heads/'
-            start_pos = repo_url.find(start_marker)
-            if start_pos != -1:
-                branch_start = start_pos + len(start_marker)
-                branch_end = repo_url.find('.zip', branch_start)
-                if branch_end != -1:
-                    branch = repo_url[branch_start:branch_end]
-                    parts = repo_url.split('/')
-                    owner = parts[3]
-                    repo = parts[4]
-                    
-                    # Construire l'URL du fichier brut
-                    raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{file_path}"
-                    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-                    
-                    response = requests.get(raw_url, headers=headers, timeout=30)
-                    response.raise_for_status()
-                    
-                    # Créer le dossier de destination si nécessaire
-                    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
-                    
-                    # Écrire le fichier
-                    with open(destination_path, 'wb') as f:
-                        f.write(response.content)
-                    
-                    print(f"Fichier téléchargé: {file_path}")
-                    return True
+        if 'github.com' not in repo_url: return 0
+        
+        parts = repo_url.split('/')
+        owner = parts[3]
+        repo = parts[4]
+        
+        raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{commit_sha}/{file_path}"
+        headers = _get_github_auth_headers()
+        
+        response = requests.head(raw_url, headers=headers, timeout=10, allow_redirects=True)
+        response.raise_for_status()
+        
+        size = response.headers.get('Content-Length')
+        return int(size) if size is not None else 0
+            
+    except Exception as e:
+        print(f"Avertissement: Impossible de récupérer la taille de {file_path} au commit {commit_sha[:7]}: {e}")
+        return 0
+
+def download_single_file_from_github(repo_url, file_path, destination_path, commit_sha):
+    """
+    Télécharge un fichier spécifique depuis GitHub en utilisant un SHA de commit précis.
+    """
+    try:
+        if 'github.com' not in repo_url: return False
+        
+        parts = repo_url.split('/')
+        owner = parts[3]
+        repo = parts[4]
+        
+        raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{commit_sha}/{file_path}"
+        headers = _get_github_auth_headers()
+        
+        response = requests.get(raw_url, headers=headers, timeout=30)
+        response.raise_for_status()
+        
+        os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+        
+        with open(destination_path, 'wb') as f:
+            f.write(response.content)
+        
+        # print(f"Fichier téléchargé: {file_path}") # Optionnel, peut être verbeux
+        return True
                     
     except Exception as e:
-        print(f"Erreur lors du téléchargement de {file_path}: {e}")
+        print(f"Erreur lors du téléchargement de {file_path} au commit {commit_sha[:7]}: {e}")
         return False
-    
-    return False
 
-def update_modpack_delta(modpack_name, install_dir, changes, repo_url):
+def update_modpack_delta(modpack_name, install_dir, changes, repo_url, new_sha, progress_callback=None):
     """
-    Applique les changements delta au modpack installé.
+    Applique les changements delta au modpack installé en téléchargeant fichier par fichier depuis GitHub.
     """
     modpack_dir = os.path.join(install_dir, modpack_name)
     
@@ -914,91 +1057,69 @@ def update_modpack_delta(modpack_name, install_dir, changes, repo_url):
     print(f"  - Fichiers à modifier: {len(changes['modified'])}")
     print(f"  - Fichiers à supprimer: {len(changes['removed'])}")
     
-    # Si trop de changements, faire une installation complète
-    total_changes = len(changes['added']) + len(changes['modified']) + len(changes['removed'])
-    if total_changes > 50:  # Seuil arbitraire
-        print(f"Trop de changements ({total_changes}), installation complète recommandée")
-        return False
-    
-    # Supprimer les fichiers
+    # Supprimer les fichiers en premier
     for file_path in changes['removed']:
         full_path = os.path.join(modpack_dir, file_path)
         if os.path.exists(full_path):
-            os.remove(full_path)
-            print(f"  Supprimé: {file_path}")
+            try:
+                os.remove(full_path)
+                print(f"  Supprimé: {file_path}")
+            except OSError as e:
+                print(f"Erreur lors de la suppression de {file_path}: {e}")
+
     
-    # Pour les fichiers ajoutés/modifiés, on va télécharger le ZIP et extraire seulement ces fichiers
-    # C'est plus simple et plus fiable que de télécharger fichier par fichier
+    # Mettre à jour les fichiers ajoutés/modifiés
     files_to_update = changes['added'] + changes['modified']
     
     if files_to_update:
-        print(f"Téléchargement et extraction de {len(files_to_update)} fichiers...")
+        print(f"Calcul de la taille totale de la mise à jour...")
         
-        # Télécharger le ZIP temporairement
-        temp_zip = os.path.join(install_dir, "temp_delta.zip")
-        try:
-            # Utiliser la même logique d'URL que install_modpack_files_fresh
-            final_url = repo_url
-            if 'dropbox.com' in repo_url and 'dl=1' not in repo_url:
-                parsed_url = urllib.parse.urlparse(repo_url)
-                query_params = urllib.parse.parse_qs(parsed_url.query)
-                query_params['dl'] = ['1']
-                new_query = urllib.parse.urlencode(query_params, doseq=True)
-                final_url = urllib.parse.urlunparse(
-                    (parsed_url.scheme, parsed_url.netloc, parsed_url.path, parsed_url.params, new_query, parsed_url.fragment)
-                )
+        # Utiliser le new_sha pour obtenir la taille des fichiers de la nouvelle version
+        file_sizes = {f: get_github_file_size(repo_url, f, new_sha) for f in files_to_update}
+        total_size = sum(file_sizes.values())
+        
+        if total_size == 0 and any(s is not None and s > 0 for s in file_sizes.values()):
+             print("Avertissement: La taille totale est 0 mais certains fichiers ont une taille > 0. Un problème de calcul est survenu.")
+        elif total_size == 0:
+            print("Aucun contenu à télécharger (fichiers de taille nulle).")
+        else:
+            print(f"Taille totale à télécharger: {total_size / (1024*1024):.2f} MB")
+        
+        bytes_downloaded = 0
+        if progress_callback:
+            progress_callback(bytes_downloaded, total_size)
+
+        if total_size > 0:
+            print(f"Téléchargement de {len(files_to_update)} fichiers depuis GitHub...")
             
-            # Télécharger le ZIP
-            download_file_with_progress(final_url, temp_zip, None, 200)
-            
-            # Extraire seulement les fichiers nécessaires
-            with zipfile.ZipFile(temp_zip, 'r') as zip_ref:
-                # Lister tous les fichiers dans le ZIP
-                zip_files = zip_ref.namelist()
+            success_count = 0
+            for file_path, file_size in file_sizes.items():
+                dest_path = os.path.join(modpack_dir, file_path)
                 
-                # Trouver le préfixe du dossier racine (ex: CatzLauncher-forge-1.16.5-biggess-pack-cat-edition-v2/)
-                root_prefix = None
-                for zip_file in zip_files:
-                    if '/' in zip_file and not zip_file.endswith('/'):
-                        root_prefix = zip_file.split('/')[0] + '/'
-                        break
-                
-                if root_prefix:
-                    # Extraire seulement les fichiers modifiés/ajoutés
-                    for file_path in files_to_update:
-                        zip_path = root_prefix + file_path
-                        if zip_path in zip_files:
-                            # Créer le dossier de destination si nécessaire
-                            dest_path = os.path.join(modpack_dir, file_path)
-                            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-                            
-                            # Extraire le fichier
-                            zip_ref.extract(zip_path, modpack_dir)
-                            
-                            # Déplacer le fichier du sous-dossier vers le bon emplacement
-                            extracted_path = os.path.join(modpack_dir, zip_path)
-                            if os.path.exists(extracted_path):
-                                shutil.move(extracted_path, dest_path)
-                                print(f"  Mis à jour: {file_path}")
-                            else:
-                                print(f"  Erreur: fichier non trouvé dans le ZIP: {file_path}")
-                        else:
-                            print(f"  Erreur: fichier non trouvé dans le ZIP: {file_path}")
+                # Utiliser le new_sha pour télécharger la version la plus récente du fichier
+                if download_single_file_from_github(repo_url, file_path, dest_path, new_sha):
+                    success_count += 1
+                    # La taille réelle pourrait être différente si get_github_file_size a échoué.
+                    # On utilise la taille connue pour la progression.
+                    bytes_downloaded += file_size if file_size is not None else 0
+                    if progress_callback:
+                        progress_callback(bytes_downloaded, total_size)
+                    # print(f"  ✓ Mis à jour: {file_path}") # Trop verbeux
                 else:
-                    print("Erreur: impossible de déterminer la structure du ZIP")
-                    return False
+                    print(f"  ✗ Erreur de téléchargement: {file_path}")
             
-            print("Mise à jour delta terminée avec succès")
+            if progress_callback and total_size > 0:
+                progress_callback(total_size, total_size)
+                
+            print(f"Mise à jour delta terminée: {success_count}/{len(files_to_update)} fichiers mis à jour")
+            return success_count == len(files_to_update)
+        else:
+            # S'il n'y avait que des fichiers vides à "mettre à jour"
+            print("Mise à jour delta terminée: Aucun contenu à télécharger.")
             return True
-            
-        except Exception as e:
-            print(f"Erreur lors de la mise à jour delta: {e}")
-            return False
-        finally:
-            if os.path.exists(temp_zip):
-                os.remove(temp_zip)
+        
     else:
-        print("Aucun fichier à mettre à jour")
+        print("Aucun fichier à mettre à jour (seulement des suppressions).")
         return True
 
 def get_local_github_commit(modpack_name):
@@ -1022,49 +1143,79 @@ def update_local_commit(modpack_name, new_commit_info):
 
 def install_or_update_modpack_github(url, install_dir, modpack_name, estimated_mb, progress_callback=None):
     """
-    Installe ou met à jour un modpack GitHub avec logique delta.
+    Installe un modpack depuis GitHub ou le met à jour s'il est déjà installé.
+    Gère l'installation complète et les mises à jour delta.
     """
-    if not is_modpack_installed(modpack_name):
-        print(f"Installation complète de '{modpack_name}'...")
-        # Installation complète
-        install_modpack_files_fresh(url, install_dir, modpack_name, estimated_mb, progress_callback)
-    else:
-        print(f"Vérification des mises à jour pour '{modpack_name}'...")
-        # Récupérer le dernier commit local
-        local_commit = get_local_github_commit(modpack_name)
-        if not local_commit:
-            print("Pas d'information de commit local, installation complète...")
-            install_modpack_files_fresh(url, install_dir, modpack_name, estimated_mb, progress_callback)
-            return
-        
-        # Récupérer le dernier commit distant
+    try:
         remote_commit = get_github_last_commit(url)
-        if not remote_commit:
-            print("Impossible de récupérer le commit distant, installation complète...")
-            install_modpack_files_fresh(url, install_dir, modpack_name, estimated_mb, progress_callback)
-            return
+        if isinstance(remote_commit, str): # C'est un message d'erreur
+            show_error("Erreur GitHub", remote_commit)
+            return False
+    except Exception as e:
+        show_error("Erreur de Connexion", f"Impossible de contacter GitHub: {e}")
+        return False
+
+    is_installed = is_modpack_installed(modpack_name)
+    
+    # S'il est installé, vérifier les mises à jour
+    if is_installed:
+        local_commit = get_local_github_commit(modpack_name)
+        update_available = check_github_update(url, local_commit) # Utilise la fonction dédiée
         
-        if local_commit['sha'] != remote_commit['sha']:
-            print(f"Mise à jour delta: {local_commit['sha'][:8]} → {remote_commit['sha'][:8]}")
+        if update_available:
+            print(f"Mise à jour disponible pour '{modpack_name}'.")
             
-            # Récupérer tous les commits entre les deux
-            commits = get_commits_between(url, local_commit['sha'], remote_commit['sha'])
-            if commits:
-                # Analyser tous les changements
-                all_changes = analyze_all_commits(url, commits)
+            try:
+                new_sha = remote_commit['sha']
+                # On s'assure que le commit local a bien un SHA
+                if not local_commit or not local_commit.get('sha'):
+                     raise ValueError("Le commit local est invalide ou manquant. Une réinstallation complète est nécessaire.")
+
+                all_changes = get_cumulative_changes(url, local_commit['sha'], new_sha)
                 
-                # Appliquer les changements delta
-                if update_modpack_delta(modpack_name, install_dir, all_changes, url):
-                    # Mettre à jour le commit local
-                    update_local_commit(modpack_name, remote_commit)
-                    print(f"'{modpack_name}' mis à jour avec succès (delta)")
+                if all_changes:
+                    update_successful = update_modpack_delta(
+                        modpack_name,
+                        install_dir,
+                        all_changes,
+                        url, 
+                        new_sha, # Passer le SHA du dernier commit
+                        progress_callback=progress_callback
+                    )
+                    
+                    if update_successful:
+                        save_local_github_commit(modpack_name, remote_commit)
+                        print(f"'{modpack_name}' mis à jour avec succès vers le commit {new_sha[:7]}.")
+                        show_message("Mise à jour terminée", f"Le modpack '{modpack_name}' a été mis à jour avec succès.")
+                        return True
+                    else:
+                        print(f"Échec de la mise à jour delta pour '{modpack_name}'.")
+                        show_error("Échec de la mise à jour", f"La mise à jour de '{modpack_name}' a échoué. Vous pouvez essayer de le réinstaller.")
+                        return False
                 else:
-                    # Fallback vers installation complète
-                    print("Fallback vers installation complète...")
-                    install_modpack_files_fresh(url, install_dir, modpack_name, estimated_mb, progress_callback)
-            else:
-                # Pas de commits intermédiaires, installation complète
-                print("Pas de commits intermédiaires, installation complète...")
-                install_modpack_files_fresh(url, install_dir, modpack_name, estimated_mb, progress_callback)
+                    print("Impossible d'obtenir la liste des changements. La mise à jour delta est annulée.")
+                    show_error("Erreur de mise à jour", "Impossible d'obtenir la liste des changements depuis GitHub.")
+                    return False
+
+            except Exception as e:
+                print(f"Erreur majeure durant le processus de mise à jour delta: {e}")
+                show_error("Erreur de mise à jour", f"Une réinstallation complète est requise. Erreur: {e}")
+                return False
+        
         else:
-            print(f"'{modpack_name}' est à jour (commit: {local_commit['sha'][:8]})")
+             print(f"'{modpack_name}' est déjà à jour.")
+             show_message("À jour", f"Le modpack '{modpack_name}' est déjà à la dernière version.")
+             return True
+    else:
+        print(f"Installation complète de '{modpack_name}'...")
+        if install_modpack_files_fresh(url, install_dir, modpack_name, estimated_mb, progress_callback):
+            save_local_github_commit(modpack_name, remote_commit)
+            show_message("Installation terminée", f"Le modpack '{modpack_name}' a été installé avec succès.")
+            return True
+        else:
+            show_error("Échec de l'installation", f"L'installation de '{modpack_name}' a échoué.")
+            # Nettoyer les fichiers potentiellement corrompus
+            modpack_dir = os.path.join(install_dir, modpack_name)
+            if os.path.exists(modpack_dir):
+                shutil.rmtree(modpack_dir)
+            return False
