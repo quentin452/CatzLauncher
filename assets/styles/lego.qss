@@ -1,0 +1,396 @@
+/* ===== CatzLauncher QSS Stylesheet - Lego Fantasy Theme ===== */
+
+/* ===== COLORS ===== */
+/* Lego Red: #d90000 */
+/* Lego Yellow: #ffc700 */
+/* Lego Blue: #0059a3 */
+/* Lego Green: #009640 */
+/* Dark Purple/Blue BG: #2a2d47 */
+/* Light Gray: #f0f0f0 */
+
+/* ===== FONT ===== */
+* {
+    font-family: "Segoe UI", "Verdana", sans-serif;
+    font-weight: bold;
+}
+
+/* ===== MAIN WINDOW ===== */
+QMainWindow {
+    border-image: url('assets/textures/lego.png') 0 0 0 0 stretch stretch;
+    background-color: #2a2d47; /* Dark Purple/Blue fallback */
+}
+
+/* ===== TAB WIDGET ===== */
+QTabWidget::pane {
+    border: none;
+    background: transparent;
+}
+
+QTabBar::tab {
+    background-color: rgba(42, 45, 71, 0.7);
+    color: #f0f0f0;
+    padding: 10px 20px;
+    margin-right: 2px;
+    border: 1px solid transparent;
+    border-radius: 15px 15px 0 0;
+    font-size: 14px;
+    min-width: 110px;
+    transition: all 0.3s ease;
+}
+
+QTabBar::tab:selected {
+    background-color: #0059a3; /* Blue */
+    color: white;
+    border: 1px solid #007acc;
+    box-shadow: 0 0 15px rgba(0, 89, 163, 0.6);
+}
+
+QTabBar::tab:hover:!selected {
+    background-color: rgba(0, 89, 163, 0.4);
+}
+
+/* ===== HEADER ===== */
+#header {
+    background: rgba(217, 0, 0, 0.8); /* Red transparent */
+    border-bottom: 2px solid #ffc700; /* Yellow */
+    box-shadow: 0 2px 10px rgba(255, 199, 0, 0.4);
+}
+
+/* ===== SCROLLBARS ===== */
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: transparent;
+    border: none;
+    margin: 0px;
+}
+
+QScrollBar:vertical {
+    width: 14px;
+}
+
+QScrollBar:horizontal {
+    height: 14px;
+}
+
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    background-color: rgba(0, 89, 163, 0.7); /* Blue transparent */
+    border-radius: 7px;
+    border: 1px solid rgba(0, 122, 204, 0.8);
+}
+
+QScrollBar::handle:vertical {
+    min-height: 30px;
+}
+
+QScrollBar::handle:horizontal {
+    min-width: 30px;
+}
+
+QScrollBar::handle:hover {
+    background-color: rgba(0, 122, 204, 0.9);
+}
+
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: transparent;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    height: 0;
+    width: 0;
+    border: none;
+    background: none;
+}
+
+/* ===== TITLES ===== */
+QLabel.title {
+    color: white;
+    font-size: 20px;
+    background-color: rgba(217, 0, 0, 0.7); /* Red transparent */
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+QLabel.title-small {
+    color: #f0f0f0;
+    font-size: 16px;
+}
+
+QLabel.title, QLabel.status {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+QLabel.title-large {
+    color: #ffc700; /* Yellow */
+    font-size: 26px;
+    text-shadow: 0 0 10px #ffc700;
+}
+
+/* ===== LIST WIDGET ===== */
+QListWidget {
+    background-color: rgba(42, 45, 71, 0.8);
+    border: 1px solid #0059a3;
+    border-radius: 15px;
+    color: #f0f0f0;
+    font-size: 14px;
+    padding: 10px;
+}
+
+QListWidget::item {
+    background-color: transparent;
+    padding: 10px;
+    margin: 2px;
+    border-radius: 10px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+QListWidget::item:hover {
+    background-color: rgba(255, 199, 0, 0.2); /* Yellow transparent */
+}
+
+QListWidget::item:selected {
+    background-color: #ffc700; /* Yellow */
+    color: #2a2d47;
+    box-shadow: 0 0 10px rgba(255, 199, 0, 0.5);
+}
+
+/* ===== PROGRESS BAR ===== */
+QProgressBar {
+    border: none;
+    text-align: center;
+    background-color: rgba(42, 45, 71, 0.7);
+    color: #f0f0f0;
+    border-radius: 12px;
+    padding: 1px;
+}
+
+QProgressBar::chunk {
+    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #009640, stop:1 #55dd55); /* Green gradient */
+    border-radius: 11px;
+}
+
+/* ===== STATUS LABELS ===== */
+QLabel.status {
+    color: #f0f0f0;
+    font-size: 14px;
+    padding: 10px;
+    background-color: rgba(42, 45, 71, 0.8);
+    border: 1px solid #009640; /* Green */
+    border-radius: 15px;
+}
+
+QLabel.status-success {
+    color: #55ff55;
+    background-color: rgba(85, 255, 85, 0.1);
+    border: 2px solid #55ff55;
+}
+
+QLabel.status-error {
+    color: #ff5555;
+    background-color: rgba(255, 85, 85, 0.1);
+    border: 2px solid #ff5555;
+}
+
+QLabel.status-connected, QLabel.status-disconnected {
+    font-size: 16px;
+    font-weight: bold;
+    padding: 15px;
+}
+
+QLabel.status-connected {
+    color: #55ff55;
+    background-color: rgba(85, 255, 85, 0.1);
+    border: 2px solid #55ff55;
+}
+
+QLabel.status-disconnected {
+    color: #aaaaaa;
+    background-color: rgba(68, 68, 68, 0.6);
+    border: 2px solid #aaaaaa;
+}
+
+/* ===== CONFIGURATION TAB SPECIFIC ===== */
+#configTab, #configScrollArea, #configScrollContent, #configScrollArea > QWidget {
+    background: transparent;
+    border: none;
+}
+
+/* ===== CONFIGURATION FORM & FRAMES ===== */
+#configFormContainer, QFrame.account-frame {
+    background-color: rgba(0, 89, 163, 0.3); /* Blue transparent */
+    border: 1px solid #007acc;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+#configFormContainer QLabel, QFrame.account-frame QLabel {
+    color: #ffc700; /* Yellow */
+    font-size: 14px;
+    text-shadow: 1px 1px 2px #2a2d47;
+    background: transparent;
+    border: none;
+}
+
+/* ===== LINE EDITS & COMBOBOX ===== */
+QLineEdit, QComboBox {
+    background-color: #009640; /* Green */
+    border: 1px solid #00642a;
+    border-radius: 8px;
+    color: white;
+    padding: 10px;
+    font-size: 13px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+QLineEdit:focus, QComboBox:focus {
+    border: 1px solid #ffc700; /* Yellow */
+    background-color: #00a648;
+    box-shadow: 0 0 10px rgba(255, 199, 0, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== CHECKBOXES ===== */
+QCheckBox {
+    color: #f0f0f0;
+    font-size: 14px;
+    background-color: transparent;
+    border: none;
+    padding: 5px;
+}
+
+QCheckBox::indicator {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #555;
+    border-radius: 5px;
+    background-color: #d90000; /* Red */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+QCheckBox::indicator:hover {
+    border-color: #888;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #009640; /* Green */
+    border-color: #55dd55;
+    image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+}
+
+/* ===== MODPACK LIST BUTTONS ===== */
+QListWidget QPushButton {
+    background-color: #0059a3; /* Blue */
+    border: none;
+    border-radius: 10px;
+    color: white;
+    min-width: 20px;
+    max-width: 20px;
+    min-height: 20px;
+    max-height: 20px;
+    transition: all 0.2s ease;
+}
+
+QListWidget QPushButton:hover {
+    background-color: #007acc;
+    transform: scale(1.1);
+}
+
+/* ===== WINDOW CONTROLS ===== */
+.window-control-btn {
+    background-color: transparent;
+    color: #aaaaaa;
+    border: none;
+    border-radius: 5px;
+}
+
+.window-control-btn:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.close-btn:hover {
+    background-color: #d90000; /* Red */
+    color: white;
+}
+
+/* ===== MAIN BUTTONS ===== */
+QPushButton, .update-btn, AnimatedButton {
+    background-color: #d90000; /* Red */
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-size: 16px;
+    padding: 12px 25px;
+    box-shadow: 0 4px 15px rgba(217, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+QPushButton:hover, .update-btn:hover, AnimatedButton:hover {
+    background-color: #e60000;
+    box-shadow: 0 6px 20px rgba(217, 0, 0, 0.5);
+    transform: translateY(-2px);
+}
+
+QPushButton:pressed, .update-btn:pressed, AnimatedButton:pressed {
+    background-color: #b00000;
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba(217, 0, 0, 0.4);
+}
+
+/* ===== TRANSPARENT WIDGETS ===== */
+QWidget.transparent {
+    background: transparent;
+}
+
+/* ===== PARTICLE SYSTEM ===== */
+QWidget.particle-system {
+    background: transparent;
+}
+
+/* ===== COMBOBOX DROPDOWN ===== */
+QComboBox::drop-down {
+    border: none;
+    background-color: transparent;
+    width: 25px;
+}
+
+QComboBox::down-arrow {
+    border: 6px solid transparent;
+    border-top-color: #f0f0f0;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #2a2d47;
+    border: 1px solid #0059a3; /* Blue */
+    border-radius: 10px;
+    selection-background-color: #0059a3; /* Blue */
+    color: #f0f0f0;
+}
+
+/* ===== TOKEN STATUS ===== */
+QLabel.token-status-ok {
+    color: #55ff55;
+    font-size: 11px;
+}
+
+QLabel.token-status-warning {
+    color: #ffc700; /* Yellow */
+    font-size: 11px;
+}
+
+/* ===== MODPACK LIST ITEM ===== */
+QLabel.modpack-name {
+    color: #f0f0f0;
+    font-size: 14px;
+    font-weight: bold;
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+/* ===== LABELS ===== */
+QLabel.config-label {
+    color: #f0f0f0;
+    font-weight: bold;
+    margin-bottom: 5px;
+} 
