@@ -29,6 +29,24 @@ from src.utils import (
 )
 from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
 
+def load_qss_stylesheet():
+    """Load the QSS stylesheet from file."""
+    try:
+        qss_file = os.path.join(os.path.dirname(__file__), "style.qss")
+        with open(qss_file, 'r', encoding='utf-8') as f:
+            return f.read()
+    except Exception as e:
+        print(f"Warning: Could not load QSS file: {e}")
+        return ""
+
+def apply_css_class(widget, css_class):
+    """Apply a CSS class to a widget and force stylesheet reapplication."""
+    widget.setProperty("class", css_class)
+    # Force stylesheet reapplication
+    widget.style().unpolish(widget)
+    widget.style().polish(widget)
+    widget.update()
+
 # --- Signals for thread-safe UI updates ---
 class WorkerSignals(QObject):
     progress = pyqtSignal(int)
@@ -186,15 +204,7 @@ class ModpackListItem(QWidget):
         
         # Label avec le nom et la version
         self.name_label = QLabel(f"{modpack_data['name']} - {modpack_data['version']}")
-        self.name_label.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-size: 14px;
-                font-weight: bold;
-                background: transparent;
-                border: none;
-            }
-        """)
+        self.name_label.setProperty("class", "modpack-name")
         layout.addWidget(self.name_label)
         
         layout.addStretch()
@@ -203,24 +213,7 @@ class ModpackListItem(QWidget):
         self.check_update_btn = AnimatedButton("🔄")
         self.check_update_btn.setFixedSize(35, 35)
         self.check_update_btn.setToolTip("Vérifier les mises à jour pour ce modpack")
-        self.check_update_btn.setStyleSheet("""
-            QPushButton {
-                background-color: rgba(60, 60, 80, 0.8);
-                border: 2px solid rgba(100, 100, 140, 0.5);
-                border-radius: 17px;
-                color: white;
-                font-size: 16px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: rgba(80, 80, 120, 0.8);
-                border: 2px solid rgba(120, 150, 255, 0.5);
-            }
-            QPushButton:pressed {
-                background-color: rgba(100, 150, 255, 0.8);
-                border: 2px solid rgba(150, 200, 255, 0.8);
-            }
-        """)
+        self.check_update_btn.setProperty("class", "update-btn")
         layout.addWidget(self.check_update_btn)
     
     def set_checking_state(self, checking=True):
@@ -366,7 +359,7 @@ class MinecraftLauncher(QMainWindow):
         title_font.setPointSize(24)
         title_font.setBold(True)
         title_label.setFont(title_font)
-        title_label.setStyleSheet("color: white;")
+        title_label.setProperty("class", "title-large")
         layout.addWidget(title_label)
         
         layout.addStretch()
@@ -391,74 +384,24 @@ class MinecraftLauncher(QMainWindow):
         title_font.setPointSize(18)
         title_font.setBold(True)
         title_label.setFont(title_font)
-        title_label.setStyleSheet("color: white; margin-bottom: 10px;")
+        title_label.setProperty("class", "title")
         layout.addWidget(title_label)
 
         # Enhanced list widget
         self.modpack_list = AnimatedListWidget()
         self.modpack_list.setMinimumHeight(250)
-        self.modpack_list.setStyleSheet("""
-            QListWidget {
-                background-color: rgba(40, 40, 60, 0.8);
-                border: 2px solid rgba(100, 100, 140, 0.5);
-                border-radius: 10px;
-                color: white;
-                font-size: 14px;
-                padding: 10px;
-            }
-            QListWidget::item {
-                background-color: rgba(60, 60, 80, 0.6);
-                border-radius: 5px;
-                padding: 8px;
-                margin: 2px;
-            }
-            QListWidget::item:hover {
-                background-color: rgba(80, 80, 120, 0.8);
-                border: 1px solid rgba(120, 150, 255, 0.5);
-            }
-            QListWidget::item:selected {
-                background-color: rgba(100, 150, 255, 0.8);
-                border: 1px solid rgba(150, 200, 255, 0.8);
-            }
-        """)
         layout.addWidget(self.modpack_list)
 
         # Enhanced progress bar
         self.progress = AnimatedProgressBar()
         self.progress.setRange(0, 100)
         self.progress.setTextVisible(True)
-        self.progress.setStyleSheet("""
-            QProgressBar {
-                border: 2px solid rgba(100, 100, 140, 0.5);
-                border-radius: 10px;
-                text-align: center;
-                background-color: rgba(40, 40, 60, 0.8);
-                color: white;
-                font-weight: bold;
-            }
-            QProgressBar::chunk {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                    stop:0 rgba(100, 150, 255, 0.8),
-                    stop:1 rgba(150, 200, 255, 0.8));
-                border-radius: 8px;
-            }
-        """)
         layout.addWidget(self.progress)
 
         # Status label with animation
         self.status_label = QLabel("✨ Prêt à jouer !")
         self.status_label.setAlignment(Qt.AlignCenter)
-        self.status_label.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-size: 14px;
-                font-weight: bold;
-                padding: 10px;
-                background-color: rgba(40, 40, 60, 0.6);
-                border-radius: 8px;
-                border: 1px solid rgba(100, 100, 140, 0.3);
-            }
-        """)
+        self.status_label.setProperty("class", "status")
         layout.addWidget(self.status_label)
 
         # Button layout with animated buttons
@@ -491,40 +434,20 @@ class MinecraftLauncher(QMainWindow):
         title_font.setPointSize(18)
         title_font.setBold(True)
         title_label.setFont(title_font)
-        title_label.setStyleSheet("color: white; margin-bottom: 10px;")
+        title_label.setProperty("class", "title")
         layout.addWidget(title_label)
 
         # Java Path with enhanced styling
         java_frame = QFrame()
-        java_frame.setStyleSheet("""
-            QFrame {
-                background-color: rgba(40, 40, 60, 0.8);
-                border: 2px solid rgba(100, 100, 140, 0.5);
-                border-radius: 10px;
-                padding: 15px;
-            }
-        """)
+        java_frame.setProperty("class", "config-frame")
         java_layout = QVBoxLayout(java_frame)
         
         java_label = QLabel("📁 Chemin Java:")
-        java_label.setStyleSheet("color: white; font-weight: bold; margin-bottom: 5px;")
+        java_label.setProperty("class", "config-label")
         java_layout.addWidget(java_label)
         
         java_input_layout = QHBoxLayout()
         self.java_path_edit = QLineEdit(self.config.get("java_path", ""))
-        self.java_path_edit.setStyleSheet("""
-            QLineEdit {
-                background-color: rgba(60, 60, 80, 0.8);
-                border: 2px solid rgba(100, 100, 140, 0.5);
-                border-radius: 8px;
-                color: white;
-                padding: 8px;
-                font-size: 12px;
-            }
-            QLineEdit:focus {
-                border: 2px solid rgba(100, 150, 255, 0.8);
-            }
-        """)
         java_input_layout.addWidget(self.java_path_edit)
         
         self.browse_java_btn = AnimatedButton("📂 Parcourir")
@@ -535,17 +458,16 @@ class MinecraftLauncher(QMainWindow):
 
         # GitHub Token
         token_frame = QFrame()
-        token_frame.setStyleSheet(java_frame.styleSheet())
+        token_frame.setProperty("class", "config-frame")
         token_layout = QVBoxLayout(token_frame)
         
         token_label = QLabel("🔑 Token d'accès personnel GitHub:")
-        token_label.setStyleSheet(java_label.styleSheet())
+        token_label.setProperty("class", "config-label")
         token_layout.addWidget(token_label)
         
         self.github_token_edit = QLineEdit()
         self.github_token_edit.setPlaceholderText("Coller un nouveau token pour (écraser et) sauvegarder")
         self.github_token_edit.setEchoMode(QLineEdit.Password)
-        self.github_token_edit.setStyleSheet(self.java_path_edit.styleSheet())
         token_layout.addWidget(self.github_token_edit)
         
         self.token_status_label = QLabel()
@@ -556,62 +478,20 @@ class MinecraftLauncher(QMainWindow):
 
         # JVM Arguments
         args_frame = QFrame()
-        args_frame.setStyleSheet("""
-            QFrame {
-                background-color: rgba(40, 40, 60, 0.8);
-                border: 2px solid rgba(100, 100, 140, 0.5);
-                border-radius: 10px;
-                padding: 15px;
-            }
-        """)
+        args_frame.setProperty("class", "config-frame")
         args_layout = QVBoxLayout(args_frame)
         
         args_label = QLabel("🔧 Arguments JVM:")
-        args_label.setStyleSheet("color: white; font-weight: bold; margin-bottom: 5px;")
+        args_label.setProperty("class", "config-label")
         args_layout.addWidget(args_label)
         
         self.java_args_edit = QLineEdit(self.config.get("java_args", ""))
-        self.java_args_edit.setStyleSheet("""
-            QLineEdit {
-                background-color: rgba(60, 60, 80, 0.8);
-                border: 2px solid rgba(100, 100, 140, 0.5);
-                border-radius: 8px;
-                color: white;
-                padding: 8px;
-                font-size: 12px;
-            }
-            QLineEdit:focus {
-                border: 2px solid rgba(100, 150, 255, 0.8);
-            }
-        """)
         args_layout.addWidget(self.java_args_edit)
         layout.addWidget(args_frame)
 
         # Auto-update checkbox with enhanced styling
         self.auto_check_cb = QCheckBox("🔄 Vérifier automatiquement les mises à jour au démarrage")
         self.auto_check_cb.setChecked(self.config.get("auto_check_updates", True))
-        self.auto_check_cb.setStyleSheet("""
-            QCheckBox {
-                color: white;
-                font-size: 14px;
-                font-weight: bold;
-                padding: 10px;
-                background-color: rgba(40, 40, 60, 0.6);
-                border-radius: 8px;
-                border: 1px solid rgba(100, 100, 140, 0.3);
-            }
-            QCheckBox::indicator {
-                width: 20px;
-                height: 20px;
-                border: 2px solid rgba(100, 100, 140, 0.5);
-                border-radius: 4px;
-                background-color: rgba(60, 60, 80, 0.8);
-            }
-            QCheckBox::indicator:checked {
-                background-color: rgba(100, 150, 255, 0.8);
-                border: 2px solid rgba(150, 200, 255, 0.8);
-            }
-        """)
         layout.addWidget(self.auto_check_cb)
 
         layout.addStretch()
@@ -631,30 +511,13 @@ class MinecraftLauncher(QMainWindow):
 
         # Account info with enhanced styling
         account_frame = QFrame()
-        account_frame.setStyleSheet("""
-            QFrame {
-                background-color: rgba(40, 40, 60, 0.8);
-                border: 2px solid rgba(100, 100, 140, 0.5);
-                border-radius: 15px;
-                padding: 30px;
-            }
-        """)
+        account_frame.setProperty("class", "account-frame")
         account_layout = QVBoxLayout(account_frame)
         account_layout.setSpacing(20)
 
         self.account_info_label = QLabel("❌ Non connecté")
         self.account_info_label.setAlignment(Qt.AlignCenter)
-        self.account_info_label.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-size: 16px;
-                font-weight: bold;
-                padding: 15px;
-                background-color: rgba(60, 60, 80, 0.6);
-                border-radius: 10px;
-                border: 1px solid rgba(100, 100, 140, 0.3);
-            }
-        """)
+        self.account_info_label.setProperty("class", "status-disconnected")
         account_layout.addWidget(self.account_info_label)
 
         self.login_btn = AnimatedButton("🔐 Login avec Microsoft")
@@ -691,68 +554,7 @@ class MinecraftLauncher(QMainWindow):
 
     def _apply_styles(self):
         """Apply beautiful modern styling to the entire application."""
-        self.setStyleSheet("""
-            QMainWindow {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #1a1a2e,
-                    stop:0.3 #16213e,
-                    stop:0.7 #0f3460,
-                    stop:1 #533483);
-            }
-            
-            QTabWidget::pane {
-                border: none;
-                background: transparent;
-            }
-            
-            QTabBar::tab {
-                background-color: rgba(40, 40, 60, 0.8);
-                color: white;
-                padding: 8px 15px;
-                margin-right: 5px;
-                border-top-left-radius: 10px;
-                border-top-right-radius: 10px;
-                font-weight: bold;
-                font-size: 13px;
-                min-width: 100px; /* Largeur minimale (facultatif) */
-            }
-            
-            QTabBar::tab:selected {
-                background-color: rgba(100, 150, 255, 0.8);
-                border-bottom: 3px solid rgba(150, 200, 255, 0.8);
-            }
-            
-            QTabBar::tab:hover:!selected {
-                background-color: rgba(80, 80, 120, 0.8);
-            }
-            
-            #header {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                    stop:0 rgba(100, 150, 255, 0.3),
-                    stop:1 rgba(150, 200, 255, 0.3));
-                border-bottom: 2px solid rgba(100, 150, 255, 0.5);
-            }
-            
-            QScrollBar:vertical {
-                background-color: rgba(40, 40, 60, 0.8);
-                width: 12px;
-                border-radius: 6px;
-            }
-            
-            QScrollBar::handle:vertical {
-                background-color: rgba(100, 150, 255, 0.8);
-                border-radius: 6px;
-                min-height: 20px;
-            }
-            
-            QScrollBar::handle:vertical:hover {
-                background-color: rgba(150, 200, 255, 0.8);
-            }
-            
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-        """)
+        self.setStyleSheet(load_qss_stylesheet())
 
     def load_config(self):
         """Load configuration from file."""
@@ -786,30 +588,10 @@ class MinecraftLauncher(QMainWindow):
         
         # Show success animation
         self.status_label.setText("✅ Configuration sauvegardée !")
-        self.status_label.setStyleSheet("""
-            QLabel {
-                color: #4CAF50;
-                font-size: 14px;
-                font-weight: bold;
-                padding: 10px;
-                background-color: rgba(76, 175, 80, 0.2);
-                border-radius: 8px;
-                border: 1px solid rgba(76, 175, 80, 0.5);
-            }
-        """)
+        apply_css_class(self.status_label, "status-success")
         
         # Reset style after 3 seconds
-        QTimer.singleShot(3000, lambda: self.status_label.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-size: 14px;
-                font-weight: bold;
-                padding: 10px;
-                background-color: rgba(40, 40, 60, 0.6);
-                border-radius: 8px;
-                border: 1px solid rgba(100, 100, 140, 0.3);
-            }
-        """))
+        QTimer.singleShot(3000, lambda: apply_css_class(self.status_label, "status"))
 
     def update_login_button_states(self):
         """Update login button states with animations."""
@@ -824,10 +606,10 @@ class MinecraftLauncher(QMainWindow):
         """Met à jour le label de statut du token."""
         if load_github_token():
             self.token_status_label.setText("✅ Un token est sauvegardé de manière sécurisée.")
-            self.token_status_label.setStyleSheet("color: #4CAF50; font-size: 11px;")
+            apply_css_class(self.token_status_label, "token-status-ok")
         else:
             self.token_status_label.setText("❌ Aucun token n'est actuellement sauvegardé. Recommandé.")
-            self.token_status_label.setStyleSheet("color: #FFC107; font-size: 11px;")
+            apply_css_class(self.token_status_label, "token-status-warning")
 
     def show_client_id_error(self):
         """Affiche une erreur si le Client ID n'est pas configuré."""
@@ -925,8 +707,6 @@ class MinecraftLauncher(QMainWindow):
             self.signals.login_complete.emit(profile)
 
         except Exception as e:
-            
-            print(f"--- Erreur dans _do_microsoft_auth_flow ---")
             traceback.print_exc()
             error_message = f"{type(e).__name__}: {e}"
             if hasattr(e, 'response') and e.response is not None:
@@ -938,17 +718,7 @@ class MinecraftLauncher(QMainWindow):
         self.header_spinner.hide()
         self.login_btn.setEnabled(True)
         self.account_info_label.setText(f"✅ Connecté: {profile['name']}")
-        self.account_info_label.setStyleSheet("""
-            QLabel {
-                color: #4CAF50;
-                font-size: 16px;
-                font-weight: bold;
-                padding: 15px;
-                background-color: rgba(76, 175, 80, 0.2);
-                border-radius: 10px;
-                border: 1px solid rgba(76, 175, 80, 0.5);
-            }
-        """)
+        apply_css_class(self.account_info_label, "status-connected")
         self.update_login_button_states()
         self.status_label.setText(f"🎉 Bienvenue, {profile['name']}!")
 
@@ -957,18 +727,7 @@ class MinecraftLauncher(QMainWindow):
         self.header_spinner.hide()
         self.login_btn.setEnabled(True)
         self.account_info_label.setText(f"❌ {error}")
-        self.account_info_label.setStyleSheet("""
-            QLabel {
-                color: #f44336;
-                font-size: 12px;
-                font-weight: bold;
-                padding: 15px;
-                background-color: rgba(244, 67, 54, 0.2);
-                border-radius: 10px;
-                border: 1px solid rgba(244, 67, 54, 0.5);
-                word-wrap: break-word;
-            }
-        """)
+        apply_css_class(self.account_info_label, "status-error")
         self.update_login_button_states()
         self.status_label.setText("Erreur de connexion.")
 
@@ -979,17 +738,7 @@ class MinecraftLauncher(QMainWindow):
         self.save_config()
         
         self.account_info_label.setText("❌ Non connecté")
-        self.account_info_label.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-size: 16px;
-                font-weight: bold;
-                padding: 15px;
-                background-color: rgba(60, 60, 80, 0.6);
-                border-radius: 10px;
-                border: 1px solid rgba(100, 100, 140, 0.3);
-            }
-        """)
+        apply_css_class(self.account_info_label, "status-disconnected")
         self.update_login_button_states()
         self.status_label.setText("🚪 Déconnexion réussie")
 
@@ -1017,7 +766,7 @@ class MinecraftLauncher(QMainWindow):
                 self.signals.progress.emit(progress)
                 self.signals.status.emit(f"🔍 Vérification de {modpack['name']}...")
                 
-                update_needed, reason = check_update(modpack['name'], modpack['url'], modpack.get('last_modified'))
+                update_needed, _ = check_update(modpack['name'], modpack['url'], modpack.get('last_modified'))
                 if update_needed:
                     updates.append(modpack)
             
@@ -1028,8 +777,6 @@ class MinecraftLauncher(QMainWindow):
                 self.signals.status.emit("✅ Aucune mise à jour disponible")
                 
         except Exception as e:
-            
-            print(f"--- Erreur dans check_modpack_updates ---")
             traceback.print_exc()
             self.signals.status.emit(f"❌ Erreur [check_updates]: {e}")
 

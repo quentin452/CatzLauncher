@@ -47,7 +47,7 @@ class ParticleSystem(QWidget):
         # Set up the widget
         self.setAttribute(Qt.WA_TransparentForMouseEvents)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setStyleSheet("background: transparent;")
+        self.setProperty("class", "particle-system")
         
         # Animation timer
         self.timer = QTimer()
@@ -89,7 +89,6 @@ class ParticleSystem(QWidget):
                 self.update() # Schedule a repaint to clear them from screen
             return
 
-        current_time = time.time()
         dt = 0.016  # Approximate delta time for 60 FPS
         
         # Update particles
