@@ -268,7 +268,6 @@ QListWidget QPushButton {
     max-width: 16px;
     min-height: 16px;
     max-height: 16px;
-    border-radius: 16px;  
 }
 
 QListWidget QPushButton:hover {
