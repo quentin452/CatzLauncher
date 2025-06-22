@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QProgressBar, QListWidget, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
     QInputDialog, QTabWidget, QFrame, QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
-    QListWidgetItem
+    QListWidgetItem, QStackedWidget
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QPropertyAnimation, QEasingCurve, QTimer, QParallelAnimationGroup
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient
@@ -269,7 +269,7 @@ class MinecraftLauncher(QMainWindow):
         self.setMinimumSize(900, 700)
         
         # Set window flags for modern look
-        self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
+        self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint | Qt.WindowMaximizeButtonHint)
         
         # Enable mouse tracking for particle effects
         self.setMouseTracking(True)
@@ -292,21 +292,18 @@ class MinecraftLauncher(QMainWindow):
         self._connect_signals()
         self._apply_styles()
 
+        # Show loading screen for a few seconds, then switch to main content
+        QTimer.singleShot(3000, self.show_main_content)
+
+        # Start background tasks while loading screen is visible
         self.refresh_modpack_list()
         self.try_refresh_login()
-        if self.config.get("auto_check_updates", True):
-            self.check_modpack_updates()
             
-        # Start fade-in animation
+        # Start fade-in animation for the whole window
         self.fade_animation.start()
 
         if not self.client_id:
             self.show_client_id_error()
-
-    def mouseMoveEvent(self, event):
-        """Track mouse movement for particle effects."""
-        super().mouseMoveEvent(event)
-        self.particle_system.mouse_move_event(event.pos())
 
     def _setup_ui(self):
         # Create central widget with gradient background
@@ -322,19 +319,82 @@ class MinecraftLauncher(QMainWindow):
         header = self._create_header()
         main_layout.addWidget(header)
         
-        # Enhanced tab widget
-        self.tabs = AnimatedTabWidget()
-        main_layout.addWidget(self.tabs)
+        # QStackedWidget for switching between loading and main content
+        self.stacked_widget = QStackedWidget()
+        main_layout.addWidget(self.stacked_widget)
 
+        # Create and add loading widget
+        self.loading_widget = self._create_loading_widget()
+        self.stacked_widget.addWidget(self.loading_widget)
+
+        # Create and add main content widget (tabs)
+        self.tabs = self._create_main_content_widget()
+        self.stacked_widget.addWidget(self.tabs)
+
+        # Start on the loading widget
+        self.stacked_widget.setCurrentWidget(self.loading_widget)
+
+    def _create_loading_widget(self):
+        loading_widget = QWidget()
+        layout = QVBoxLayout(loading_widget)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+
+        logo_label = QLabel()
+        pixmap = QPixmap('assets/logo.png')
+        logo_label.setPixmap(pixmap.scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        logo_label.setAlignment(Qt.AlignCenter)
+        
+        loading_label = QLabel("Loading CatzLauncher...", self)
+        loading_label.setAlignment(Qt.AlignCenter)
+        loading_label.setStyleSheet("color: white; font-size: 16px; font-weight: bold; background: transparent;")
+
+        layout.addWidget(logo_label)
+        layout.addWidget(loading_label)
+        
+        # Animation for the logo
+        opacity_effect = QGraphicsOpacityEffect(logo_label)
+        logo_label.setGraphicsEffect(opacity_effect)
+        self.logo_opacity_anim = QPropertyAnimation(opacity_effect, b"opacity")
+        self.logo_opacity_anim.setDuration(1500)
+        self.logo_opacity_anim.setStartValue(0.0)
+        self.logo_opacity_anim.setEndValue(1.0)
+        self.logo_opacity_anim.setEasingCurve(QEasingCurve.InOutQuad)
+        self.logo_opacity_anim.start()
+
+        return loading_widget
+
+    def _create_main_content_widget(self):
+        tabs = AnimatedTabWidget()
+        
         self.main_tab = self._create_main_tab()
         self.config_tab = self._create_config_tab()
         self.account_tab = self._create_account_tab()
 
-        self.tabs.addTab(self.main_tab, "Jouer")
-        self.tabs.addTab(self.config_tab, "Config")
-        self.tabs.addTab(self.account_tab, "Compte")
+        tabs.addTab(self.main_tab, "Jouer")
+        tabs.addTab(self.config_tab, "Config")
+        tabs.addTab(self.account_tab, "Compte")
 
         self.update_login_button_states()
+        return tabs
+
+    def show_main_content(self):
+        # Create opacity effect for the tabs for a smooth fade-in
+        tabs_opacity_effect = QGraphicsOpacityEffect(self.tabs)
+        self.tabs.setGraphicsEffect(tabs_opacity_effect)
+
+        # Animation to fade in tabs widget
+        self.tabs_fade_in = QPropertyAnimation(tabs_opacity_effect, b"opacity")
+        self.tabs_fade_in.setDuration(500)
+        self.tabs_fade_in.setStartValue(0)
+        self.tabs_fade_in.setEndValue(1)
+        
+        self.stacked_widget.setCurrentWidget(self.tabs)
+        self.tabs_fade_in.start()
+
+        # Now start background tasks that might show popups
+        if self.config.get("auto_check_updates", True):
+            self.check_modpack_updates()
 
     def _create_header(self):
         """Create a beautiful header with logo and title."""
