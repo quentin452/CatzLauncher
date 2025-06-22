@@ -276,6 +276,29 @@ QLabel.modpack-name {
     border: none;
 }
 
+/* ===== MODPACK LIST BUTTONS ===== */
+QListWidget QPushButton {
+    background-color: rgba(80, 100, 140, 0.6);
+    border: 1px solid rgba(100, 120, 180, 0.6);
+    color: white;
+    padding: 0px;
+    min-width: 16px;
+    max-width: 16px;
+    min-height: 16px;
+    max-height: 16px;
+    border-radius: 16px; /* half of width/height for a perfect circle */
+}
+
+QListWidget QPushButton:hover {
+    background-color: rgba(90, 110, 150, 0.8);
+    border-color: rgba(110, 130, 190, 0.9);
+}
+
+QListWidget QPushButton:pressed {
+    background-color: rgba(70, 90, 130, 0.9);
+    border-color: rgba(110, 130, 190, 1);
+}
+
 /* ===== WINDOW CONTROLS ===== */
 .window-control-btn {
     background-color: transparent;
