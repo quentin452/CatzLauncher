@@ -7,7 +7,6 @@ from datetime import datetime
 from zipfile import ZipFile
 import zipfile
 from minecraft_launcher_lib.forge import install_forge_version
-from mega import Mega
 import sys
 import subprocess
 import importlib
@@ -132,11 +131,7 @@ def ensure_requirements():
     required = [
         ("requests", "requests"),
         ("minecraft_launcher_lib", "minecraft-launcher-lib"),
-        ("mega", "mega.py"),
         ("keyring", "keyring"),
-        # Suppression des dépendances inutiles
-        # ("bs4", "beautifulsoup4"),
-        # ("cloudscraper", "cloudscraper"),
     ]
     missing = []
     for mod, pkg in required:
@@ -249,18 +244,11 @@ def extract_mb_from_string(mb_string):
 
 def download_file_with_progress(url, destination, callback=None, estimated_mb=200):
     """
-    Télécharge un fichier depuis une URL HTTP/S ou Mega.nz.
+    Télécharge un fichier depuis une URL HTTP/S.
     Version avec User-Agent pour GitHub et taille estimée pour la progression.
     """
     # Convertir estimated_mb en nombre si c'est une chaîne
     estimated_mb = extract_mb_from_string(estimated_mb)
-    
-    if 'mega.nz' in url:
-        print("Lien Mega.nz détecté. Utilisation du client Mega.")
-        mega = Mega()
-        m = mega.login()
-        m.download_url(url, destination, None)
-        return
 
     try:
         print(f"Début du téléchargement depuis: {url}")

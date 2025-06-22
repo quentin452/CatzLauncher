@@ -1,6 +1,5 @@
 requests
 minecraft-launcher-lib
-mega.py
 pillow
 bs4
 cloudscraper
