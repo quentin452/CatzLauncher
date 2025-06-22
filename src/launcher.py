@@ -1152,12 +1152,17 @@ class MinecraftLauncher(QMainWindow):
             QMessageBox.warning(self, "Sélection Requise", "Veuillez sélectionner un modpack.")
             return
 
-        modpack_name = selected_item.text().split(' - ')[0]
-        modpacks = self.load_modpacks()
-        modpack = next((m for m in modpacks if m['name'] == modpack_name), None)
+        # Récupérer le widget personnalisé à partir de l'item sélectionné
+        widget = self.modpack_list.itemWidget(selected_item)
+        if not widget:
+            QMessageBox.critical(self, "Erreur", "Impossible de récupérer les données du modpack.")
+            return
+
+        # Le widget contient déjà toutes les données du modpack
+        modpack = widget.modpack_data
         
         if not modpack:
-            QMessageBox.critical(self, "Erreur", f"Données du modpack '{modpack_name}' non trouvées.")
+            QMessageBox.critical(self, "Erreur", f"Données du modpack non trouvées.")
             return
 
         # Si le modpack est installé, lance le jeu. Sinon, propose l'installation.
