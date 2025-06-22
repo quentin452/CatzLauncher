@@ -948,14 +948,25 @@ class MinecraftLauncher(QMainWindow):
             install_dir = os.path.join(minecraft_directory, "modpacks")
             backup_dir = os.path.join(install_dir, "backups")
 
-            # La fonction d'installation atomique de utils.py gère le reste
-            install_modpack_files(
-                modpack_data["url"],
-                install_dir,
-                modpack_data["name"],
-                modpack_data.get("estimated_mb", 200), 
-                lambda cur, tot: self.signals.progress.emit(int(cur / tot * 100) if tot > 0 else 0)
-            )
+            # Utiliser la nouvelle logique delta pour les modpacks GitHub
+            if 'github.com' in modpack_data["url"] and '/archive/refs/heads/' in modpack_data["url"]:
+                from src.utils import install_or_update_modpack_github
+                install_or_update_modpack_github(
+                    modpack_data["url"],
+                    install_dir,
+                    modpack_data["name"],
+                    modpack_data.get("estimated_mb", 200), 
+                    lambda cur, tot: self.signals.progress.emit(int(cur / tot * 100) if tot > 0 else 0)
+                )
+            else:
+                # Installation classique pour les autres types d'URL
+                install_modpack_files(
+                    modpack_data["url"],
+                    install_dir,
+                    modpack_data["name"],
+                    modpack_data.get("estimated_mb", 200), 
+                    lambda cur, tot: self.signals.progress.emit(int(cur / tot * 100) if tot > 0 else 0)
+                )
 
             self.signals.progress.emit(100)
             self.signals.status.emit("Installation terminée!")
