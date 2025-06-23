@@ -24,14 +24,14 @@ from PyQt5.QtWidgets import QApplication
 from minecraft_launcher_lib.utils import (get_minecraft_directory)
 from minecraft_launcher_lib.command import get_minecraft_command
 from src.utils import (
-    ensure_requirements, install_modpack_files_fresh, check_update,
-    install_forge_if_needed, update_installed_info, refresh_ms_token,
+    install_modpack_files_fresh, check_update,
+    install_forge_if_needed, refresh_ms_token,
     exchange_code_for_token, authenticate_with_xbox, authenticate_with_xsts,
     login_with_minecraft, get_minecraft_profile, is_modpack_installed,
     save_github_token, load_github_token, is_connected_to_internet
 )
 from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
-from src.launcher_updater import LauncherUpdateManager, LauncherUpdater, is_git_repo
+from src.launcher_updater import LauncherUpdateManager, is_git_repo
 
 def load_qss_stylesheet(theme_name="vanilla.qss"):
     """Load the QSS stylesheet from file."""
@@ -273,7 +273,6 @@ class MinecraftLauncher(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        ensure_requirements()
         os.makedirs(self.SAVE_DIR, exist_ok=True)
 
         self.client_id = load_azure_client_id()

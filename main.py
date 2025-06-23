@@ -3,7 +3,6 @@ import os
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
 from src.launcher import MinecraftLauncher
-
 def ensure_version_file_exists():
     """
     Ensures version.txt exists. If not, creates it with a default "0.0.0".

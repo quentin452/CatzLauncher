@@ -124,32 +124,6 @@ def _get_github_auth_headers():
         headers['Authorization'] = f"token {token}"
     return headers
 
-def ensure_requirements():
-    """
-    Vérifie que les paquets requis sont installés.
-    """
-    required = [
-        ("requests", "requests"),
-        ("minecraft_launcher_lib", "minecraft-launcher-lib"),
-        ("keyring", "keyring"),
-    ]
-    missing = []
-    for mod, pkg in required:
-        try:
-            importlib.import_module(mod)
-        except ImportError:
-            missing.append(pkg)
-
-    if missing:
-        print(f"Paquets manquants : {', '.join(missing)}. Tentative d'installation via pip...")
-        try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", *missing])
-            print("Installation réussie. Veuillez redémarrer l'application.")
-        except Exception as e:
-            print(f"Erreur lors de l'installation des paquets : {e}")
-            print("Veuillez les installer manuellement.")
-        sys.exit(1)
-
 def get_preserved_items():
     """
     Retourne la liste des fichiers et dossiers à préserver lors des mises à jour.
