@@ -99,34 +99,54 @@ class LauncherUpdateManager:
             return False, None
 
         except (requests.RequestException, ValueError, KeyError) as e:
-            print(f"Error fetching remote version via API: {e}")
             return False, None
     
     def perform_update(self, update_info, progress_callback=None):
-        """Performs a full update by downloading and extracting the main branch zip."""
+        """
+        Performs a full update by downloading, extracting the main branch zip,
+        and creating a script to perform the file operations after the app closes.
+        Returns (success, message) where message is the script_path on success,
+        or an error string on failure.
+        """
         zip_url = update_info.get('zip_url')
         if not zip_url:
-            raise ValueError("L'URL de téléchargement est manquante.")
+            return False, "L'URL de téléchargement est manquante dans les informations de mise à jour."
 
         temp_dir = tempfile.mkdtemp(prefix="catzlauncher_update_")
         
         try:
+            # 1. Download
             self.signals.status.emit("Téléchargement de la mise à jour...")
             zip_path = self.download_full_update(zip_url, temp_dir, progress_callback)
             
+            # 2. Extract
             self.signals.status.emit("Extraction des fichiers...")
             extract_dir = os.path.join(temp_dir, "extracted")
             with ZipFile(zip_path, 'r') as zip_ref:
                 zip_ref.extractall(extract_dir)
 
-            extracted_content_dir = os.path.join(extract_dir, os.listdir(extract_dir)[0])
-            restart_script = self.create_update_script(extracted_content_dir)
+            # 3. Find content directory
+            extracted_subfolders = os.listdir(extract_dir)
+            if not extracted_subfolders:
+                raise IOError("Le fichier de mise à jour (zip) est vide ou corrompu.")
+            extracted_content_dir = os.path.join(extract_dir, extracted_subfolders[0])
             
+            # 4. Create update script
+            restart_script = self.create_update_script(extracted_content_dir, temp_dir)
+            
+            # 5. Finalize
             self.save_local_update_info({'version': update_info['new_version']})
             return True, restart_script
-            
-        finally:
+
+        except (requests.RequestException, IOError) as e:
+            # Catch specific, expected errors and return a user-friendly message
             shutil.rmtree(temp_dir, ignore_errors=True)
+            return False, f"Échec de l'opération de fichier/réseau: {e}"
+        except Exception as e:
+            # Catch any other unexpected error
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            # Re-raise the exception to be handled by the main UI thread, which will show a traceback
+            raise e
 
     def download_full_update(self, zip_url, temp_dir, progress_callback):
         zip_path = os.path.join(temp_dir, "launcher.zip")
@@ -142,37 +162,62 @@ class LauncherUpdateManager:
                     progress_callback(bytes_downloaded, total_size)
         return zip_path
 
-    def create_update_script(self, new_content_dir):
+    def create_update_script(self, new_content_dir, temp_dir_to_delete):
         launcher_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        script_path = os.path.join(launcher_dir, "update_and_restart.bat" if sys.platform == "win32" else "update_and_restart.sh")
-        python_executable = sys.executable.replace("\\", "/")
-        main_script = os.path.join(launcher_dir, "main.py").replace("\\", "/")
-        new_content_dir_norm = new_content_dir.replace("\\", "/")
-        launcher_dir_norm = launcher_dir.replace("\\", "/")
+        script_path = os.path.join(launcher_dir, "updater.py")
+        python_executable = os.path.normpath(sys.executable)
+        
+        norm_new_content_dir = os.path.normpath(new_content_dir)
+        norm_launcher_dir = os.path.normpath(launcher_dir)
+        norm_temp_dir_to_delete = os.path.normpath(temp_dir_to_delete)
 
-        if sys.platform == "win32":
-            script_content = f'''@echo off
-echo Mise a jour des fichiers...
-timeout /t 2 /nobreak > NUL
-xcopy "{new_content_dir_norm}" "{launcher_dir_norm}" /E /H /C /I /Y > NUL
-echo Nettoyage...
-rd /s /q "{os.path.dirname(new_content_dir_norm)}"
-echo Redemarrage...
-start "" "{python_executable}" "{main_script}"
-del "%~f0"
+        # Create a self-contained Python script to perform the update.
+        # This avoids all issues with batch files, special path characters, and shell interpretation.
+        script_content = f'''# -*- coding: utf-8 -*-
+import sys, os, time, shutil, subprocess, traceback
+
+def main():
+    try:
+        source_dir = r'{norm_new_content_dir}'
+        target_dir = r'{norm_launcher_dir}'
+        temp_root_to_delete = r'{norm_temp_dir_to_delete}'
+        python_exe = r'{python_executable}'
+        launcher_main_script = os.path.join(target_dir, 'main.py')
+
+        # 1. Wait for the main launcher to close completely
+        time.sleep(3)
+
+        # 2. Copy the updated files over the old ones using shutil
+        shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
+
+        # 3. Clean up the temporary update folder
+        shutil.rmtree(temp_root_to_delete, ignore_errors=True)
+        
+        # 4. Restart the main launcher in a detached process
+        DETACHED_PROCESS = 0x00000008
+        subprocess.Popen([python_exe, launcher_main_script], cwd=target_dir, creationflags=DETACHED_PROCESS)
+        
+        # 5. Self-delete this script
+        # This might fail if the OS still has a lock, so we try a few times.
+        for _ in range(5):
+            time.sleep(1)
+            try:
+                os.remove(__file__)
+                break
+            except PermissionError:
+                continue
+
+    except Exception as e:
+        # In case of any error, write it to a log file for debugging.
+        log_path = os.path.join(r'{norm_launcher_dir}', "updater_error.log")
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write(f"An error occurred: {{str(e)}}\\n")
+            f.write(traceback.format_exc())
+
+if __name__ == "__main__":
+    main()
 '''
-        else: # Linux/macOS
-            script_content = f'''#!/bin/bash
-echo "Mise a jour des fichiers..."
-sleep 2
-cp -r "{new_content_dir_norm}/." "{launcher_dir_norm}/"
-echo "Nettoyage..."
-rm -rf "{os.path.dirname(new_content_dir_norm)}"
-echo "Redemarrage..."
-nohup "{python_executable}" "{main_script}" &
-rm "$0"
-'''
-        with open(script_path, "w") as f:
+        with open(script_path, "w", encoding="utf-8") as f:
             f.write(script_content)
         return script_path
         

@@ -9,6 +9,7 @@ import webbrowser
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import traceback
+
 from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QPropertyAnimation, QEasingCurve, QTimer, QParallelAnimationGroup, QPoint
 from PyQt5.QtWidgets import (
@@ -294,7 +295,8 @@ class MinecraftLauncher(QMainWindow):
         
         # Initialize launcher updater
         self.launcher_repo_url = "https://github.com/quentin452/CatzLauncher"
-        self.launcher_updater = LauncherUpdateManager(self.launcher_repo_url)
+        self.launcher_version = self._get_current_launcher_version()
+        self.launcher_updater = LauncherUpdateManager(self.launcher_repo_url, current_version=self.launcher_version)
         self.launcher_update_thread = None
         
         # Animation properties
@@ -327,6 +329,14 @@ class MinecraftLauncher(QMainWindow):
 
         if not self.client_id:
             self.show_client_id_error()
+
+    def _get_current_launcher_version(self):
+        """Reads the version from version.txt."""
+        try:
+            with open('version.txt', 'r', encoding='utf-8') as f:
+                return f.read().strip()
+        except FileNotFoundError:
+            return "0.0.0"
 
     def _setup_ui(self):
         # Create central widget with gradient background
@@ -1274,79 +1284,74 @@ class MinecraftLauncher(QMainWindow):
                 self.check_modpack_updates()
     
     def prompt_launcher_update(self, update_info):
-        """Show update prompt to user using modal dialog."""
-        current_version = update_info['current_version']
-        new_version = update_info['new_version']
-
-        reply = QMessageBox.question(
-            self, "Mise à jour du launcher disponible",
-            f"Une nouvelle version de CatzLauncher est disponible!\n\n"
-            f"<b>Version actuelle :</b> {current_version}\n"
-            f"<b>Nouvelle version :</b> {new_version}\n\n"
-            f"Voulez-vous mettre à jour maintenant ?\n"
-            f"(Le launcher redémarrera après la mise à jour)",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.Yes
-        )
+        """Affiche une boîte de dialogue pour confirmer la mise à jour du launcher."""
+        new_version = update_info.get('new_version', 'inconnue')
+        current_version = self.launcher_version or "inconnue"
         
+        reply = QMessageBox.question(
+            self,
+            'Mise à jour du launcher disponible',
+            f"Une nouvelle version du launcher est disponible : <b>{new_version}</b><br>"
+            f"Votre version actuelle est : <b>{current_version}</b><br><br>"
+            "Voulez-vous mettre à jour maintenant ? L'application redémarrera.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
         if reply == QMessageBox.Yes:
             self.perform_launcher_update(update_info)
-        else:
-            if self.config.get("auto_check_updates", True):
-                self.check_modpack_updates()
-    
+
     def perform_launcher_update(self, update_info):
-        """Perform the launcher update"""
+        """Lance le processus de mise à jour du launcher dans une boîte de dialogue."""
+        progress_dialog = QProgressDialog("Mise à jour du launcher...", "Annuler", 0, 100, self)
+        progress_dialog.setWindowModality(Qt.WindowModal)
+        progress_dialog.setWindowTitle("Mise à jour")
+        progress_dialog.show()
+
+        def progress_callback(current, total):
+            if total > 0:
+                progress_dialog.setValue(int((current / total) * 100))
+            QApplication.processEvents() # Permet à l'UI de rester réactive
+
         try:
-            # Create progress dialog
-            progress_dialog = QProgressDialog("Mise à jour du launcher...", "Annuler", 0, 100, self)
-            progress_dialog.setWindowModality(Qt.WindowModal)
-            progress_dialog.setAutoClose(False)
-            progress_dialog.show()
+            # Importe la fonction de mise à jour et la lance
+            from src.launcher_updater import perform_launcher_update as do_update
+            success, result = do_update(self.launcher_repo_url, update_info, progress_callback)
             
-            def progress_callback(current, total):
-                if total > 0:
-                    percentage = int((current / total) * 100)
-                    progress_dialog.setValue(percentage)
-                    progress_dialog.setLabelText(f"Mise à jour... {percentage}%")
-            
-            # Perform update (incremental is now handled by the updater class)
-            success, restart_script = self.launcher_updater.perform_update(
-                update_info,
-                progress_callback=progress_callback
-            )
-            
-            progress_dialog.close()
-            
-            if success:
-                QMessageBox.information(
-                    self, "Mise à jour terminée",
-                    f"Le launcher a été mis à jour avec succès !\n\n"
-                    f"Nouvelle version: {update_info['new_version']}\n\n"
-                    f"Le launcher va redémarrer pour appliquer les changements."
-                )
+            if success and result:
+                script_path = result
+                progress_dialog.setLabelText("Mise à jour terminée ! Redémarrage en cours...")
+                progress_dialog.setValue(100)
                 
-                # Restart the launcher
-                if restart_script and os.path.exists(restart_script):
-                    subprocess.Popen([sys.executable, restart_script], creationflags=subprocess.CREATE_NO_WINDOW)
-                    QApplication.instance().quit()
-                else:
-                    # Fallback restart
-                    QMessageBox.information(self, "Redémarrage requis", "Veuillez redémarrer le launcher manuellement.")
-                    QApplication.instance().quit()
+                # Attendre un court instant pour que l'utilisateur voie le message
+                QTimer.singleShot(1500, lambda: self._execute_update_script(script_path))
             else:
-                QMessageBox.critical(
-                    self, "Échec de la mise à jour",
-                    "Impossible de mettre à jour le launcher. Veuillez réessayer plus tard."
-                )
-                
+                error_message = result or "Raison inconnue."
+                QMessageBox.critical(self, "Erreur de mise à jour", f"Une erreur est survenue durant la mise à jour: {error_message}")
+                progress_dialog.close()
+
         except Exception as e:
-            print(f"Error performing launcher update: {e}")
-            QMessageBox.critical(
-                self, "Erreur de mise à jour",
-                f"Une erreur est survenue durant la mise à jour: {str(e)}"
-            )
-    
+            traceback.print_exc()
+            QMessageBox.critical(self, "Erreur de mise à jour", f"Une erreur inattendue est survenue: {str(e)}")
+            progress_dialog.close()
+
+    def _execute_update_script(self, script_path):
+        """Exécute le script de mise à jour Python et quitte l'application."""
+        try:
+            # We now launch a Python script, not a batch file.
+            # This is robust across platforms and avoids shell interpretation issues.
+            command = [sys.executable, script_path]
+            
+            # Use DETACHED_PROCESS on Windows to let the script run independently.
+            # On other platforms, the default behavior is sufficient.
+            flags = subprocess.DETACHED_PROCESS if sys.platform == "win32" else 0
+            
+            subprocess.Popen(command, creationflags=flags)
+
+            self.close() # Ferme le launcher pour permettre la mise à jour des fichiers
+        except Exception as e:
+            traceback.print_exc()
+            QMessageBox.critical(self, "Erreur au redémarrage", f"Impossible de lancer le script de mise à jour: {e}")
+
     def manual_check_launcher_updates(self):
-        """Manual check for launcher updates"""
+        """Bouton pour vérifier manuellement les mises à jour du launcher."""
         self.check_launcher_updates()
