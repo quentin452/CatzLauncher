@@ -1,0 +1,162 @@
+/* discord.qss - Style inspiré de Discord 2024 */
+
+QWidget {
+    background-color: #313338;
+    color: #f2f3f5;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 15px;
+}
+
+QMenuBar, QMenu {
+    background-color: #232428;
+    color: #f2f3f5;
+    border: none;
+}
+
+QMenu::item:selected {
+    background-color: #5865f2;
+    color: #fff;
+    border-radius: 8px;
+}
+
+QPushButton {
+    background-color: #5865f2;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 20px;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+QPushButton:hover {
+    background-color: #7289da;
+}
+
+QPushButton:pressed {
+    background-color: #4752c4;
+}
+
+QLineEdit, QTextEdit, QPlainTextEdit {
+    background-color: #383a40;
+    color: #f2f3f5;
+    border: 1.5px solid #232428;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 15px;
+}
+
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
+    border: 1.5px solid #5865f2;
+}
+
+QLabel {
+    color: #f2f3f5;
+    font-size: 15px;
+}
+
+QScrollBar:vertical {
+    background: #232428;
+    width: 8px;
+    margin: 0px 0px 0px 0px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical {
+    background: #383a40;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #5865f2;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QTabWidget::pane {
+    border: 1.5px solid #232428;
+    border-radius: 10px;
+    background: #232428;
+}
+QTabBar::tab {
+    background: #232428;
+    color: #b5bac1;
+    padding: 10px 20px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    margin-right: 2px;
+    font-size: 15px;
+}
+QTabBar::tab:selected {
+    background: #313338;
+    color: #fff;
+}
+QTabBar::tab:hover {
+    background: #383a40;
+}
+
+QComboBox {
+    background-color: #383a40;
+    color: #f2f3f5;
+    border: 1.5px solid #232428;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 15px;
+}
+QComboBox QAbstractItemView {
+    background-color: #232428;
+    color: #f2f3f5;
+    border-radius: 8px;
+    selection-background-color: #5865f2;
+    selection-color: #fff;
+}
+
+QCheckBox, QRadioButton {
+    color: #f2f3f5;
+    spacing: 10px;
+    font-size: 15px;
+}
+
+QCheckBox::indicator, QRadioButton::indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+}
+
+QCheckBox::indicator:checked, QRadioButton::indicator:checked {
+    background: #5865f2;
+    border: 1.5px solid #5865f2;
+}
+
+QCheckBox::indicator:unchecked, QRadioButton::indicator:unchecked {
+    background: #383a40;
+    border: 1.5px solid #232428;
+}
+
+QGroupBox {
+    border: 1.5px solid #232428;
+    border-radius: 12px;
+    margin-top: 12px;
+    background-color: #232428;
+}
+QGroupBox:title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 6px;
+    color: #b5bac1;
+    font-size: 15px;
+}
+
+QStatusBar {
+    background: #232428;
+    color: #b5bac1;
+    border-top: 1.5px solid #232428;
+}
+
+/* Style pour les "cards" Discord */
+.QFrame#card, .QWidget#card {
+    background: #383a40;
+    border-radius: 16px;
+    border: 1.5px solid #232428;
+    padding: 16px;
+} 
