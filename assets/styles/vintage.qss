@@ -1,0 +1,85 @@
+/*
+ * vintage.qss - Thème Hyper Vintage pour CatzLauncher
+ * Couleurs chaudes, textures papier, typographie rétro
+ */
+
+QWidget {
+    background-color: #f5ecd9;
+    color: #5a4632;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 15px;
+}
+
+QPushButton {
+    background-color: #e2c290;
+    color: #5a4632;
+    border: 2px solid #b89b6a;
+    border-radius: 8px;
+    padding: 6px 16px;
+    font-weight: bold;
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
+QPushButton:hover {
+    background-color: #f5ecd9;
+    color: #a67c52;
+    border: 2px solid #a67c52;
+}
+QLineEdit, QTextEdit {
+    background-color: #fff8e7;
+    color: #5a4632;
+    border: 1px solid #b89b6a;
+    border-radius: 6px;
+    padding: 4px;
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
+QLabel {
+    color: #7c5c3b;
+    font-size: 16px;
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
+QMenuBar, QMenu {
+    background-color: #e2c290;
+    color: #5a4632;
+    border: 1px solid #b89b6a;
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
+QMenu::item:selected {
+    background-color: #f5ecd9;
+    color: #a67c52;
+}
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: #e2c290;
+    border: 1px solid #b89b6a;
+    width: 12px;
+    margin: 16px 0 16px 0;
+}
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    background: #b89b6a;
+    min-height: 20px;
+    border-radius: 6px;
+}
+QScrollBar::add-line, QScrollBar::sub-line {
+    background: #f5ecd9;
+    border: 1px solid #b89b6a;
+    height: 16px;
+    subcontrol-origin: margin;
+}
+QTabWidget::pane {
+    border: 2px solid #b89b6a;
+    background: #fff8e7;
+    border-radius: 8px;
+}
+QTabBar::tab {
+    background: #e2c290;
+    color: #5a4632;
+    border: 1px solid #b89b6a;
+    border-radius: 6px;
+    padding: 6px 12px;
+    margin: 2px;
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
+QTabBar::tab:selected {
+    background: #f5ecd9;
+    color: #a67c52;
+    border: 2px solid #a67c52;
+} 

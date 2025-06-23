@@ -1,0 +1,148 @@
+/*
+ * windows7.qss - Thème Windows 7 amélioré pour CatzLauncher
+ * Effet glossy, couleurs vives, bordures marquées, détails typiques de l'OS
+ */
+
+/* ===== CatzLauncher QSS Stylesheet - Windows 7 Ultimate Edition ===== */
+
+QMainWindow {
+    background-color: #eaf6fd;
+    background-image: url('assets/textures/windows7_background.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    border-image: url('assets/textures/windows7_background.png') 0 0 0 0 stretch stretch;
+}
+
+QWidget {
+    background: transparent;
+    color: #222;
+    font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+    font-size: 14px;
+}
+
+QLabel {
+    color: #1a467b;
+    font-size: 15px;
+    font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+    background: transparent;
+}
+
+QPushButton {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #fafdfe, stop:0.4 #b5d6fb, stop:0.7 #7eb4ea, stop:1 #5596e6);
+    color: #222;
+    border: 1px solid #5596e6;
+    border-radius: 8px;
+    padding: 7px 22px;
+    font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    box-shadow: 0px 2px 8px #b5d6fb;
+}
+QPushButton:hover {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #eaf6fd, stop:0.5 #b5d6fb, stop:1 #7eb4ea);
+    border: 2px solid #1a6ed8;
+}
+QPushButton:pressed {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #b5d6fb, stop:1 #eaf6fd);
+    border: 2px inset #5596e6;
+}
+
+QLineEdit, QTextEdit, QComboBox {
+    background: transparent;
+    color: #222;
+    border: 1px solid #7eb4ea;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+    font-size: 14px;
+}
+QLineEdit:focus, QTextEdit:focus, QComboBox:focus {
+    border: 1.5px solid #5596e6;
+    background-color: #eaf6fd;
+}
+
+QMenuBar, QMenu {
+    background-color: #eaf6fd;
+    color: #1a467b;
+    border: 1px solid #b5d6fb;
+    font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+    font-size: 15px;
+}
+QMenu::item:selected {
+    background-color: #b5d6fb;
+    color: #1a467b;
+    border: 1px solid #5596e6;
+}
+
+QTabWidget::pane {
+    border: 2px solid #b5d6fb;
+    background: transparent;
+    border-radius: 8px;
+}
+QTabBar::tab {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #fafdfe, stop:0.5 #b5d6fb, stop:1 #7eb4ea);
+    color: #1a467b;
+    border: 1px solid #7eb4ea;
+    border-radius: 6px 6px 0 0;
+    padding: 7px 18px;
+    margin: 2px;
+    font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+    font-size: 15px;
+}
+QTabBar::tab:selected {
+    background: #b5d6fb;
+    color: #1a467b;
+    border: 2px solid #5596e6;
+}
+
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: #eaf6fd;
+    border: 1px solid #b5d6fb;
+    width: 14px;
+    margin: 16px 0 16px 0;
+    border-radius: 7px;
+}
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b5d6fb, stop:1 #7eb4ea);
+    min-height: 30px;
+    border-radius: 7px;
+}
+QScrollBar::add-line, QScrollBar::sub-line {
+    background: #eaf6fd;
+    border: 1px solid #b5d6fb;
+    height: 18px;
+    subcontrol-origin: margin;
+}
+
+QProgressBar {
+    border: 1px solid #7eb4ea;
+    border-radius: 6px;
+    background: transparent;
+    text-align: center;
+    color: #1a467b;
+    font-weight: bold;
+    font-size: 13px;
+}
+QProgressBar::chunk {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #7eb4ea, stop:1 #b5d6fb);
+    border-radius: 6px;
+}
+
+QCheckBox {
+    color: #1a467b;
+    font-size: 14px;
+    font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+    background: transparent;
+    padding: 6px;
+}
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #7eb4ea;
+    background: #fff;
+    border-radius: 4px;
+}
+QCheckBox::indicator:checked {
+    background: #7eb4ea;
+    border: 1.5px solid #5596e6;
+} 
