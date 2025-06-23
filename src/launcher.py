@@ -693,7 +693,7 @@ class MinecraftLauncher(QMainWindow):
 
     def _apply_styles(self):
         """Apply beautiful modern styling to the entire application."""
-        theme = self.config.get("theme", "vanilla.qss")
+        theme = self.config.get("theme", "black.qss")
         self.setStyleSheet(load_qss_stylesheet(theme))
 
     def load_config(self):
@@ -1241,7 +1241,7 @@ class MinecraftLauncher(QMainWindow):
         """Populates the theme selector combobox."""
         self.theme_selector.clear()
         themes = get_available_themes()
-        current_theme = self.config.get("theme", "vanilla.qss")
+        current_theme = self.config.get("theme", "black.qss")
         
         for theme in themes:
             self.theme_selector.addItem(theme)
