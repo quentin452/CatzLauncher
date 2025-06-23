@@ -51,20 +51,33 @@ class LauncherUpdateManager:
             return "0.0.0"
 
     def check_launcher_update(self):
-        """Compares local version.txt with the remote one."""
+        """Compares local version.txt with the remote one, handling potential errors."""
         if not is_connected_to_internet():
             return False, None
             
         try:
+            # 1. Fetch remote version
             response = requests.get(self.version_url, timeout=10)
             response.raise_for_status()
             remote_version_str = response.text.strip()
 
-            local_version = semver.parse(self.current_version)
-            remote_version = semver.parse(remote_version_str)
+            # 2. Safely parse remote version
+            try:
+                remote_version = semver.parse(remote_version_str)
+            except semver.InvalidVersion:
+                print(f"WARNING: Remote version from GitHub is invalid: '{remote_version_str}'. Aborting update check.")
+                return False, None
+
+            # 3. Safely parse local version
+            try:
+                local_version = semver.parse(self.current_version)
+            except semver.InvalidVersion:
+                print(f"WARNING: Local version is invalid: '{self.current_version}'. Defaulting to 0.0.0 for comparison.")
+                local_version = semver.parse("0.0.0")
             
             print(f"DEBUG: Local version: {local_version}, Remote version: {remote_version}")
 
+            # 4. Compare
             if remote_version > local_version:
                 print("DEBUG: Update available.")
                 return True, {
@@ -72,10 +85,12 @@ class LauncherUpdateManager:
                     'new_version': str(remote_version),
                     'zip_url': self.zip_url
                 }
+            
             print("DEBUG: No update needed.")
             return False, None
-        except (requests.RequestException, semver.InvalidVersion) as e:
-            print(f"Error checking for manual version update: {e}")
+
+        except requests.RequestException as e:
+            print(f"Error fetching remote version: {e}")
             return False, None
     
     def perform_update(self, update_info, progress_callback=None):
