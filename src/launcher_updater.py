@@ -66,23 +66,88 @@ class LauncherUpdater(QThread):
         except Exception as e:
             self.signals.error.emit(f"Update check failed: {str(e)}")
     
-    def perform_update(self):
-        """Perform the actual update"""
+    def perform_update(self, update_info, use_incremental=True, progress_callback=None):
+        """Perform the launcher update, trying incremental first."""
+        new_sha = update_info['commit_sha']
+        local_sha = self.current_version
+        
+        # --- Incremental Update Attempt ---
+        if use_incremental and len(local_sha) >= 7:
+            try:
+                self.signals.status.emit("Calcul des changements...")
+                changes = self.get_update_changes(local_sha, new_sha)
+                
+                if changes and (changes['added'] or changes['modified'] or changes['removed']):
+                    self.signals.status.emit("Mise à jour incrémentielle...")
+                    self.apply_incremental_update(changes, new_sha, progress_callback)
+                    
+                    self.save_local_update_info({'sha': new_sha})
+                    
+                    # For incremental updates, we just need to restart the app.
+                    # The files are already in place.
+                    restart_script = self.create_simple_restart_script()
+                    return True, restart_script
+                else:
+                    # No changes detected, or already up to date
+                    self.save_local_update_info({'sha': new_sha})
+                    return True, None # No restart needed
+                    
+            except Exception as e:
+                print(f"Incremental update failed, falling back to full update: {e}")
+        
+        # --- Fallback to Full Update ---
+        self.signals.status.emit("Téléchargement de la mise à jour complète...")
+        zip_path = self.download_full_update(progress_callback)
+        temp_dir = os.path.dirname(zip_path)
+        
         try:
-            if not self.update_info:
-                self.signals.error.emit("No update information available")
-                return
-                
-            self.signals.status.emit("Starting launcher update...")
-            success = self._download_and_apply_update()
+            self.signals.status.emit("Extraction des fichiers...")
+            extract_dir = os.path.join(temp_dir, "extracted")
+            with ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(extract_dir)
+
+            extracted_content_dir = extract_dir
+            if len(os.listdir(extract_dir)) == 1:
+                possible_root = os.path.join(extract_dir, os.listdir(extract_dir)[0])
+                if os.path.isdir(possible_root):
+                    extracted_content_dir = possible_root
             
-            if success:
-                self.signals.update_complete.emit(True, "Update completed successfully")
-            else:
-                self.signals.update_complete.emit(False, "Update failed")
-                
-        except Exception as e:
-            self.signals.error.emit(f"Update failed: {str(e)}")
+            # For a full update, we need a script that copies the new files over.
+            restart_script = self.create_update_script(extracted_content_dir)
+            
+            self.save_local_update_info({'sha': new_sha})
+            return True, restart_script
+            
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            
+    def create_simple_restart_script(self):
+        """Creates a script that simply restarts the application."""
+        launcher_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        script_path = os.path.join(launcher_dir, "restart.bat" if sys.platform == "win32" else "restart.sh")
+        
+        python_executable = sys.executable
+        main_script = os.path.join(launcher_dir, "main.py")
+
+        if sys.platform == "win32":
+            script_content = f'''
+@echo off
+echo Redemarrage du launcher...
+timeout /t 1 /nobreak > NUL
+start "" "{python_executable}" "{main_script}"
+exit
+'''
+        else:
+            script_content = f'''#!/bin/bash
+echo "Redemarrage du launcher..."
+sleep 1
+nohup "{python_executable}" "{main_script}" &
+exit
+'''
+        
+        with open(script_path, "w") as f:
+            f.write(script_content)
+        return script_path
 
 class LauncherUpdateManager:
     """Manages launcher updates with incremental download support"""
@@ -348,59 +413,6 @@ del "%~f0"
         except Exception as e:
             print(f"Error creating restart script: {e}")
             return None
-    
-    def perform_update(self, update_info, use_incremental=True, progress_callback=None):
-        """Perform the launcher update, trying incremental first."""
-        new_sha = update_info['commit_sha']
-        local_sha = self.current_version
-        
-        if use_incremental and len(local_sha) >= 7: # Check if local_sha is a plausible commit hash
-            try:
-                self.signals.status.emit("Calcul des changements...")
-                changes = self.get_update_changes(local_sha, new_sha)
-                if changes:
-                    self.signals.status.emit("Mise à jour incrémentielle...")
-                    self.apply_incremental_update(changes, new_sha, progress_callback)
-                    
-                    self.save_local_update_info({'sha': new_sha})
-                    restart_script = self.create_update_script(os.path.dirname(os.path.abspath(sys.argv[0])))
-                    return True, restart_script
-            except Exception as e:
-                print(f"Incremental update failed, falling back to full update: {e}")
-        
-        # Fallback to full update
-        self.signals.status.emit("Téléchargement de la mise à jour complète...")
-        zip_path = self.download_full_update(progress_callback)
-        temp_dir = os.path.dirname(zip_path)
-        
-        try:
-            self.signals.status.emit("Extraction des fichiers...")
-            
-            extract_dir = os.path.join(temp_dir, "extracted")
-            with ZipFile(zip_path, 'r') as zip_ref:
-                zip_ref.extractall(extract_dir)
-            
-            # The contents are often inside a single root folder in the zip
-            extracted_content_dir = extract_dir
-            if len(os.listdir(extract_dir)) == 1:
-                possible_root = os.path.join(extract_dir, os.listdir(extract_dir)[0])
-                if os.path.isdir(possible_root):
-                    extracted_content_dir = possible_root
-
-            self.signals.status.emit("Création du script de mise à jour...")
-            
-            restart_script = self.create_update_script(extracted_content_dir)
-            
-            self.signals.status.emit("Mise à jour terminée. Redémarrage en cours...")
-            
-            return True, restart_script
-            
-        finally:
-            # Clean up the temp directory
-            shutil.rmtree(temp_dir, ignore_errors=True)
-            self.save_local_update_info({'sha': new_sha})
-        
-        return True, restart_script # return success and script path
 
 def check_launcher_updates(launcher_repo_url, current_version=None):
     """Convenience function to check for launcher updates"""
