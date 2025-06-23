@@ -318,7 +318,7 @@ class MinecraftLauncher(QMainWindow):
         self.try_refresh_login()
         
         # Check for launcher updates
-        if is_git_repo() and self.config.get("auto_check_launcher_updates", True):
+        if not is_git_repo() and self.config.get("auto_check_launcher_updates", True):
             self.check_launcher_updates()
             
         # Start fade-in animation for the whole window
