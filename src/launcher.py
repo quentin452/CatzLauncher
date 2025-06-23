@@ -1277,14 +1277,12 @@ class MinecraftLauncher(QMainWindow):
         """Show update prompt to user using modal dialog."""
         current_version = update_info['current_version']
         new_version = update_info['new_version']
-        commit_message = update_info['commit_message']
 
         reply = QMessageBox.question(
             self, "Mise à jour du launcher disponible",
-            f"Une mise à jour pour CatzLauncher est disponible!\n\n"
-            f"<b>Version actuelle:</b> {current_version}\n"
-            f"<b>Nouvelle version:</b> {new_version}\n\n"
-            f"<b>Dernier changement:</b>\n{commit_message}\n\n"
+            f"Une nouvelle version de CatzLauncher est disponible!\n\n"
+            f"<b>Version actuelle :</b> {current_version}\n"
+            f"<b>Nouvelle version :</b> {new_version}\n\n"
             f"Voulez-vous mettre à jour maintenant ?\n"
             f"(Le launcher redémarrera après la mise à jour)",
             QMessageBox.Yes | QMessageBox.No,
