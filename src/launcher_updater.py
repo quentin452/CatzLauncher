@@ -170,7 +170,7 @@ echo "Redemarrage..."
 nohup "{python_executable}" "{main_script}" &
 rm "$0"
 '''
-        with open(script_path, "w", newline='\\n') as f:
+        with open(script_path, "w") as f:
             f.write(script_content)
         return script_path
         
