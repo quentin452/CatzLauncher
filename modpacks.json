@@ -7,14 +7,5 @@
         "estimated_mb": "849MB",
         "url": "https://github.com/quentin452/CatzLauncher/archive/refs/heads/forge-1.16.5-biggess-pack-cat-edition-v2.zip",
         "last_modified": "2025-06-21T16:50:12.780956"
-    },
-    {
-        "name": "Test",
-        "version": "1.16.5",
-        "forge_version": "36.2.42",
-        "java_version": "8",
-        "estimated_mb": "150MB",
-        "url": "https://github.com/quentin452/CatzLauncher/archive/refs/heads/test.zip",
-        "last_modified": "2025-06-21T16:50:12.780956"
     }
 ]
