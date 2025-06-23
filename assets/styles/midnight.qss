@@ -1,0 +1,109 @@
+QWidget {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 #141E30, stop:1 #243B55);
+    color: #F0F0F5;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 12pt;
+}
+
+QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #232A3E, stop:1 #3A4660);
+    color: #F8F8FF;
+    border: 1.5px solid #B0B8C1;
+    border-radius: 10px;
+    padding: 8px 18px;
+    box-shadow: 0px 2px 8px rgba(60, 60, 80, 0.25);
+}
+QPushButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #2C3654, stop:1 #4B5A7A);
+    border: 1.5px solid #E0E6F0;
+}
+QPushButton:pressed {
+    background: #141E30;
+    border: 1.5px solid #B0B8C1;
+}
+
+QLineEdit, QTextEdit {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #1A2233, stop:1 #232A3E);
+    color: #F0F0F5;
+    border: 1.5px solid #B0B8C1;
+    border-radius: 8px;
+    padding: 6px;
+    box-shadow: 0px 1px 4px rgba(60, 60, 80, 0.15);
+}
+
+QMenuBar, QMenu {
+    background: #232A3E;
+    color: #F0F0F5;
+    border-bottom: 1px solid #B0B8C1;
+}
+QMenu::item:selected {
+    background: #2C3654;
+}
+
+QStatusBar {
+    background: #141E30;
+    color: #B0B8C1;
+    border-top: 1px solid #B0B8C1;
+}
+
+/* Effet de relief lunaire sur les widgets principaux */
+QWidget#mainWindow, QWidget#centralWidget {
+    border: 2px solid #E0E6F0;
+    border-radius: 18px;
+    background: qradialgradient(cx:0.7, cy:0.2, radius: 1.2,
+        fx:0.8, fy:0.1, stop:0 #F0F0F5, stop:0.2 #243B55, stop:1 #141E30);
+    box-shadow: 0px 4px 24px rgba(60, 60, 80, 0.30);
+}
+
+/* ===== TAB WIDGET MIDNIGHT ===== */
+QTabWidget::pane {
+    border: 2.5px solid #B0B8C1;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 #181F33, stop:0.5 #243B55, stop:1 #3A4660);
+    border-radius: 18px;
+    margin: 12px 8px 0px 8px;
+    box-shadow: 0 6px 32px 0 rgba(40, 60, 100, 0.18);
+}
+
+QTabBar::tab {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #232A3E, stop:0.5 #2C3654, stop:1 #3A4660);
+    color: #E0E6F0;
+    border: 2px solid #B0B8C1;
+    border-bottom: none;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    padding: 10px 32px 10px 32px;
+    margin-right: 8px;
+    font-size: 15px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-width: 120px;
+    box-shadow: 0px 4px 16px rgba(60, 60, 80, 0.13);
+    transition: all 0.25s cubic-bezier(.4,2,.6,1);
+    letter-spacing: 0.5px;
+}
+QTabBar::tab:selected {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #F0F0F5, stop:0.15 #B0B8C1, stop:0.4 #8A99B8, stop:1 #243B55);
+    color: #232A3E;
+    border: 2.5px solid #E0E6F0;
+    border-bottom: none;
+    box-shadow: 0 0 32px 4px #E0E6F0, 0 2px 12px 0 #243B55;
+    font-weight: bold;
+    z-index: 2;
+    text-shadow: 0 2px 8px #B0B8C1;
+}
+QTabBar::tab:hover:!selected {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #2C3654, stop:0.5 #3A4660, stop:1 #4B5A7A);
+    color: #F0F0F5;
+    border: 2px solid #E0E6F0;
+    box-shadow: 0 0 12px 2px #B0B8C1;
+}
+QTabBar::tab:!selected {
+    opacity: 0.92;
+} 
