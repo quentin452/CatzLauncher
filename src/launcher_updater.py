@@ -177,40 +177,51 @@ class LauncherUpdateManager:
 import sys, os, time, shutil, subprocess, traceback
 
 def main():
-    try:
-        source_dir = r'{norm_new_content_dir}'
-        target_dir = r'{norm_launcher_dir}'
-        temp_root_to_delete = r'{norm_temp_dir_to_delete}'
-        python_exe = r'{python_executable}'
-        launcher_main_script = os.path.join(target_dir, 'main.py')
-
-        # 1. Wait for the main launcher to close completely
-        time.sleep(3)
-
-        # 2. Copy the updated files over the old ones using shutil
-        shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
-
-        # 3. Clean up the temporary update folder
-        shutil.rmtree(temp_root_to_delete, ignore_errors=True)
+    # Create a log file immediately to trace execution.
+    log_path = os.path.join(r'{norm_launcher_dir}', "updater.log")
+    with open(log_path, "w", encoding="utf-8") as f:
+        f.write("Updater script started at " + time.ctime() + "\\n")
         
-        # 4. Restart the main launcher in a detached process
-        DETACHED_PROCESS = 0x00000008
-        subprocess.Popen([python_exe, launcher_main_script], cwd=target_dir, creationflags=DETACHED_PROCESS)
-        
-        # 5. Self-delete this script
-        # This might fail if the OS still has a lock, so we try a few times.
-        for _ in range(5):
+        try:
+            source_dir = r'{norm_new_content_dir}'
+            f.write(f"Source: {{source_dir}}\\n")
+            target_dir = r'{norm_launcher_dir}'
+            f.write(f"Target: {{target_dir}}\\n")
+            temp_root_to_delete = r'{norm_temp_dir_to_delete}'
+            python_exe = r'{python_executable}'
+            f.write(f"Python exe: {{python_exe}}\\n")
+            launcher_main_script = os.path.join(target_dir, 'main.py')
+            f.write(f"Launcher main script: {{launcher_main_script}}\\n")
+
+            # 1. Wait
+            f.write("Waiting for launcher to close...\\n")
+            time.sleep(3)
+
+            # 2. Copy
+            f.write("Copying files...\\n")
+            shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
+            f.write("Copy complete.\\n")
+
+            # 3. Clean
+            f.write("Cleaning up temp folder...\\n")
+            shutil.rmtree(temp_root_to_delete, ignore_errors=True)
+            f.write("Cleanup complete.\\n")
+            
+            # 4. Restart
+            f.write("Restarting launcher...\\n")
+            DETACHED_PROCESS = 0x00000008 if sys.platform == 'win32' else 0
+            subprocess.Popen([python_exe, launcher_main_script], cwd=target_dir, creationflags=DETACHED_PROCESS)
+            f.write("Restart command sent.\\n")
+            
+            # 5. Self-delete
+            f.write("Attempting to self-delete...\\n")
+            f.close() # Close the log file before trying to delete the script
             time.sleep(1)
-            try:
-                os.remove(__file__)
-                break
-            except PermissionError:
-                continue
+            os.remove(__file__)
 
-    except Exception as e:
-        # In case of any error, write it to a log file for debugging.
-        log_path = os.path.join(r'{norm_launcher_dir}', "updater_error.log")
-        with open(log_path, "w", encoding="utf-8") as f:
+        except Exception as e:
+            # In case of any error, write it to a log file for debugging.
+            f.write(f"\\n--- ERROR --- \\n")
             f.write(f"An error occurred: {{str(e)}}\\n")
             f.write(traceback.format_exc())
 
