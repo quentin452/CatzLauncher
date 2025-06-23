@@ -517,7 +517,7 @@ class MinecraftLauncher(QMainWindow):
         btn_layout = QHBoxLayout()
         btn_layout.setSpacing(15)
         
-        self.play_btn = AnimatedButton("🚀 Jouerz")
+        self.play_btn = AnimatedButton("🚀 Jouer")
         self.play_btn.setFixedHeight(50)
         self.play_btn.setMinimumWidth(150)
         btn_layout.addWidget(self.play_btn)
