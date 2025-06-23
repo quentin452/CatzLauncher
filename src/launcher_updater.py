@@ -11,6 +11,8 @@ from zipfile import ZipFile
 from PyQt5.QtCore import QObject, pyqtSignal, QThread
 from PyQt5.QtWidgets import QMessageBox, QProgressDialog
 from packaging import version as semver
+import time
+import base64
 
 # Import existing utilities
 try:
@@ -30,11 +32,11 @@ class LauncherUpdaterSignals(QObject):
     error = pyqtSignal(str)
 
 class LauncherUpdateManager:
-    """Manages launcher updates based on a remote version.txt file."""
+    """Manages launcher updates based on a remote version.txt file via the GitHub API."""
     
     def __init__(self, launcher_repo_url, current_version=None):
         self.launcher_repo_url = launcher_repo_url
-        self.version_url = "https://raw.githubusercontent.com/quentin452/CatzLauncher/main/version.txt"
+        self.api_version_url = "https://api.github.com/repos/quentin452/CatzLauncher/contents/version.txt"
         self.zip_url = f"{launcher_repo_url}/archive/refs/heads/main.zip"
         self.current_version = current_version or self._get_current_version()
         self.signals = LauncherUpdaterSignals()
@@ -51,46 +53,51 @@ class LauncherUpdateManager:
             return "0.0.0"
 
     def check_launcher_update(self):
-        """Compares local version.txt with the remote one, handling potential errors."""
+        """Compares local version.txt with the remote one via GitHub API to bypass cache."""
         if not is_connected_to_internet():
             return False, None
             
         try:
-            # 1. Fetch remote version
-            response = requests.get(self.version_url, timeout=10)
+            # 1. Fetch remote version content from API
+            headers = { 'Accept': 'application/vnd.github.v3+json' }
+            response = requests.get(self.api_version_url, timeout=10, headers=headers)
             response.raise_for_status()
-            remote_version_str = response.text.strip()
+            
+            # Decode the content from Base64
+            api_response = response.json()
+            if 'content' not in api_response:
+                raise ValueError("API response did not contain file content.")
+                
+            content_b64 = api_response['content']
+            decoded_content = base64.b64decode(content_b64).decode('utf-8')
+            remote_version_str = decoded_content.strip()
 
             # 2. Safely parse remote version
             try:
                 remote_version = semver.parse(remote_version_str)
             except semver.InvalidVersion:
-                print(f"WARNING: Remote version from GitHub is invalid: '{remote_version_str}'. Aborting update check.")
+                print(f"WARNING: Remote version from GitHub API is invalid: '{remote_version_str}'. Aborting.")
                 return False, None
 
             # 3. Safely parse local version
             try:
                 local_version = semver.parse(self.current_version)
             except semver.InvalidVersion:
-                print(f"WARNING: Local version is invalid: '{self.current_version}'. Defaulting to 0.0.0 for comparison.")
+                print(f"WARNING: Local version is invalid: '{self.current_version}'. Defaulting to 0.0.0.")
                 local_version = semver.parse("0.0.0")
             
-            print(f"DEBUG: Local version: {local_version}, Remote version: {remote_version}")
-
             # 4. Compare
             if remote_version > local_version:
-                print("DEBUG: Update available.")
                 return True, {
                     'current_version': str(local_version),
                     'new_version': str(remote_version),
                     'zip_url': self.zip_url
                 }
             
-            print("DEBUG: No update needed.")
             return False, None
 
-        except requests.RequestException as e:
-            print(f"Error fetching remote version: {e}")
+        except (requests.RequestException, ValueError, KeyError) as e:
+            print(f"Error fetching remote version via API: {e}")
             return False, None
     
     def perform_update(self, update_info, progress_callback=None):
