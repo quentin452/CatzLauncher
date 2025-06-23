@@ -5,7 +5,6 @@ import functools
 import requests
 import subprocess
 import webbrowser
-from .launcher_updater import(is_git_repo)
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import traceback
@@ -30,7 +29,7 @@ from src.utils import (
     save_github_token, load_github_token, is_connected_to_internet
 )
 from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
-from src.launcher_updater import LauncherUpdateManager, LauncherUpdater
+from src.launcher_updater import LauncherUpdateManager, LauncherUpdater, is_git_repo
 
 def load_qss_stylesheet(theme_name="vanilla.qss"):
     """Load the QSS stylesheet from file."""
@@ -71,6 +70,7 @@ class WorkerSignals(QObject):
     modpack_list_refreshed = pyqtSignal(list)
     error_dialog = pyqtSignal(str, str)
     single_update_found = pyqtSignal(dict)  # Nouveau signal pour les updates individuels
+    launcher_update_found = pyqtSignal(dict)
 
 def run_in_thread(fn):
     @functools.wraps(fn)
@@ -414,8 +414,8 @@ class MinecraftLauncher(QMainWindow):
         self.stacked_widget.setCurrentWidget(self.tabs)
         self.tabs_fade_in.start()
 
-        # Now start background tasks that might show popups
-        if self.config.get("auto_check_updates", True):
+        # Vérification des mises à jour unifiée - seulement si la vérification du launcher n'est pas activée
+        if not self.config.get("auto_check_launcher_updates", True) and self.config.get("auto_check_updates", True):
             self.check_modpack_updates()
 
     def _create_header(self):
@@ -690,6 +690,7 @@ class MinecraftLauncher(QMainWindow):
         self.signals.modpack_list_refreshed.connect(self.update_modpack_list_ui)
         self.signals.error_dialog.connect(self.show_error_dialog)
         self.signals.single_update_found.connect(self.handle_single_update_found)
+        self.signals.launcher_update_found.connect(self.prompt_launcher_update)
 
     def _apply_styles(self):
         """Apply beautiful modern styling to the entire application."""
@@ -1259,27 +1260,32 @@ class MinecraftLauncher(QMainWindow):
             
             if update_available:
                 self.signals.status.emit("Launcher update available!")
-                self.prompt_launcher_update(update_info)
+                self.signals.launcher_update_found.emit(update_info)
             else:
                 self.signals.status.emit("Launcher is up to date")
+                if self.config.get("auto_check_updates", True):
+                    self.check_modpack_updates()
                 
         except Exception as e:
             print(f"Error checking launcher updates: {e}")
             self.signals.status.emit("Update check failed")
+            if self.config.get("auto_check_updates", True):
+                self.check_modpack_updates()
     
     def prompt_launcher_update(self, update_info):
-        """Show update prompt to user"""
+        """Show update prompt to user using modal dialog like modpacks"""
         current_version = update_info['current_version']
         new_version = update_info['new_version']
         commit_message = update_info['commit_message']
         
         reply = QMessageBox.question(
-            self, "Launcher Update Available",
-            f"A new version of CatzLauncher is available!\n\n"
-            f"Current version: {current_version}\n"
-            f"New version: {new_version}\n\n"
-            f"Commit message: {commit_message}\n\n"
-            f"Would you like to update now?",
+            self, "Mise à jour du launcher disponible",
+            f"Une mise à jour du launcher CatzLauncher est disponible!\n\n"
+            f"Version actuelle: {current_version}\n"
+            f"Nouvelle version: {new_version}\n\n"
+            f"Message du commit: {commit_message}\n\n"
+            f"Voulez-vous mettre à jour maintenant ?\n"
+            f"(Le launcher redémarrera après la mise à jour)",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.Yes
         )
