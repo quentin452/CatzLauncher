@@ -5,6 +5,7 @@ import functools
 import requests
 import subprocess
 import webbrowser
+from .launcher_updater import(is_git_repo)
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import traceback
@@ -14,7 +15,7 @@ from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QProgressBar, QListWidget, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
     QInputDialog, QTabWidget, QFrame, QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
-    QListWidgetItem, QStackedWidget, QSizePolicy, QComboBox, QFormLayout, QScrollArea, QSlider
+    QListWidgetItem, QStackedWidget, QSizePolicy, QComboBox, QFormLayout, QScrollArea, QSlider, QProgressDialog
 )
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient
 from PyQt5.QtWidgets import QApplication
@@ -29,6 +30,7 @@ from src.utils import (
     save_github_token, load_github_token, is_connected_to_internet
 )
 from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
+from src.launcher_updater import LauncherUpdateManager, LauncherUpdater
 
 def load_qss_stylesheet(theme_name="vanilla.qss"):
     """Load the QSS stylesheet from file."""
@@ -289,6 +291,11 @@ class MinecraftLauncher(QMainWindow):
         self.config = self.load_config()
         self.auth_data = None
         
+        # Initialize launcher updater
+        self.launcher_repo_url = "https://github.com/quentin452/CatzLauncher"
+        self.launcher_updater = LauncherUpdateManager(self.launcher_repo_url)
+        self.launcher_update_thread = None
+        
         # Animation properties
         self.fade_animation = QPropertyAnimation(self, b"windowOpacity")
         self.fade_animation.setDuration(500)
@@ -309,6 +316,10 @@ class MinecraftLauncher(QMainWindow):
         # Start background tasks while loading screen is visible
         self.refresh_modpack_list()
         self.try_refresh_login()
+        
+        # Check for launcher updates
+        if is_git_repo() and self.config.get("auto_check_launcher_updates", True):
+            self.check_launcher_updates()
             
         # Start fade-in animation for the whole window
         self.fade_animation.start()
@@ -606,6 +617,16 @@ class MinecraftLauncher(QMainWindow):
         self.auto_check_cb.setChecked(self.config.get("auto_check_updates", True))
         layout.addWidget(self.auto_check_cb)
 
+        # Launcher auto-update checkbox
+        self.auto_check_launcher_cb = QCheckBox("🚀 Vérifier automatiquement les mises à jour du launcher")
+        self.auto_check_launcher_cb.setChecked(self.config.get("auto_check_launcher_updates", True))
+        layout.addWidget(self.auto_check_launcher_cb)
+
+        # Launcher update button
+        self.check_launcher_updates_btn = AnimatedButton("🚀 Vérifier les mises à jour du launcher")
+        self.check_launcher_updates_btn.setFixedHeight(40)
+        layout.addWidget(self.check_launcher_updates_btn)
+
         layout.addStretch()
         
         # Save button (outside the scroll area)
@@ -647,6 +668,7 @@ class MinecraftLauncher(QMainWindow):
         # Button clicks
         self.play_btn.clicked.connect(self.launch_game)
         self.check_updates_btn.clicked.connect(self.manual_check_updates)
+        self.check_launcher_updates_btn.clicked.connect(self.manual_check_launcher_updates)
         self.browse_java_btn.clicked.connect(self.browse_java)
         self.save_settings_btn.clicked.connect(self.save_settings)
         self.login_btn.clicked.connect(self.microsoft_login)
@@ -694,6 +716,7 @@ class MinecraftLauncher(QMainWindow):
         self.config["java_path"] = self.java_path_edit.text()
         self.config["java_args"] = self.java_args_edit.text()
         self.config["auto_check_updates"] = self.auto_check_cb.isChecked()
+        self.config["auto_check_launcher_updates"] = self.auto_check_launcher_cb.isChecked()
         self.config["theme"] = self.theme_selector.currentText()
         self.config["max_memory"] = self.max_memory_slider.value()
         
@@ -1224,3 +1247,99 @@ class MinecraftLauncher(QMainWindow):
             self.theme_selector.addItem(theme)
             if theme == current_theme:
                 self.theme_selector.setCurrentText(theme)
+
+    # --- Launcher Update Methods ---
+    
+    @run_in_thread
+    def check_launcher_updates(self):
+        """Check for launcher updates in background thread"""
+        try:
+            self.signals.status.emit("Checking for launcher updates...")
+            update_available, update_info = self.launcher_updater.check_launcher_update()
+            
+            if update_available:
+                self.signals.status.emit("Launcher update available!")
+                self.prompt_launcher_update(update_info)
+            else:
+                self.signals.status.emit("Launcher is up to date")
+                
+        except Exception as e:
+            print(f"Error checking launcher updates: {e}")
+            self.signals.status.emit("Update check failed")
+    
+    def prompt_launcher_update(self, update_info):
+        """Show update prompt to user"""
+        current_version = update_info['current_version']
+        new_version = update_info['new_version']
+        commit_message = update_info['commit_message']
+        
+        reply = QMessageBox.question(
+            self, "Launcher Update Available",
+            f"A new version of CatzLauncher is available!\n\n"
+            f"Current version: {current_version}\n"
+            f"New version: {new_version}\n\n"
+            f"Commit message: {commit_message}\n\n"
+            f"Would you like to update now?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes
+        )
+        
+        if reply == QMessageBox.Yes:
+            self.perform_launcher_update(update_info)
+    
+    def perform_launcher_update(self, update_info):
+        """Perform the launcher update"""
+        try:
+            # Create progress dialog
+            progress_dialog = QProgressDialog("Updating launcher...", "Cancel", 0, 100, self)
+            progress_dialog.setWindowModality(Qt.WindowModal)
+            progress_dialog.setAutoClose(False)
+            progress_dialog.show()
+            
+            def progress_callback(current, total):
+                if total > 0:
+                    percentage = int((current / total) * 100)
+                    progress_dialog.setValue(percentage)
+                    progress_dialog.setLabelText(f"Updating launcher... {percentage}%")
+            
+            # Perform update
+            success, restart_script = self.launcher_updater.perform_update(
+                update_info, 
+                use_incremental=True, 
+                progress_callback=progress_callback
+            )
+            
+            progress_dialog.close()
+            
+            if success:
+                QMessageBox.information(
+                    self, "Update Complete",
+                    f"Launcher has been updated successfully!\n\n"
+                    f"New version: {update_info['new_version']}\n\n"
+                    f"The launcher will restart to apply the changes."
+                )
+                
+                # Restart the launcher
+                if restart_script and os.path.exists(restart_script):
+                    subprocess.Popen([restart_script])
+                    self.close()
+                else:
+                    # Fallback restart
+                    subprocess.Popen([sys.executable, "main.py"])
+                    self.close()
+            else:
+                QMessageBox.critical(
+                    self, "Update Failed",
+                    "Failed to update the launcher. Please try again later."
+                )
+                
+        except Exception as e:
+            print(f"Error performing launcher update: {e}")
+            QMessageBox.critical(
+                self, "Update Error",
+                f"An error occurred during the update: {str(e)}"
+            )
+    
+    def manual_check_launcher_updates(self):
+        """Manual check for launcher updates"""
+        self.check_launcher_updates()
