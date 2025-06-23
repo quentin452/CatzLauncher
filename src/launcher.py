@@ -3,6 +3,7 @@ import json
 import threading
 import functools
 import requests
+import sys
 import subprocess
 import webbrowser
 from urllib.parse import urlparse, parse_qs
@@ -1276,14 +1277,19 @@ class MinecraftLauncher(QMainWindow):
         """Show update prompt to user using modal dialog like modpacks"""
         current_version = update_info['current_version']
         new_version = update_info['new_version']
-        commit_message = update_info['commit_message']
-        
+        release_name = update_info['release_name']
+        release_body = update_info['release_body']
+
+        # Format release body for display
+        release_notes = release_body if release_body else "Pas de notes de version."
+
         reply = QMessageBox.question(
             self, "Mise à jour du launcher disponible",
             f"Une mise à jour du launcher CatzLauncher est disponible!\n\n"
+            f"<b>{release_name}</b>\n\n"
             f"Version actuelle: {current_version}\n"
             f"Nouvelle version: {new_version}\n\n"
-            f"Message du commit: {commit_message}\n\n"
+            f"<b>Notes de version:</b>\n{release_notes}\n\n"
             f"Voulez-vous mettre à jour maintenant ?\n"
             f"(Le launcher redémarrera après la mise à jour)",
             QMessageBox.Yes | QMessageBox.No,
@@ -1292,12 +1298,16 @@ class MinecraftLauncher(QMainWindow):
         
         if reply == QMessageBox.Yes:
             self.perform_launcher_update(update_info)
+        else:
+            # Si l'utilisateur refuse, on passe à la vérification des modpacks
+            if self.config.get("auto_check_updates", True):
+                self.check_modpack_updates()
     
     def perform_launcher_update(self, update_info):
         """Perform the launcher update"""
         try:
             # Create progress dialog
-            progress_dialog = QProgressDialog("Updating launcher...", "Cancel", 0, 100, self)
+            progress_dialog = QProgressDialog("Mise à jour du launcher...", "Annuler", 0, 100, self)
             progress_dialog.setWindowModality(Qt.WindowModal)
             progress_dialog.setAutoClose(False)
             progress_dialog.show()
@@ -1306,12 +1316,11 @@ class MinecraftLauncher(QMainWindow):
                 if total > 0:
                     percentage = int((current / total) * 100)
                     progress_dialog.setValue(percentage)
-                    progress_dialog.setLabelText(f"Updating launcher... {percentage}%")
+                    progress_dialog.setLabelText(f"Mise à jour... {percentage}%")
             
-            # Perform update
+            # Perform update (incremental is now handled by the updater class)
             success, restart_script = self.launcher_updater.perform_update(
-                update_info, 
-                use_incremental=True, 
+                update_info,
                 progress_callback=progress_callback
             )
             
@@ -1319,31 +1328,31 @@ class MinecraftLauncher(QMainWindow):
             
             if success:
                 QMessageBox.information(
-                    self, "Update Complete",
-                    f"Launcher has been updated successfully!\n\n"
-                    f"New version: {update_info['new_version']}\n\n"
-                    f"The launcher will restart to apply the changes."
+                    self, "Mise à jour terminée",
+                    f"Le launcher a été mis à jour avec succès !\n\n"
+                    f"Nouvelle version: {update_info['new_version']}\n\n"
+                    f"Le launcher va redémarrer pour appliquer les changements."
                 )
                 
                 # Restart the launcher
                 if restart_script and os.path.exists(restart_script):
-                    subprocess.Popen([restart_script])
-                    self.close()
+                    subprocess.Popen([sys.executable, restart_script], creationflags=subprocess.CREATE_NO_WINDOW)
+                    QApplication.instance().quit()
                 else:
                     # Fallback restart
-                    subprocess.Popen([sys.executable, "main.py"])
-                    self.close()
+                    QMessageBox.information(self, "Redémarrage requis", "Veuillez redémarrer le launcher manuellement.")
+                    QApplication.instance().quit()
             else:
                 QMessageBox.critical(
-                    self, "Update Failed",
-                    "Failed to update the launcher. Please try again later."
+                    self, "Échec de la mise à jour",
+                    "Impossible de mettre à jour le launcher. Veuillez réessayer plus tard."
                 )
                 
         except Exception as e:
             print(f"Error performing launcher update: {e}")
             QMessageBox.critical(
-                self, "Update Error",
-                f"An error occurred during the update: {str(e)}"
+                self, "Erreur de mise à jour",
+                f"Une erreur est survenue durant la mise à jour: {str(e)}"
             )
     
     def manual_check_launcher_updates(self):

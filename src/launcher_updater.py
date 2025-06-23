@@ -11,6 +11,7 @@ from zipfile import ZipFile
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QProgressDialog
 from PyQt5.QtCore import QThread
+from packaging import version as semver
 
 # Import existing utilities - handle both relative and absolute imports
 try:
@@ -149,29 +150,34 @@ class LauncherUpdateManager:
         except:
             return None
     
-    def get_github_last_commit(self):
-        """Get the latest commit from GitHub"""
+    def get_latest_github_release(self):
+        """Get the latest release from GitHub."""
         repo_info = self._get_github_repo_info(self.launcher_repo_url)
         if not repo_info:
             return None
-            
+        
         try:
-            api_url = f"https://api.github.com/repos/{repo_info['owner']}/{repo_info['repo']}/commits/{repo_info['branch']}"
+            api_url = f"https://api.github.com/repos/{repo_info['owner']}/{repo_info['repo']}/releases/latest"
             headers = _get_github_auth_headers()
             
             response = requests.get(api_url, headers=headers, timeout=10)
             response.raise_for_status()
             
-            commit_data = response.json()
+            release_data = response.json()
+            
+            # Find the .zip asset in the release
+            zip_asset = next((asset for asset in release_data.get('assets', []) if asset['name'].endswith('.zip')), None)
+
             return {
-                'sha': commit_data['sha'],
-                'short_sha': commit_data['sha'][:8],
-                'date': commit_data['commit']['author']['date'],
-                'message': commit_data['commit']['message'],
-                'url': commit_data['html_url']
+                'tag_name': release_data['tag_name'].lstrip('v'),
+                'name': release_data['name'],
+                'body': release_data['body'],
+                'published_at': release_data['published_at'],
+                'zipball_url': release_data['zipball_url'],
+                'zip_asset_url': zip_asset['browser_download_url'] if zip_asset else None,
             }
         except Exception as e:
-            print(f"Error getting GitHub commit: {e}")
+            print(f"Error getting GitHub release: {e}")
             return None
     
     def get_local_update_info(self):
@@ -194,36 +200,26 @@ class LauncherUpdateManager:
             print(f"Error saving update info: {e}")
     
     def check_launcher_update(self):
-        """Check if a launcher update is available"""
+        """Check if a launcher update is available using GitHub Releases."""
         if not is_connected_to_internet():
             return False, None
             
-        try:
-            # Get latest commit from GitHub
-            latest_commit = self.get_github_last_commit()
-            if not latest_commit:
-                return False, None
-            
-            # Get local update info
-            local_info = self.get_local_update_info()
-            
-            # If no local info or different commit, update is available
-            if not local_info or local_info.get('sha') != latest_commit['sha']:
-                update_info = {
-                    'current_version': self.current_version,
-                    'new_version': latest_commit['short_sha'],
-                    'commit_sha': latest_commit['sha'],
-                    'commit_date': latest_commit['date'],
-                    'commit_message': latest_commit['message'],
-                    'commit_url': latest_commit['url'],
-                    'repo_url': self.launcher_repo_url
-                }
-                return True, update_info
-            
+        latest_release = self.get_latest_github_release()
+        if not latest_release:
             return False, None
             
-        except Exception as e:
-            print(f"Error checking for updates: {e}")
+        local_version = semver.parse(self.current_version)
+        remote_version = semver.parse(latest_release['tag_name'])
+        
+        if remote_version > local_version:
+            return True, {
+                'current_version': str(local_version),
+                'new_version': str(remote_version),
+                'release_name': latest_release['name'],
+                'release_body': latest_release['body'],
+                'zip_url': latest_release['zip_asset_url'] or latest_release['zipball_url']
+            }
+        else:
             return False, None
     
     def get_update_changes(self, old_sha, new_sha):
@@ -341,73 +337,41 @@ class LauncherUpdateManager:
             print("No files to update (only deletions)")
             return True
     
-    def download_full_update(self, progress_callback=None):
-        """Download full launcher update as ZIP"""
-        repo_info = self._get_github_repo_info(self.launcher_repo_url)
-        if not repo_info:
-            return False
-            
+    def download_full_update(self, update_info, progress_callback=None):
+        """Download a full update from a release URL."""
+        
+        zip_url = update_info.get('zip_url')
+        if not zip_url:
+            raise Exception("URL de la release non trouvée.")
+
+        temp_dir = tempfile.mkdtemp(prefix="catzlauncher_update_")
+        zip_path = os.path.join(temp_dir, "launcher.zip")
+        
         try:
-            # Create temporary directory for update
-            temp_dir = tempfile.mkdtemp()
-            zip_path = os.path.join(temp_dir, "launcher_update.zip")
-            
-            # Download ZIP from GitHub
-            zip_url = f"https://github.com/{repo_info['owner']}/{repo_info['repo']}/archive/refs/heads/{repo_info['branch']}.zip"
-            
-            self.signals.status.emit("Downloading launcher update...")
-            
             response = requests.get(zip_url, stream=True, timeout=30)
             response.raise_for_status()
             
             total_size = int(response.headers.get('content-length', 0))
-            downloaded = 0
+            bytes_downloaded = 0
             
             with open(zip_path, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:
-                        f.write(chunk)
-                        downloaded += len(chunk)
-                        if progress_callback and total_size > 0:
-                            progress_callback(downloaded, total_size)
+                    f.write(chunk)
+                    bytes_downloaded += len(chunk)
+                    if progress_callback:
+                        progress_callback(bytes_downloaded, total_size)
             
-            # Extract ZIP
-            self.signals.status.emit("Extracting update...")
-            launcher_dir = os.path.dirname(os.path.dirname(__file__))
+            if progress_callback:
+                progress_callback(total_size, total_size)
+
+            return zip_path
             
-            with ZipFile(zip_path, 'r') as zip_ref:
-                # Get the root folder name from the ZIP
-                root_folder = zip_ref.namelist()[0].split('/')[0]
-                
-                # Extract to temporary location first
-                extract_temp = os.path.join(temp_dir, "extracted")
-                zip_ref.extractall(extract_temp)
-                
-                # Move files from extracted folder to launcher directory
-                extracted_root = os.path.join(extract_temp, root_folder)
-                
-                # Copy files, preserving structure
-                for root, dirs, files in os.walk(extracted_root):
-                    # Calculate relative path
-                    rel_path = os.path.relpath(root, extracted_root)
-                    target_dir = os.path.join(launcher_dir, rel_path)
-                    
-                    # Create directories
-                    os.makedirs(target_dir, exist_ok=True)
-                    
-                    # Copy files
-                    for file in files:
-                        src_file = os.path.join(root, file)
-                        dst_file = os.path.join(target_dir, file)
-                        shutil.copy2(src_file, dst_file)
-            
-            # Cleanup
-            shutil.rmtree(temp_dir)
-            return True
-            
+        except requests.RequestException as e:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            raise Exception(f"Le téléchargement a échoué: {e}")
         except Exception as e:
-            print(f"Error downloading full update: {e}")
-            return False
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            raise e
     
     def create_update_script(self, new_sha):
         """Create a script to restart the launcher after update"""
@@ -427,44 +391,40 @@ del "%~f0"
             print(f"Error creating restart script: {e}")
             return None
     
-    def perform_update(self, update_info, use_incremental=True, progress_callback=None):
-        """Perform the launcher update"""
+    def perform_update(self, update_info, progress_callback=None):
+        """Perform a full update from a release."""
+        self.signals.status.emit("Téléchargement de la mise à jour...")
+        
+        zip_path = self.download_full_update(update_info, progress_callback)
+        temp_dir = os.path.dirname(zip_path)
+        
         try:
-            new_sha = update_info['commit_sha']
-            local_info = self.get_local_update_info()
+            self.signals.status.emit("Extraction des fichiers...")
             
-            if use_incremental and local_info and local_info.get('sha'):
-                # Try incremental update
-                changes = self.get_update_changes(local_info['sha'], new_sha)
-                if changes:
-                    self.signals.status.emit("Applying incremental update...")
-                    success = self.apply_incremental_update(changes, new_sha, progress_callback)
-                else:
-                    # Fallback to full update
-                    success = self.download_full_update(progress_callback)
-            else:
-                # Full update
-                success = self.download_full_update(progress_callback)
+            extract_dir = os.path.join(temp_dir, "extracted")
+            with ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(extract_dir)
             
-            if success:
-                # Save new update info
-                self.save_local_update_info({
-                    'sha': new_sha,
-                    'version': update_info['new_version'],
-                    'date': update_info['commit_date'],
-                    'message': update_info['commit_message']
-                })
-                
-                # Create restart script
-                restart_script = self.create_update_script(new_sha)
-                
-                return True, restart_script
-            else:
-                return False, None
-                
-        except Exception as e:
-            print(f"Error performing update: {e}")
-            return False, None
+            # The contents are often inside a single root folder in the zip
+            extracted_content_dir = extract_dir
+            if len(os.listdir(extract_dir)) == 1:
+                possible_root = os.path.join(extract_dir, os.listdir(extract_dir)[0])
+                if os.path.isdir(possible_root):
+                    extracted_content_dir = possible_root
+
+            self.signals.status.emit("Création du script de mise à jour...")
+            
+            # Use the new version tag for the script
+            restart_script = self.create_update_script(extracted_content_dir, update_info['new_version'])
+            
+            self.signals.status.emit("Mise à jour terminée. Redémarrage en cours...")
+            
+            return True, restart_script
+            
+        finally:
+            # Clean up the temp directory
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            self.save_local_update_info({'last_successful_version': update_info['new_version']})
 
 def check_launcher_updates(launcher_repo_url, current_version=None):
     """Convenience function to check for launcher updates"""

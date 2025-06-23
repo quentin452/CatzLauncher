@@ -3,4 +3,5 @@ minecraft-launcher-lib
 pillow
 bs4
 cloudscraper
+packaging
 # tkinter is part of the Python standard library (usually included by default) 
