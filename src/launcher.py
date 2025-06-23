@@ -1274,22 +1274,17 @@ class MinecraftLauncher(QMainWindow):
                 self.check_modpack_updates()
     
     def prompt_launcher_update(self, update_info):
-        """Show update prompt to user using modal dialog like modpacks"""
+        """Show update prompt to user using modal dialog."""
         current_version = update_info['current_version']
         new_version = update_info['new_version']
-        release_name = update_info['release_name']
-        release_body = update_info['release_body']
-
-        # Format release body for display
-        release_notes = release_body if release_body else "Pas de notes de version."
+        commit_message = update_info['commit_message']
 
         reply = QMessageBox.question(
             self, "Mise à jour du launcher disponible",
-            f"Une mise à jour du launcher CatzLauncher est disponible!\n\n"
-            f"<b>{release_name}</b>\n\n"
-            f"Version actuelle: {current_version}\n"
-            f"Nouvelle version: {new_version}\n\n"
-            f"<b>Notes de version:</b>\n{release_notes}\n\n"
+            f"Une mise à jour pour CatzLauncher est disponible!\n\n"
+            f"<b>Version actuelle:</b> {current_version}\n"
+            f"<b>Nouvelle version:</b> {new_version}\n\n"
+            f"<b>Dernier changement:</b>\n{commit_message}\n\n"
             f"Voulez-vous mettre à jour maintenant ?\n"
             f"(Le launcher redémarrera après la mise à jour)",
             QMessageBox.Yes | QMessageBox.No,
@@ -1299,7 +1294,6 @@ class MinecraftLauncher(QMainWindow):
         if reply == QMessageBox.Yes:
             self.perform_launcher_update(update_info)
         else:
-            # Si l'utilisateur refuse, on passe à la vérification des modpacks
             if self.config.get("auto_check_updates", True):
                 self.check_modpack_updates()
     

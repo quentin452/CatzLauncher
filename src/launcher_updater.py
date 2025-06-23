@@ -93,135 +93,93 @@ class LauncherUpdateManager:
         self.update_file = os.path.join(os.path.dirname(__file__), "../saves/launcher_update_info.json")
         self.signals = LauncherUpdaterSignals()
         
-        # Ensure saves directory exists
         os.makedirs(os.path.dirname(self.update_file), exist_ok=True)
     
     def _get_current_version(self):
-        """Get current launcher version from version file or git"""
+        """Get current launcher version from version file or git."""
         version_file = os.path.join(os.path.dirname(__file__), "../version.txt")
-        
-        # Try to read from version file
         if os.path.exists(version_file):
             try:
                 with open(version_file, 'r') as f:
                     return f.read().strip()
             except:
                 pass
-        
-        # Try to get from git
-        try:
-            result = subprocess.run(
-                ['git', 'rev-parse', 'HEAD'], 
-                capture_output=True, 
-                text=True, 
-                cwd=os.path.dirname(__file__)
-            )
-            if result.returncode == 0:
-                return result.stdout.strip()[:8]  # Short SHA
-        except:
-            pass
-        
-        # Fallback to timestamp
-        return datetime.now().strftime("%Y%m%d_%H%M%S")
-    
+        return "unknown" # Fallback
+
     def _get_github_repo_info(self, repo_url):
-        """Extract owner, repo, and branch from GitHub URL"""
+        """Extract owner and repo from GitHub URL, always assuming the 'main' branch for updates."""
         if 'github.com' not in repo_url:
             return None
             
         try:
-            # Handle different GitHub URL formats
-            if '/archive/refs/heads/' in repo_url:
-                # Format: https://github.com/owner/repo/archive/refs/heads/branch.zip
-                parts = repo_url.split('/')
-                owner = parts[3]
-                repo = parts[4]
-                branch_start = repo_url.find('/archive/refs/heads/') + len('/archive/refs/heads/')
-                branch_end = repo_url.find('.zip', branch_start)
-                branch = repo_url[branch_start:branch_end]
-            else:
-                # Format: https://github.com/owner/repo
-                parts = repo_url.split('/')
-                owner = parts[3]
-                repo = parts[4]
-                branch = 'main'  # Default branch
+            parts = repo_url.split('/')
+            owner = parts[3]
+            repo = parts[4].replace('.git', '')
+            branch = 'main'  
                 
             return {'owner': owner, 'repo': repo, 'branch': branch}
-        except:
+        except IndexError:
             return None
     
-    def get_latest_github_release(self):
-        """Get the latest release from GitHub."""
+    def get_github_last_commit(self):
+        """Get the latest commit from GitHub"""
         repo_info = self._get_github_repo_info(self.launcher_repo_url)
         if not repo_info:
             return None
-        
+            
         try:
-            api_url = f"https://api.github.com/repos/{repo_info['owner']}/{repo_info['repo']}/releases/latest"
+            api_url = f"https://api.github.com/repos/{repo_info['owner']}/{repo_info['repo']}/commits/{repo_info['branch']}"
             headers = _get_github_auth_headers()
             
             response = requests.get(api_url, headers=headers, timeout=10)
             response.raise_for_status()
             
-            release_data = response.json()
-            
-            # Find the .zip asset in the release
-            zip_asset = next((asset for asset in release_data.get('assets', []) if asset['name'].endswith('.zip')), None)
-
+            commit_data = response.json()
             return {
-                'tag_name': release_data['tag_name'].lstrip('v'),
-                'name': release_data['name'],
-                'body': release_data['body'],
-                'published_at': release_data['published_at'],
-                'zipball_url': release_data['zipball_url'],
-                'zip_asset_url': zip_asset['browser_download_url'] if zip_asset else None,
+                'sha': commit_data['sha'],
+                'short_sha': commit_data['sha'][:7], # 7 characters is standard
+                'date': commit_data['commit']['author']['date'],
+                'message': commit_data['commit']['message'].split('\n')[0], # First line only
+                'url': commit_data['html_url']
             }
         except Exception as e:
-            print(f"Error getting GitHub release: {e}")
+            print(f"Error getting GitHub commit: {e}")
             return None
-    
+            
     def get_local_update_info(self):
         """Get locally stored update information"""
         if not os.path.exists(self.update_file):
             return None
-            
         try:
             with open(self.update_file, 'r') as f:
                 return json.load(f)
         except:
             return None
-    
+
     def save_local_update_info(self, update_info):
         """Save update information locally"""
-        try:
-            with open(self.update_file, 'w') as f:
-                json.dump(update_info, f, indent=4)
-        except Exception as e:
-            print(f"Error saving update info: {e}")
-    
+        with open(self.update_file, 'w') as f:
+            json.dump(update_info, f, indent=4)
+
     def check_launcher_update(self):
-        """Check if a launcher update is available using GitHub Releases."""
-        if not is_connected_to_internet():
+        """Check if a launcher update is available by comparing commit hashes."""
+        if not is_connected_to_internet() or is_git_repo():
             return False, None
-            
-        latest_release = self.get_latest_github_release()
-        if not latest_release:
+
+        latest_commit = self.get_github_last_commit()
+        if not latest_commit:
             return False, None
-            
-        local_version = semver.parse(self.current_version)
-        remote_version = semver.parse(latest_release['tag_name'])
         
-        if remote_version > local_version:
+        # The current_version read from version.txt is the local commit sha
+        if self.current_version != latest_commit['sha'] and self.current_version != latest_commit['short_sha']:
             return True, {
-                'current_version': str(local_version),
-                'new_version': str(remote_version),
-                'release_name': latest_release['name'],
-                'release_body': latest_release['body'],
-                'zip_url': latest_release['zip_asset_url'] or latest_release['zipball_url']
+                'current_version': self.current_version,
+                'new_version': latest_commit['short_sha'],
+                'commit_sha': latest_commit['sha'],
+                'commit_message': latest_commit['message'],
             }
-        else:
-            return False, None
-    
+        return False, None
+
     def get_update_changes(self, old_sha, new_sha):
         """Get list of changed files between two commits"""
         repo_info = self._get_github_repo_info(self.launcher_repo_url)
@@ -337,10 +295,10 @@ class LauncherUpdateManager:
             print("No files to update (only deletions)")
             return True
     
-    def download_full_update(self, update_info, progress_callback=None):
+    def download_full_update(self, progress_callback=None):
         """Download a full update from a release URL."""
         
-        zip_url = update_info.get('zip_url')
+        zip_url = self.update_info.get('zip_url')
         if not zip_url:
             raise Exception("URL de la release non trouvée.")
 
@@ -373,7 +331,7 @@ class LauncherUpdateManager:
             shutil.rmtree(temp_dir, ignore_errors=True)
             raise e
     
-    def create_update_script(self, new_sha):
+    def create_update_script(self, new_content_dir):
         """Create a script to restart the launcher after update"""
         launcher_dir = os.path.dirname(os.path.dirname(__file__))
         script_content = f"""@echo off
@@ -391,11 +349,28 @@ del "%~f0"
             print(f"Error creating restart script: {e}")
             return None
     
-    def perform_update(self, update_info, progress_callback=None):
-        """Perform a full update from a release."""
-        self.signals.status.emit("Téléchargement de la mise à jour...")
+    def perform_update(self, update_info, use_incremental=True, progress_callback=None):
+        """Perform the launcher update, trying incremental first."""
+        new_sha = update_info['commit_sha']
+        local_sha = self.current_version
         
-        zip_path = self.download_full_update(update_info, progress_callback)
+        if use_incremental and len(local_sha) >= 7: # Check if local_sha is a plausible commit hash
+            try:
+                self.signals.status.emit("Calcul des changements...")
+                changes = self.get_update_changes(local_sha, new_sha)
+                if changes:
+                    self.signals.status.emit("Mise à jour incrémentielle...")
+                    self.apply_incremental_update(changes, new_sha, progress_callback)
+                    
+                    self.save_local_update_info({'sha': new_sha})
+                    restart_script = self.create_update_script(os.path.dirname(os.path.abspath(sys.argv[0])))
+                    return True, restart_script
+            except Exception as e:
+                print(f"Incremental update failed, falling back to full update: {e}")
+        
+        # Fallback to full update
+        self.signals.status.emit("Téléchargement de la mise à jour complète...")
+        zip_path = self.download_full_update(progress_callback)
         temp_dir = os.path.dirname(zip_path)
         
         try:
@@ -414,8 +389,7 @@ del "%~f0"
 
             self.signals.status.emit("Création du script de mise à jour...")
             
-            # Use the new version tag for the script
-            restart_script = self.create_update_script(extracted_content_dir, update_info['new_version'])
+            restart_script = self.create_update_script(extracted_content_dir)
             
             self.signals.status.emit("Mise à jour terminée. Redémarrage en cours...")
             
@@ -424,7 +398,9 @@ del "%~f0"
         finally:
             # Clean up the temp directory
             shutil.rmtree(temp_dir, ignore_errors=True)
-            self.save_local_update_info({'last_successful_version': update_info['new_version']})
+            self.save_local_update_info({'sha': new_sha})
+        
+        return True, restart_script # return success and script path
 
 def check_launcher_updates(launcher_repo_url, current_version=None):
     """Convenience function to check for launcher updates"""
