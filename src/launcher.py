@@ -318,10 +318,12 @@ class MinecraftLauncher(QMainWindow):
         self.refresh_modpack_list()
         self.try_refresh_login()
         
-        # Check for launcher updates
+        # Check for launcher updates or modpack updates at startup
         if not is_git_repo() and self.config.get("auto_check_launcher_updates", True):
-            self.check_launcher_updates()
-            
+            self.check_launcher_updates(trigger_modpack_check_if_up_to_date=True)
+        elif self.config.get("auto_check_updates", True):
+            self.check_modpack_updates()
+        
         # Start fade-in animation for the whole window
         self.fade_animation.start()
 
@@ -726,12 +728,6 @@ class MinecraftLauncher(QMainWindow):
         self.auto_check_launcher_cb.setChecked(self.config.get("auto_check_launcher_updates", True))
         layout.addWidget(self.auto_check_launcher_cb)
 
-        # Launcher update button
-        self.check_launcher_updates_btn = AnimatedButton("🚀 Vérifier les mises à jour du launcher")
-        self.check_launcher_updates_btn.setProperty("tr_key", "config.check_launcher_updates")
-        self.check_launcher_updates_btn.setFixedHeight(40)
-        layout.addWidget(self.check_launcher_updates_btn)
-
         layout.addStretch()
         
         # Save button (outside the scroll area)
@@ -746,7 +742,6 @@ class MinecraftLauncher(QMainWindow):
         # Button clicks
         self.play_btn.clicked.connect(self.launch_game)
         self.check_updates_btn.clicked.connect(self.manual_check_updates)
-        self.check_launcher_updates_btn.clicked.connect(self.manual_check_launcher_updates)
         self.browse_java_btn.clicked.connect(self.browse_java)
         self.save_settings_btn.clicked.connect(self.save_settings)
         self.login_btn.clicked.connect(self.microsoft_login)
@@ -1349,7 +1344,7 @@ class MinecraftLauncher(QMainWindow):
     # --- Launcher Update Methods ---
     
     @run_in_thread
-    def check_launcher_updates(self):
+    def check_launcher_updates(self, trigger_modpack_check_if_up_to_date=True):
         """Check for launcher updates in background thread"""
         try:
             self.signals.status.emit("Vérification des mises à jour du launcher...")
@@ -1360,13 +1355,13 @@ class MinecraftLauncher(QMainWindow):
                 self.signals.launcher_update_found.emit(update_info)
             else:
                 self.signals.status.emit("Launcher à jour")
-                if self.config.get("auto_check_updates", True):
+                if trigger_modpack_check_if_up_to_date and self.config.get("auto_check_updates", True):
                     self.check_modpack_updates()
                 
         except Exception as e:
             print(f"Error checking launcher updates: {e}")
             self.signals.status.emit("Erreur lors de la vérification des mises à jour du launcher")
-            if self.config.get("auto_check_updates", True):
+            if trigger_modpack_check_if_up_to_date and self.config.get("auto_check_updates", True):
                 self.check_modpack_updates()
     
     def prompt_launcher_update(self, update_info):
@@ -1438,7 +1433,7 @@ class MinecraftLauncher(QMainWindow):
 
     def manual_check_launcher_updates(self):
         """Bouton pour vérifier manuellement les mises à jour du launcher."""
-        self.check_launcher_updates()
+        self.check_launcher_updates(trigger_modpack_check_if_up_to_date=False)
 
     def update_avatar(self, pseudo):
         """Met à jour l'avatar Minecraft du joueur à partir de minotar.net."""
