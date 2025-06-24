@@ -18,6 +18,28 @@ import keyring
 import keyring.errors
 from PyQt5.QtWidgets import QMessageBox
 
+def get_save_dir():
+    if sys.platform == "win32":
+        appdata = os.environ.get("APPDATA")
+        if appdata:
+            return os.path.join(appdata, ".CatzLauncher")
+        else:
+            # fallback to home
+            return os.path.expanduser("~/.CatzLauncher")
+    elif sys.platform == "darwin":
+        return os.path.expanduser("~/Library/Application Support/CatzLauncher")
+    else:
+        # Linux and others
+        return os.path.expanduser("~/.CatzLauncher")
+
+SAVE_DIR = get_save_dir()
+os.makedirs(SAVE_DIR, exist_ok=True)
+
+INSTALLED_FILE = os.path.join(SAVE_DIR, "installed_modpacks.json")
+STATS_FILE = os.path.join(SAVE_DIR, "user_stats.json")
+CONFIG_FILE = os.path.join(SAVE_DIR, "launcher_config.json")
+SERVICE_NAME = "CatzLauncher.GitHubToken"
+
 # Placeholder functions for GUI integration
 def show_error(title, message):
     """Placeholder for GUI error dialog"""
@@ -84,13 +106,6 @@ def get_cumulative_changes(repo_url, old_sha, new_sha):
         return None
     
     return None
-
-SAVE_DIR = os.path.join(os.getcwd(), "saves")
-os.makedirs(SAVE_DIR, exist_ok=True)
-INSTALLED_FILE = os.path.join(SAVE_DIR, "installed_modpacks.json")
-STATS_FILE = os.path.join(SAVE_DIR, "user_stats.json")
-CONFIG_FILE = os.path.join(SAVE_DIR, "launcher_config.json")
-SERVICE_NAME = "CatzLauncher.GitHubToken"
 
 def save_github_token(token):
     """Saves the GitHub token securely in the system's keyring."""

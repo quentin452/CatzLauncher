@@ -30,7 +30,7 @@ from src.utils import (
     install_forge_if_needed, refresh_ms_token,
     exchange_code_for_token, authenticate_with_xbox, authenticate_with_xsts,
     login_with_minecraft, get_minecraft_profile, is_modpack_installed,
-    save_github_token, load_github_token, is_connected_to_internet, STATS_FILE
+    save_github_token, load_github_token, is_connected_to_internet, STATS_FILE, CONFIG_FILE, SAVE_DIR
 )
 from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
 from src.launcher_updater import LauncherUpdateManager, is_git_repo
@@ -270,12 +270,9 @@ class AnimatedListWidget(QListWidget):
             self.update()
 
 class MinecraftLauncher(QMainWindow):
-    SAVE_DIR = os.path.join(os.getcwd(), "saves")
-    CONFIG_FILE = os.path.join(SAVE_DIR, "launcher_config.json")
-
     def __init__(self):
         super().__init__()
-        os.makedirs(self.SAVE_DIR, exist_ok=True)
+        os.makedirs(SAVE_DIR, exist_ok=True)
 
         self.client_id = load_azure_client_id()
 
@@ -781,12 +778,12 @@ class MinecraftLauncher(QMainWindow):
 
     def load_config(self):
         """Load configuration from file."""
-        config = load_json_file(self.CONFIG_FILE, {})
+        config = load_json_file(CONFIG_FILE, {})
         return config
 
     def save_config(self):
         """Save configuration to file."""
-        save_json_file(self.CONFIG_FILE, self.config)
+        save_json_file(CONFIG_FILE, self.config)
 
     def browse_java(self):
         """Browse for Java executable."""
