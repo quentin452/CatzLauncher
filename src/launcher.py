@@ -579,7 +579,10 @@ class MinecraftLauncher(QMainWindow):
         login_layout = QVBoxLayout(login_widget)
         login_layout.setSpacing(15)
         login_layout.setContentsMargins(0, 0, 0, 0)
-        login_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        login_layout.setAlignment(Qt.AlignmentFlag.AlignBottom)
+
+        # Espacement flexible en haut pour pousser le contenu vers le bas
+        login_layout.addStretch(1)
 
         # Avatar Minecraft (toujours affiché)
         self.avatar_label = QLabel()
@@ -636,9 +639,6 @@ class MinecraftLauncher(QMainWindow):
         # Ajouter les widgets de boutons (login OU logout+stats)
         login_layout.addWidget(self.login_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         login_layout.addWidget(self.logout_stats_widget, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        # Espacement flexible en bas
-        login_layout.addStretch(1)
 
         # Afficher/cacher selon l'état de connexion
         self.update_login_button_states()
