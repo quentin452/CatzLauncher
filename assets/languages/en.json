@@ -1,0 +1,126 @@
+{
+  "window": {
+    "title": "CatzLauncher - Modpack Launcher",
+    "header_title": "CatzLauncher"
+  },
+  "tabs": {
+    "play": "Play",
+    "config": "Config"
+  },
+  "main": {
+    "modpacks_title": "🎯 Available Modpacks",
+    "ready_to_play": "✨ Ready to play!",
+    "play_button": "🚀 Play",
+    "check_updates_button": "🔄 Check for updates",
+    "checking_updates": "🔄 Checking...",
+    "checking_single": "🔍 Checking {name}...",
+    "update_available": "✅ Update available for {name}",
+    "up_to_date": "✅ {name} is up to date",
+    "check_error": "❌ Error checking {name}: {error}",
+    "no_updates": "✅ No updates available",
+    "updates_found": "Updates available for",
+    "install_updates": "Do you want to install the updates?",
+    "single_update_available": "An update is available for '{name}'.",
+    "install_single_update": "Do you want to install it now?",
+    "modpack_not_installed": "The modpack '{name}' is not installed.",
+    "install_modpack": "Do you want to install it now?"
+  },
+  "login": {
+    "not_connected": "❌ Not connected",
+    "connected": "✅ Connected: {name}",
+    "login_microsoft": "🔐 Login with Microsoft",
+    "logout": "🚪 Logout",
+    "stats": "📊 Stats",
+    "login_in_progress": "🔄 Connecting...",
+    "reconnecting": "🔄 Reconnecting...",
+    "login_cancelled": "⚠️ Authentication cancelled.",
+    "login_success": "🎉 Welcome, {name}!",
+    "logout_success": "🚪 Logout successful",
+    "login_required": "Please login before playing.",
+    "connection_error": "Connection error.",
+    "auth_code_prompt": "After connecting, copy and paste the complete URL of the blank page here:",
+    "auth_code_error": "Unable to find authentication code in URL.",
+    "auth_error": "Authentication error: {error}",
+    "config_required": "Configuration Required",
+    "config_required_message": "The Azure Client ID is not configured.\n\nPlease fill the `azure_config.json` file at the project root with your own 'Application (client) ID' for the connection to work.",
+    "config_required_button": "🔐 Configuration Required",
+    "config_required_tooltip": "Please configure the Client ID in azure_config.json"
+  },
+  "stats": {
+    "title": "📊 User Statistics",
+    "last_activity": "🕒 Last activity",
+    "playtime": "⏳ Total playtime",
+    "launch_count": "🚀 Number of launches",
+    "login_count": "🔑 Number of logins",
+    "close": "Close",
+    "never": "Never",
+    "minutes": "min",
+    "error": "Error"
+  },
+  "config": {
+    "title": "⚙️ Configuration",
+    "java_path": "📁 Java Path:",
+    "browse": "📂 Browse",
+    "theme": "🎨 Application theme:",
+    "github_token": "🔑 GitHub Personal Access Token:",
+    "token_placeholder": "Paste a new token to save it",
+    "token_saved": "✅ A token is securely saved.",
+    "token_not_saved": "❌ No token is currently saved. Recommended.",
+    "jvm_args": "🔧 JVM Arguments:",
+    "max_memory": "🧠 Max Memory (GB):",
+    "auto_check_updates": "🔄 Automatically check for updates on startup",
+    "auto_check_launcher": "🚀 Automatically check for launcher updates",
+    "check_launcher_updates": "🚀 Check for launcher updates",
+    "save_config": "💾 Save Configuration",
+    "config_saved": "✅ Configuration saved!",
+    "language": "🌍 Language:"
+  },
+  "launcher_updates": {
+    "checking": "Checking for launcher updates...",
+    "available": "Launcher update available!",
+    "up_to_date": "Launcher is up to date",
+    "check_failed": "Update check failed",
+    "update_available_title": "Launcher update available",
+    "update_available_message": "A new version of the launcher is available: <b>{new_version}</b><br>Your current version is: <b>{current_version}</b><br><br>Do you want to update now? The application will restart.",
+    "updating": "Updating launcher...",
+    "update_complete": "Update complete! Restarting...",
+    "update_error": "An error occurred during the update: {error}",
+    "update_unexpected_error": "An unexpected error occurred: {error}",
+    "restart_error": "Unable to launch update script: {error}"
+  },
+  "installation": {
+    "installing": "Installing {name}...",
+    "installation_complete": "Installation complete!",
+    "installation_error": "Error installing '{name}': {error}",
+    "installation_failed": "Installation of '{name}' failed.",
+    "preparing_launch": "Preparing launch...",
+    "installing_forge": "Installing Forge {version}-forge-{forge_version}...",
+    "launching_minecraft": "Launching Minecraft...",
+    "ready": "Ready",
+    "launch_error": "Launch error"
+  },
+  "errors": {
+    "critical_error": "Critical Error",
+    "minecraft_dir_not_found": "Minecraft directory not found. Please configure it.",
+    "selection_required": "Selection Required",
+    "select_modpack": "Please select a modpack.",
+    "modpack_data_error": "Unable to retrieve modpack data.",
+    "modpack_not_found": "Modpack data not found.",
+    "browser_error": "Unable to open browser: {error}",
+    "offline": "Offline",
+    "internet_required": "An internet connection is required to verify authentication and launch the game.",
+    "connection_required": "Connection Required"
+  },
+  "loading": {
+    "loading": "Loading CatzLauncher..."
+  },
+  "window_controls": {
+    "minimize": "—",
+    "maximize": "▢",
+    "close": "✕"
+  },
+  "modpack_item": {
+    "check_update_tooltip": "Check for updates for this modpack",
+    "checking_tooltip": "Checking..."
+  }
+} 
