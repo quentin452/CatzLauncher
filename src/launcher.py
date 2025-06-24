@@ -728,23 +728,31 @@ class MinecraftLauncher(QMainWindow):
         self.browse_java_btn = AnimatedButton(translations.tr("config.browse"))
         java_path_layout.addWidget(self.java_path_edit)
         java_path_layout.addWidget(self.browse_java_btn)
-        form_layout.addRow(QLabel(translations.tr("config.java_path")), java_path_layout)
+        java_path_label = QLabel(translations.tr("config.java_path"))
+        java_path_label.setProperty("tr_key", "config.java_path")
+        form_layout.addRow(java_path_label, java_path_layout)
 
         # Theme Selector
         self.theme_selector = QComboBox()
         self.populate_themes()
-        form_layout.addRow(QLabel(translations.tr("config.theme")), self.theme_selector)
+        theme_label = QLabel(translations.tr("config.theme"))
+        theme_label.setProperty("tr_key", "config.theme")
+        form_layout.addRow(theme_label, self.theme_selector)
 
         # Language Selector
         self.language_selector = QComboBox()
         self.populate_languages()
-        form_layout.addRow(QLabel(translations.tr("config.language")), self.language_selector)
+        language_label = QLabel(translations.tr("config.language"))
+        language_label.setProperty("tr_key", "config.language")
+        form_layout.addRow(language_label, self.language_selector)
 
         # GitHub Token
         self.github_token_edit = QLineEdit()
         self.github_token_edit.setPlaceholderText(translations.tr("config.token_placeholder"))
         self.github_token_edit.setEchoMode(QLineEdit.Password)
-        form_layout.addRow(QLabel(translations.tr("config.github_token")), self.github_token_edit)
+        github_token_label = QLabel(translations.tr("config.github_token"))
+        github_token_label.setProperty("tr_key", "config.github_token")
+        form_layout.addRow(github_token_label, self.github_token_edit)
         
         # Token Status Label (spans across columns)
         self.token_status_label = QLabel()
@@ -753,7 +761,9 @@ class MinecraftLauncher(QMainWindow):
         
         # JVM Arguments
         self.java_args_edit = QLineEdit(self.config.get("java_args", ""))
-        form_layout.addRow(QLabel(translations.tr("config.jvm_args")), self.java_args_edit)
+        java_args_label = QLabel(translations.tr("config.jvm_args"))
+        java_args_label.setProperty("tr_key", "config.jvm_args")
+        form_layout.addRow(java_args_label, self.java_args_edit)
 
         # Max Memory Slider
         try:
@@ -775,7 +785,9 @@ class MinecraftLauncher(QMainWindow):
         mem_layout = QHBoxLayout()
         mem_layout.addWidget(self.max_memory_slider)
         mem_layout.addWidget(self.max_memory_label)
-        form_layout.addRow(QLabel(translations.tr("config.max_memory")), mem_layout)
+        max_memory_label = QLabel(translations.tr("config.max_memory"))
+        max_memory_label.setProperty("tr_key", "config.max_memory")
+        form_layout.addRow(max_memory_label, mem_layout)
 
         layout.addWidget(form_container)
 
@@ -1775,74 +1787,19 @@ class MinecraftLauncher(QMainWindow):
             label_item = form_layout.itemAt(i, QFormLayout.LabelRole)
             if label_item and label_item.widget() and isinstance(label_item.widget(), QLabel):
                 label = label_item.widget()
-                # Identifier le label par son texte actuel et le mettre à jour
-                current_text = label.text()
-                
-                # Mapping des textes actuels vers les clés de traduction
-                text_mapping = {
-                    "📁 Chemin Java:": "config.java_path",
-                    "📁 Java Path:": "config.java_path",
-                    "🎨 Thème de l'application:": "config.theme",
-                    "🎨 Application theme:": "config.theme",
-                    "🌍 Langue:": "config.language",
-                    "🌍 Language:": "config.language",
-                    "🔑 Token d'accès personnel GitHub:": "config.github_token",
-                    "🔑 GitHub Personal Access Token:": "config.github_token",
-                    "🔧 Arguments JVM:": "config.jvm_args",
-                    "🔧 JVM Arguments:": "config.jvm_args",
-                    "🧠 Mémoire Max (Go):": "config.max_memory",
-                    "🧠 Max Memory (GB):": "config.max_memory"
-                }
-                
-                if current_text in text_mapping:
-                    label.setText(translations.tr(text_mapping[current_text]))
+                tr_key = label.property("tr_key")
+                if tr_key:
+                    label.setText(translations.tr(tr_key))
 
     def _retranslate_widget(self, widget):
         """Helper method to retranslate widget and its children."""
         if not widget:
             return
-            
-        # Retranslate specific widget types
+        # Retranslate QLabel if it has a tr_key property
         if isinstance(widget, QLabel):
-            # Check if it's a known label that needs translation
-            current_text = widget.text()
-            text_mapping = {
-                "📁 Chemin Java:": "config.java_path",
-                "📁 Java Path:": "config.java_path",
-                "🎨 Thème de l'application:": "config.theme",
-                "🎨 Application theme:": "config.theme",
-                "🌍 Langue:": "config.language",
-                "🌍 Language:": "config.language",
-                "🔑 Token d'accès personnel GitHub:": "config.github_token",
-                "🔑 GitHub Personal Access Token:": "config.github_token",
-                "🔧 Arguments JVM:": "config.jvm_args",
-                "🔧 JVM Arguments:": "config.jvm_args",
-                "🧠 Mémoire Max (Go):": "config.max_memory",
-                "🧠 Max Memory (GB):": "config.max_memory"
-            }
-            
-            if current_text in text_mapping:
-                widget.setText(translations.tr(text_mapping[current_text]))
-                
-        elif isinstance(widget, QPushButton):
-            # Check if it's a known button that needs translation
-            current_text = widget.text()
-            text_mapping = {
-                "📂 Parcourir": "config.browse",
-                "📂 Browse": "config.browse",
-                "🔄 Vérifier automatiquement les mises à jour au démarrage": "config.auto_check_updates",
-                "🔄 Automatically check for updates on startup": "config.auto_check_updates",
-                "🚀 Vérifier automatiquement les mises à jour du launcher": "config.auto_check_launcher",
-                "🚀 Automatically check for launcher updates": "config.auto_check_launcher",
-                "🚀 Vérifier les mises à jour du launcher": "config.check_launcher_updates",
-                "🚀 Check for launcher updates": "config.check_launcher_updates",
-                "💾 Sauvegarder la Configuration": "config.save_config",
-                "💾 Save Configuration": "config.save_config"
-            }
-            
-            if current_text in text_mapping:
-                widget.setText(translations.tr(text_mapping[current_text]))
-        
+            tr_key = widget.property("tr_key")
+            if tr_key:
+                widget.setText(translations.tr(tr_key))
         # Recursively retranslate children
         if hasattr(widget, 'layout') and widget.layout():
             for i in range(widget.layout().count()):
