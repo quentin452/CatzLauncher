@@ -30,7 +30,7 @@ def main():
 def update_avatar(self, user_id_or_name):
     print(f"[DEBUG] update_avatar appelé avec : {user_id_or_name}")
     try:
-        url = f'https://minotar.net/body/{user_id_or_name}/100.png'
+        url = f'https://minotar.net/armor/body/{user_id_or_name}/100.png'
         data = requests.get(url, timeout=5).content
         pixmap = QPixmap()
         pixmap.loadFromData(data)
