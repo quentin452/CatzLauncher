@@ -10,20 +10,7 @@ from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import traceback
 import time
-import random
-import psutil
-from src.utils import install_or_update_modpack_github
-from src.launcher_updater import perform_launcher_update as do_update
-from src.particles import Particle
-from OpenGL.GLU import gluPerspective
-from OpenGL.GL import (
-    glEnable, GL_DEPTH_TEST, GL_TEXTURE_2D, glClearColor, glBlendFunc, GL_BLEND, 
-    GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, glViewport, glMatrixMode, glLoadIdentity, 
-    GL_PROJECTION, GL_MODELVIEW, glClear, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, 
-    glTranslatef, glRotatef, glBindTexture, glGenTextures, glTexImage2D, glTexParameteri, 
-    GL_RGBA, GL_UNSIGNED_BYTE, GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER, GL_NEAREST, 
-    glBegin, glEnd, glTexCoord2f, glVertex3f, GL_QUADS
-)
+
 from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QPropertyAnimation, QEasingCurve, QTimer, QParallelAnimationGroup, QPoint
 from PyQt5.QtGui import QTransform
@@ -34,9 +21,7 @@ from PyQt5.QtWidgets import (
     QListWidgetItem, QStackedWidget, QSizePolicy, QComboBox, QFormLayout, QScrollArea, QSlider, QProgressDialog
 )
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient, QPen
-from PyQt5.QtWidgets import QApplication, QOpenGLWidget
-import io
-from PIL import Image
+from PyQt5.QtWidgets import QApplication
 
 from minecraft_launcher_lib.utils import (get_minecraft_directory)
 from minecraft_launcher_lib.command import get_minecraft_command
@@ -240,6 +225,7 @@ class AnimatedProgressBar(QProgressBar):
         """Update particles for progress bar."""
         if self.value() > 0 and self.value() < self.maximum():
             # Emit particles occasionally during progress
+            import random
             if random.random() < 0.1:
                 self.emit_particles()
                 
@@ -251,6 +237,8 @@ class AnimatedProgressBar(QProgressBar):
         
     def emit_particles(self):
         """Emit particles from progress bar."""
+        import random
+        from src.particles import Particle
         
         progress_width = (self.value() / self.maximum()) * self.width()
         for _ in range(2):
@@ -346,600 +334,6 @@ class AnimatedListWidget(QListWidget):
             self.hovered_item = item
             self.update()
 
-class SkinViewer3D(QOpenGLWidget):
-    def __init__(self, skin_url, parent=None):
-        super().__init__(parent)
-        self.skin_url = skin_url
-        self.texture_id = None
-        self.last_mouse_pos = None
-        self.x_rot = 20
-        self.y_rot = 20
-        # Fond transparent PyQt5
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setAutoFillBackground(False)
-
-        self.setMouseTracking(True)
-        self.target_x_rot = self.x_rot
-        self.target_y_rot = self.y_rot
-
-        self.auto_rotate_timer = QTimer(self)
-        self.auto_rotate_timer.timeout.connect(self.rotate_auto)
-        self.auto_rotate_timer.start(30)  # 30 ms pour ~33 FPS
-        self._last_mouse_pos = None
-
-        self.particle_system = ParticleSystem(self)
-        self.particle_system.raise_()
-    def initializeGL(self):
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_TEXTURE_2D)
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glClearColor(0, 0, 0, 0)  # Fond transparent
-        self.texture_id = self.load_skin_texture(self.skin_url)
-
-    def resizeGL(self, w, h):
-        glViewport(0, 0, w, h)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(45, w / h if h else 1, 0.1, 100.0)
-        glMatrixMode(GL_MODELVIEW)
-
-    def paintGL(self):
-        glClear(int(GL_COLOR_BUFFER_BIT) | int(GL_DEPTH_BUFFER_BIT))
-        glLoadIdentity()
-        glTranslatef(0, 0, -8)
-        glRotatef(self.x_rot, 1, 0, 0)
-        glRotatef(self.y_rot, 0, 1, 0)
-        if self.texture_id is None:
-            try:
-                self.texture_id = self.load_skin_texture(self.skin_url)
-            except Exception as e:
-                print(f"[ERREUR] Impossible de charger la texture du skin : {e}")
-                return
-        if self.texture_id is not None:
-            glBindTexture(GL_TEXTURE_2D, self.texture_id)
-            self.draw_full_character()
-
-    def load_skin_texture(self, url):
-        response = requests.get(url)
-        img = Image.open(io.BytesIO(response.content)).convert("RGBA")
-        img = img.resize((64, 64))
-        img = img.transpose(Image.FLIP_TOP_BOTTOM)
-
-        img_data = img.tobytes("raw", "RGBA", 0, -1)
-        tex_id = glGenTextures(1)
-        glBindTexture(GL_TEXTURE_2D, tex_id)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, img_data)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        return tex_id
-
-    def draw_cube(self, x, y, z, w, h, d, tex_coords):
-        faces = [
-            # Front
-            [(x-w/2, y-h/2, z+d/2), (x+w/2, y-h/2, z+d/2), (x+w/2, y+h/2, z+d/2), (x-w/2, y+h/2, z+d/2)],
-            # Back
-            [(x+w/2, y-h/2, z-d/2), (x-w/2, y-h/2, z-d/2), (x-w/2, y+h/2, z-d/2), (x+w/2, y+h/2, z-d/2)],
-            # Top
-            [(x-w/2, y+h/2, z+d/2), (x+w/2, y+h/2, z+d/2), (x+w/2, y+h/2, z-d/2), (x-w/2, y+h/2, z-d/2)],
-            # Bottom
-            [(x-w/2, y-h/2, z-d/2), (x+w/2, y-h/2, z-d/2), (x+w/2, y-h/2, z+d/2), (x-w/2, y-h/2, z+d/2)],
-            # Right
-            [(x+w/2, y-h/2, z+d/2), (x+w/2, y-h/2, z-d/2), (x+w/2, y+h/2, z-d/2), (x+w/2, y+h/2, z+d/2)],
-            # Left
-            [(x-w/2, y-h/2, z-d/2), (x-w/2, y-h/2, z+d/2), (x-w/2, y+h/2, z+d/2), (x-w/2, y+h/2, z-d/2)],
-        ]
-        glBegin(GL_QUADS)
-        for i, face in enumerate(faces):
-            u1, v1, u2, v2 = tex_coords[i]
-            glTexCoord2f(u1, v1); glVertex3f(*face[0])
-            glTexCoord2f(u2, v1); glVertex3f(*face[1])
-            glTexCoord2f(u2, v2); glVertex3f(*face[2])
-            glTexCoord2f(u1, v2); glVertex3f(*face[3])
-        glEnd()
-
-    def draw_full_character(self):
-        # Mapping UV corrigé selon la spécification Mojang (64x64)
-        # Tête
-        head_tex = [
-            (8/64, 8/64, 16/64, 16/64),    # front
-            (24/64, 8/64, 32/64, 16/64),   # back
-            (8/64, 0/64, 16/64, 8/64),     # top
-            (16/64, 0/64, 24/64, 8/64),    # bottom
-            (0/64, 8/64, 8/64, 16/64),     # right
-            (16/64, 8/64, 24/64, 16/64),   # left
-        ]
-        self.draw_cube(0, 1.5, 0, 1, -1, 1, head_tex)
-        # Corps
-        body_tex = [
-            (20/64, 20/64, 28/64, 32/64),  # front
-            (32/64, 20/64, 40/64, 32/64),  # back
-            (20/64, 16/64, 28/64, 20/64),  # top
-            (28/64, 16/64, 36/64, 20/64),  # bottom
-            (16/64, 20/64, 20/64, 32/64),  # right
-            (28/64, 20/64, 32/64, 32/64),  # left
-        ]
-        self.draw_cube(0, 0.25, 0, 1, -1.5, 0.5, body_tex)
-        # Bras droit
-        right_arm_tex = [
-            (44/64, 20/64, 48/64, 32/64),  # front
-            (52/64, 20/64, 56/64, 32/64),  # back
-            (44/64, 16/64, 48/64, 20/64),  # top
-            (48/64, 16/64, 52/64, 20/64),  # bottom
-            (40/64, 20/64, 44/64, 32/64),  # right
-            (48/64, 20/64, 52/64, 32/64),  # left
-        ]
-        self.draw_cube(-0.75, 0.5, 0, -0.5, -1.5, 0.5, right_arm_tex)
-        # Bras gauche
-        left_arm_tex = [
-            (36/64, 52/64, 40/64, 64/64),  # front
-            (48/64, 52/64, 52/64, 64/64),  # back
-            (36/64, 48/64, 40/64, 52/64),  # top
-            (40/64, 48/64, 44/64, 52/64),  # bottom
-            (32/64, 52/64, 36/64, 64/64),  # right
-            (40/64, 52/64, 44/64, 64/64),  # left
-        ]
-        self.draw_cube(0.75, 0.5, 0, -0.5, -1.5, 0.5, left_arm_tex)
-        # Jambe droite
-        right_leg_tex = [
-            (4/64, 20/64, 8/64, 32/64),    # front
-            (12/64, 20/64, 16/64, 32/64),  # back
-            (4/64, 16/64, 8/64, 20/64),    # top
-            (8/64, 16/64, 12/64, 20/64),   # bottom
-            (0/64, 20/64, 4/64, 32/64),    # right
-            (8/64, 20/64, 12/64, 32/64),   # left
-        ]
-        self.draw_cube(-0.25, -1, 0, -0.5, -1.5, 0.5, right_leg_tex)
-        # Jambe gauche
-        left_leg_tex = [
-            (20/64, 52/64, 24/64, 64/64),  # front
-            (28/64, 52/64, 32/64, 64/64),  # back
-            (20/64, 48/64, 24/64, 52/64),  # top
-            (24/64, 48/64, 28/64, 52/64),  # bottom
-            (16/64, 52/64, 20/64, 64/64),  # right
-            (24/64, 52/64, 28/64, 64/64),  # left
-        ]
-        self.draw_cube(0.25, -1, 0, -0.5, -1.5, 0.5, left_leg_tex)
-
-    def rotate_auto(self):
-        if self._last_mouse_pos is not None:
-            center_x = self.width() / 2
-            center_y = self.height() / 2
-            dx = self._last_mouse_pos.x() - center_x
-            dy = self._last_mouse_pos.y() - center_y
-            sensitivity = 0.25
-            max_pitch = 60
-            min_pitch = -60
-            # Calcule la cible
-            self.target_y_rot = dx * sensitivity
-            self.target_x_rot = max(min(dy * sensitivity, max_pitch), min_pitch)
-        # Interpolation douce vers la cible
-        lerp = 0.15
-        self.x_rot += (self.target_x_rot - self.x_rot) * lerp
-        self.y_rot += (self.target_y_rot - self.y_rot) * lerp
-        self.update()
-        
-    def mouseMoveEvent(self, event):
-        self._last_mouse_pos = event.pos()
-        self.particle_system.mouse_move_event(event.pos())
-
-        if event.buttons() == Qt.LeftButton and self._last_mouse_pos is not None:
-            if self.isMaximized():
-                if (event.globalPos() - self._last_mouse_pos).manhattanLength() > QApplication.startDragDistance():
-                    self.showNormal()
-                    QApplication.processEvents() 
-                    cursor_x_ratio = event.globalPos().x() / self.screen().geometry().width()
-                else:
-                    return
-
-            if not self.isMaximized() and event.globalPos().y() <= 1:
-                self.showMaximized()
-                return
-
-            local_mouse_pos = self.mapFromGlobal(event.globalPos())
-            self.last_mouse_pos = local_mouse_pos
-            event.accept()
-        else:
-            super().mouseMoveEvent(event)
-
-    def mouseReleaseEvent(self, event):
-        """ Stops dragging. """
-        self.drag_offset = None
-        event.accept()
-
-    def show_error_dialog(self, title, message):
-        """Shows a critical error message box in the main thread."""
-        QMessageBox.critical(self, title, message)
-
-    def handle_single_update_found(self, modpack_data):
-        """Handle the signal for a single update found."""
-        # Afficher une boîte de dialogue pour proposer l'installation de la mise à jour
-        reply = QMessageBox.question(
-            self, translations.tr("main.single_update_available", name=modpack_data['name']),
-            translations.tr("main.single_update_available", name=modpack_data['name']) + "\n\n" + translations.tr("main.install_single_update"),
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.Yes
-        )
-        
-        if reply == QMessageBox.Yes:
-            self.start_installation(modpack_data)
-
-    def populate_themes(self):
-        """Populates the theme selector combobox."""
-        self.theme_selector.clear()
-        themes = get_available_themes()
-        current_theme = self.config.get("theme", "dark.qss")
-        
-        for theme in themes:
-            self.theme_selector.addItem(theme)
-            if theme == current_theme:
-                self.theme_selector.setCurrentText(theme)
-
-    def populate_languages(self):
-        """Populates the language selector combobox."""
-        self.language_selector.clear()
-        languages = translations.get_available_languages()
-        current_language = self.config.get("language", "fr")
-        
-        for language in languages:
-            self.language_selector.addItem(language)
-            if language == current_language:
-                self.language_selector.setCurrentText(language)
-
-    # --- Launcher Update Methods ---
-    
-    @run_in_thread
-    def check_launcher_updates(self, trigger_modpack_check_if_up_to_date=True):
-        """Check for launcher updates in background thread"""
-        try:
-            self.signals.status.emit(translations.tr("launcher_updates.checking"))
-            update_available, update_info = self.launcher_updater.check_launcher_update()
-            
-            if update_available:
-                self.signals.status.emit(translations.tr("launcher_updates.available"))
-                self.signals.launcher_update_found.emit(update_info)
-            else:
-                self.signals.status.emit("Launcher à jour")
-                if trigger_modpack_check_if_up_to_date and self.config.get("auto_check_updates", True):
-                    self.check_modpack_updates()
-                
-        except Exception as e:
-            print(f"Error checking launcher updates: {e}")
-            self.signals.status.emit("Erreur lors de la vérification des mises à jour du launcher")
-            if trigger_modpack_check_if_up_to_date and self.config.get("auto_check_updates", True):
-                self.check_modpack_updates()
-    
-    def prompt_launcher_update(self, update_info):
-        """Affiche une boîte de dialogue pour confirmer la mise à jour du launcher."""
-        new_version = update_info.get('new_version', 'inconnue')
-        current_version = self.launcher_version or "inconnue"
-        
-        reply = QMessageBox.question(
-            self,
-            translations.tr("launcher_updates.update_available_title"),
-            translations.tr("launcher_updates.update_available_message", new_version=new_version, current_version=current_version),
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
-        )
-        if reply == QMessageBox.Yes:
-            self.perform_launcher_update(update_info)
-
-    def perform_launcher_update(self, update_info):
-        """Lance le processus de mise à jour du launcher dans une boîte de dialogue."""
-        progress_dialog = QProgressDialog(translations.tr("launcher_updates.updating"), translations.tr("stats.close"), 0, 100, self)
-        progress_dialog.setWindowModality(Qt.WindowModal)
-        progress_dialog.setWindowTitle(translations.tr("launcher_updates.updating"))
-        progress_dialog.show()
-
-        def progress_callback(current, total):
-            if total > 0:
-                progress_dialog.setValue(int((current / total) * 100))
-            QApplication.processEvents() # Permet à l'UI de rester réactive
-
-        try:
-            success, result = do_update(self.launcher_repo_url, update_info, progress_callback)
-            
-            if success and result:
-                script_path = result
-                progress_dialog.setLabelText(translations.tr("launcher_updates.update_complete"))
-                progress_dialog.setValue(100)
-                
-                # Attendre un court instant pour que l'utilisateur voie le message
-                QTimer.singleShot(1500, lambda: self._execute_update_script(script_path))
-            else:
-                error_message = result or translations.tr("stats.error")
-                QMessageBox.critical(self, translations.tr("errors.critical_error"), translations.tr("launcher_updates.update_error", error=error_message))
-                progress_dialog.close()
-
-        except Exception as e:
-            traceback.print_exc()
-            QMessageBox.critical(self, translations.tr("errors.critical_error"), translations.tr("launcher_updates.update_unexpected_error", error=str(e)))
-            progress_dialog.close()
-
-    def _execute_update_script(self, script_path):
-        """Exécute le script de mise à jour Python et quitte l'application."""
-        try:
-            # We now launch a Python script, not a batch file.
-            # This is robust across platforms and avoids shell interpretation issues.
-            command = [sys.executable, script_path]
-            
-            # Use DETACHED_PROCESS on Windows to let the script run independently.
-            # On other platforms, the default behavior is sufficient.
-            flags = subprocess.DETACHED_PROCESS if sys.platform == "win32" else 0
-            
-            subprocess.Popen(command, creationflags=flags)
-
-            self.close() # Ferme le launcher pour permettre la mise à jour des fichiers
-        except Exception as e:
-            traceback.print_exc()
-            QMessageBox.critical(self, translations.tr("errors.critical_error"), translations.tr("launcher_updates.restart_error", error=str(e)))
-
-    def manual_check_launcher_updates(self):
-        """Bouton pour vérifier manuellement les mises à jour du launcher."""
-        self.check_launcher_updates(trigger_modpack_check_if_up_to_date=False)
-
-    def update_avatar(self, pseudo):
-        """Met à jour l'avatar Minecraft 3D du joueur à partir de minotar.net."""
-        print(f"[DEBUG] update_avatar appelé avec pseudo = {pseudo}")
-        try:
-            url = f'https://minotar.net/skin/{pseudo}'
-            self.avatar_3d.skin_url = url
-            self.avatar_3d.texture_id = None
-            self.avatar_3d.update()
-        except Exception as e:
-            print(f"[ERREUR] Exception lors du chargement de l'avatar 3D pour {pseudo} : {e}")
-            # fallback: skin steve
-            self.avatar_3d.skin_url = "https://minotar.net/skin/steve"
-            self.avatar_3d.texture_id = None
-            self.avatar_3d.update()
-
-    def show_stats(self):
-        """Affiche les statistiques utilisateur dans un overlay moderne et robuste sans ombre portée."""
-        # Supprime l'overlay existant s'il y en a un
-        if hasattr(self, 'stats_overlay') and self.stats_overlay is not None:
-            try:
-                self.stats_overlay.deleteLater()
-            except Exception:
-                pass
-            self.stats_overlay = None
-
-        # Overlay semi-transparent
-        self.stats_overlay = QWidget(self)
-        self.stats_overlay.setGeometry(self.rect())
-        self.stats_overlay.setStyleSheet("background: rgba(0, 0, 0, 128);")
-        self.stats_overlay.setAttribute(Qt.WA_StyledBackground, True)
-        self.stats_overlay.show()
-        self.stats_overlay.raise_()
-
-        # Carte centrale sans ombre ni contour
-        card = QWidget(self.stats_overlay)
-        card.setFixedSize(400, 320)
-        card.setStyleSheet('''
-            background: rgba(35, 39, 46, 0.98);
-            border-radius: 28px;
-        ''')
-        card.move((self.width() - card.width()) // 2, (self.height() - card.height()) // 2)
-        card.show()
-        card.raise_()
-
-        layout = QVBoxLayout(card)
-        layout.setContentsMargins(30, 30, 30, 30)
-        layout.setSpacing(18)
-
-        title = QLabel(translations.tr("stats.title"))
-        title.setStyleSheet("font-size: 22px; font-weight: bold; color: #fff;")
-        title.setAlignment(Qt.AlignCenter)
-        layout.addWidget(title)
-
-        # Lecture des stats
-        try:
-            with open(STATS_FILE, 'r', encoding='utf-8') as f:
-                stats = json.load(f)
-            last_activity = stats.get('last_activity', translations.tr("stats.never"))
-            playtime = stats.get('playtime', 0)
-            launch_count = stats.get('launch_count', 0)
-            login_count = stats.get('login_count', 0)
-        except Exception as e:
-            print(f"[DEBUG] Erreur lecture stats : {e}")
-            last_activity = translations.tr("stats.error")
-            playtime = 0
-            launch_count = 0
-            login_count = 0
-
-        # Affichage stylé des stats
-        stat_labels = [
-            (translations.tr("stats.last_activity"), last_activity),
-            (translations.tr("stats.playtime"), f"{playtime} {translations.tr('stats.minutes')}"),
-            (translations.tr("stats.launch_count"), str(launch_count)),
-            (translations.tr("stats.login_count"), str(login_count)),
-        ]
-        for icon, value in stat_labels:
-            row = QHBoxLayout()
-            row.setSpacing(12)
-            icon_label = QLabel(icon)
-            icon_label.setStyleSheet("font-size: 18px; color: #ffd700;")
-            row.addWidget(icon_label)
-            value_label = QLabel(value)
-            value_label.setStyleSheet("font-size: 17px; color: #fff;")
-            row.addWidget(value_label)
-            row.addStretch(1)
-            layout.addLayout(row)
-
-        layout.addStretch(1)
-
-        # Bouton fermer
-        close_btn = QPushButton(translations.tr("stats.close"))
-        close_btn.setFixedHeight(38)
-        close_btn.setStyleSheet('''
-            QPushButton {
-                background: #3b82f6;
-                color: #fff;
-                border-radius: 10px;
-                font-size: 16px;
-                font-weight: bold;
-                padding: 0 18px;
-            }
-            QPushButton:hover {
-                background: #2563eb;
-            }
-        ''')
-        close_btn.clicked.connect(lambda: close_overlay())
-        layout.addWidget(close_btn, alignment=Qt.AlignCenter)
-
-    def resizeEvent(self, event):
-        # L'avatar garde sa taille fixe définie dans _create_main_tab
-        # Pas de redimensionnement ici pour éviter les incohérences
-        super().resizeEvent(event)
-
-    def set_default_avatar(self):
-        """Affiche le skin de Steve par défaut comme avatar 3D."""
-        self.avatar_3d.skin_url = "https://minotar.net/skin/steve"
-        self.avatar_3d.texture_id = None
-        self.avatar_3d.update()
-
-    def update_stats_on_launch(self, playtime_minutes):
-        """Met à jour les stats après un lancement de jeu."""
-        try:
-            stats = {}
-            if os.path.exists(STATS_FILE):
-                with open(STATS_FILE, 'r', encoding='utf-8') as f:
-                    stats = json.load(f)
-            stats['last_activity'] = datetime.now().strftime('%d/%m/%Y %H:%M')
-            stats['launch_count'] = stats.get('launch_count', 0) + 1
-            stats['playtime'] = stats.get('playtime', 0) + int(playtime_minutes)
-            with open(STATS_FILE, 'w', encoding='utf-8') as f:
-                json.dump(stats, f, indent=4)
-        except Exception as e:
-            print(f"Erreur lors de la mise à jour des stats de lancement : {e}")
-
-    def update_stats_on_login(self):
-        """Met à jour les stats après une connexion."""
-        try:
-            stats = {}
-            if os.path.exists(STATS_FILE):
-                with open(STATS_FILE, 'r', encoding='utf-8') as f:
-                    stats = json.load(f)
-            stats['last_activity'] = datetime.now().strftime('%d/%m/%Y %H:%M')
-            stats['login_count'] = stats.get('login_count', 0) + 1
-            with open(STATS_FILE, 'w', encoding='utf-8') as f:
-                json.dump(stats, f, indent=4)
-        except Exception as e:
-            print(f"Erreur lors de la mise à jour des stats de connexion : {e}")
-
-    def retranslate_ui(self):
-        """Re-translate the UI elements."""
-        # Window title
-        self.setWindowTitle(translations.tr("window.title"))
-        
-        # Tab titles
-        self.tabs.setTabText(0, translations.tr("tabs.play"))
-        self.tabs.setTabText(1, translations.tr("tabs.config"))
-        
-        # Main tab - Titre des modpacks
-        # Chercher le label du titre dans le layout principal
-        main_layout = self.main_tab.layout()
-        if main_layout:
-            # Chercher dans le premier layout horizontal (top_layout)
-            top_layout_item = main_layout.itemAt(0)
-            if top_layout_item and top_layout_item.layout():
-                top_layout = top_layout_item.layout()
-                # Le premier widget est le widget modpack
-                modpack_widget_item = top_layout.itemAt(0)
-                if modpack_widget_item and modpack_widget_item.widget():
-                    modpack_widget = modpack_widget_item.widget()
-                    modpack_layout = modpack_widget.layout()
-                    if modpack_layout:
-                        # Le premier élément est le titre
-                        title_item = modpack_layout.itemAt(0)
-                        if title_item and title_item.widget() and isinstance(title_item.widget(), QLabel):
-                            title_item.widget().setText(translations.tr("main.modpacks_title"))
-        
-        # Status et boutons principaux
-        self.status_label.setText(translations.tr("main.ready_to_play"))
-        self.play_btn.setText(translations.tr("main.play_button"))
-        self.check_updates_btn.setText(translations.tr("main.check_updates_button"))
-        
-        # Login section
-        self.account_info_label.setText(translations.tr("login.not_connected"))
-        self.login_btn.setText(translations.tr("login.login_microsoft"))
-        self.logout_btn.setText(translations.tr("login.logout"))
-        self.stats_btn.setText(translations.tr("login.stats"))
-        
-        # Config tab - Titre
-        # Chercher le label du titre dans le layout de config
-        config_layout = self.config_tab.layout()
-        if config_layout:
-            # Chercher dans le scroll area
-            scroll_area_item = config_layout.itemAt(0)
-            if scroll_area_item and scroll_area_item.widget() and isinstance(scroll_area_item.widget(), QScrollArea):
-                scroll_area = scroll_area_item.widget()
-                scroll_content = scroll_area.widget()
-                if scroll_content and scroll_content.layout():
-                    content_layout = scroll_content.layout()
-                    # Le premier élément est le titre
-                    title_item = content_layout.itemAt(0)
-                    if title_item and title_item.widget() and isinstance(title_item.widget(), QLabel):
-                        title_item.widget().setText(translations.tr("config.title"))
-        
-        # Config form labels - Mettre à jour tous les labels du formulaire
-        self._retranslate_config_form()
-        
-        # Config form buttons
-        self.browse_java_btn.setText(translations.tr("config.browse"))
-        self.github_token_edit.setPlaceholderText(translations.tr("config.token_placeholder"))
-        self.auto_check_cb.setText(translations.tr("config.auto_check_updates"))
-        self.auto_check_launcher_cb.setText(translations.tr("config.auto_check_launcher"))
-        self.save_settings_btn.setText(translations.tr("config.save_config"))
-        
-        # Mettre à jour le statut du token
-        self.update_token_status_label()
-        
-        # Re-peupler les sélecteurs
-        self.populate_languages()
-        self.populate_themes()
-
-    def _retranslate_config_form(self):
-        """Met à jour tous les labels du formulaire de configuration."""
-        config_layout = self.config_tab.layout()
-        if not config_layout:
-            return
-            
-        # Chercher dans le scroll area
-        scroll_area_item = config_layout.itemAt(0)
-        if not scroll_area_item or not scroll_area_item.widget() or not isinstance(scroll_area_item.widget(), QScrollArea):
-            return
-            
-        scroll_area = scroll_area_item.widget()
-        scroll_content = scroll_area.widget()
-        if not scroll_content or not scroll_content.layout():
-            return
-            
-        content_layout = scroll_content.layout()
-        
-        # Chercher le widget form_container
-        for i in range(content_layout.count()):
-            item = content_layout.itemAt(i)
-            if item.widget() and hasattr(item.widget(), 'objectName') and item.widget().objectName() == "configFormContainer":
-                form_container = item.widget()
-                self._retranslate_form_container(form_container)
-                break
-
-    def _retranslate_form_container(self, form_container):
-        """Met à jour les labels dans le conteneur de formulaire."""
-        if not form_container.layout():
-            return
-            
-        form_layout = form_container.layout()
-        
-        # Parcourir toutes les lignes du formulaire
-        for i in range(form_layout.rowCount()):
-            label_item = form_layout.itemAt(i, QFormLayout.LabelRole)
-            if label_item and label_item.widget() and isinstance(label_item.widget(), QLabel):
-                label = label_item.widget()
-                tr_key = label.property("tr_key")
-                if tr_key:
-                    label.setText(translations.tr(tr_key))
-                    
 class MinecraftLauncher(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -1188,16 +582,18 @@ class MinecraftLauncher(QMainWindow):
         login_layout = QVBoxLayout(login_widget)
         login_layout.setSpacing(15)
         login_layout.setContentsMargins(0, 0, 0, 0)
-        login_layout.setAlignment(Qt.AlignTop)
+        login_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        # Avatar Minecraft 3D (remplace QLabel)
-        self.avatar_3d = SkinViewer3D("https://minotar.net/skin/steve")
-        self.avatar_3d.setFixedSize(120, 240)
-        login_layout.addWidget(self.avatar_3d, alignment=Qt.AlignCenter)
+        # Avatar Minecraft (toujours affiché)
+        self.avatar_label = QLabel()
+        self.avatar_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.avatar_label.setFixedSize(120, 240)
+        self.set_default_avatar()
+        login_layout.addWidget(self.avatar_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Label d'état de connexion
         self.account_info_label = QLabel(translations.tr("login.not_connected"))
-        self.account_info_label.setAlignment(Qt.AlignCenter)
+        self.account_info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.account_info_label.setProperty("class", "status-disconnected")
         login_layout.addWidget(self.account_info_label)
 
@@ -1207,7 +603,7 @@ class MinecraftLauncher(QMainWindow):
         self.logout_btn = AnimatedButton(translations.tr("login.logout"))
         self.logout_btn.setFixedHeight(40)
         self.logout_btn.setMinimumWidth(200)
-        self.logout_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.logout_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.logout_btn.setStyleSheet('''
             QPushButton {
                 padding: 0 28px;
@@ -1219,7 +615,7 @@ class MinecraftLauncher(QMainWindow):
         self.stats_btn = AnimatedButton(translations.tr("login.stats"))
         self.stats_btn.setFixedHeight(40)
         self.stats_btn.setMinimumWidth(100)
-        self.stats_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.stats_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.stats_btn.setStyleSheet('''
             QPushButton {
                 padding: 0 28px;
@@ -1241,8 +637,8 @@ class MinecraftLauncher(QMainWindow):
         self.logout_stats_widget.setLayout(btn_row)
 
         # Ajouter les widgets de boutons (login OU logout+stats)
-        login_layout.addWidget(self.login_btn, alignment=Qt.AlignCenter)
-        login_layout.addWidget(self.logout_stats_widget, alignment=Qt.AlignCenter)
+        login_layout.addWidget(self.login_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        login_layout.addWidget(self.logout_stats_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Espacement flexible en bas
         login_layout.addStretch(1)
@@ -1262,11 +658,11 @@ class MinecraftLauncher(QMainWindow):
         self.progress = AnimatedProgressBar()
         self.progress.setRange(0, 100)
         self.progress.setTextVisible(True)
-        self.progress.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.progress.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         bottom_layout.addWidget(self.progress)
 
         self.status_label = QLabel(translations.tr("main.ready_to_play"))
-        self.status_label.setAlignment(Qt.AlignCenter)
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.status_label.setProperty("class", "status")
         bottom_layout.addWidget(self.status_label)
 
@@ -1274,11 +670,11 @@ class MinecraftLauncher(QMainWindow):
         btn_layout.setSpacing(15)
         self.play_btn = AnimatedButton(translations.tr("main.play_button"))
         self.play_btn.setFixedHeight(50)
-        self.play_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.play_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         btn_layout.addWidget(self.play_btn)
         self.check_updates_btn = AnimatedButton(translations.tr("main.check_updates_button"))
         self.check_updates_btn.setFixedHeight(50)
-        self.check_updates_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.check_updates_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         btn_layout.addWidget(self.check_updates_btn)
         bottom_layout.addLayout(btn_layout)
 
@@ -1297,7 +693,7 @@ class MinecraftLauncher(QMainWindow):
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setProperty("class", "transparent")
-        scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+        scroll_area.setFrameShape(QFrame.NoFrame)
         main_layout.addWidget(scroll_area)
 
         # Widget to contain the scrolling content
@@ -1322,7 +718,7 @@ class MinecraftLauncher(QMainWindow):
         form_layout = QFormLayout(form_container)
         form_layout.setSpacing(15)
         form_layout.setContentsMargins(15, 15, 15, 15)
-        form_layout.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
+        form_layout.setRowWrapPolicy(QFormLayout.WrapAllRows)
         
         # --- Form Rows ---
         
@@ -1353,7 +749,7 @@ class MinecraftLauncher(QMainWindow):
         # GitHub Token
         self.github_token_edit = QLineEdit()
         self.github_token_edit.setPlaceholderText(translations.tr("config.token_placeholder"))
-        self.github_token_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self.github_token_edit.setEchoMode(QLineEdit.Password)
         github_token_label = QLabel(translations.tr("config.github_token"))
         github_token_label.setProperty("tr_key", "config.github_token")
         form_layout.addRow(github_token_label, self.github_token_edit)
@@ -2119,19 +1515,23 @@ class MinecraftLauncher(QMainWindow):
         self.check_launcher_updates(trigger_modpack_check_if_up_to_date=False)
 
     def update_avatar(self, pseudo):
-        """Met à jour l'avatar Minecraft 3D du joueur à partir de minotar.net."""
+        """Met à jour l'avatar Minecraft du joueur à partir de minotar.net."""
         print(f"[DEBUG] update_avatar appelé avec pseudo = {pseudo}")
         try:
-            url = f'https://minotar.net/skin/{pseudo}'
-            self.avatar_3d.skin_url = url
-            self.avatar_3d.texture_id = None
-            self.avatar_3d.update()
+            url = f'https://minotar.net/armor/body/{pseudo}/120'
+            data = requests.get(url, timeout=5).content
+            pixmap = QPixmap()
+            pixmap.loadFromData(data)
+            if pixmap.isNull():
+                print(f"[ERREUR] Impossible de charger l'avatar pour {pseudo} depuis {url}")
+                default_avatar = QPixmap('assets/textures/logo.png').scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                self.avatar_label.setPixmap(default_avatar)
+            else:
+                self.avatar_label.setPixmap(pixmap.scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         except Exception as e:
-            print(f"[ERREUR] Exception lors du chargement de l'avatar 3D pour {pseudo} : {e}")
-            # fallback: skin steve
-            self.avatar_3d.skin_url = "https://minotar.net/skin/steve"
-            self.avatar_3d.texture_id = None
-            self.avatar_3d.update()
+            print(f"[ERREUR] Exception lors du chargement de l'avatar pour {pseudo} : {e}")
+            default_avatar = QPixmap('assets/textures/logo.png').scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.avatar_label.setPixmap(default_avatar)
 
     def show_stats(self):
         """Affiche les statistiques utilisateur dans un overlay moderne et robuste sans ombre portée."""
@@ -2223,7 +1623,11 @@ class MinecraftLauncher(QMainWindow):
                 background: #2563eb;
             }
         ''')
-        close_btn.clicked.connect(lambda: close_overlay())
+        def close_overlay():
+            if hasattr(self, 'stats_overlay') and self.stats_overlay is not None:
+                self.stats_overlay.deleteLater()
+                self.stats_overlay = None
+        close_btn.clicked.connect(close_overlay)
         layout.addWidget(close_btn, alignment=Qt.AlignCenter)
 
     def resizeEvent(self, event):
@@ -2232,10 +1636,17 @@ class MinecraftLauncher(QMainWindow):
         super().resizeEvent(event)
 
     def set_default_avatar(self):
-        """Affiche le skin de Steve par défaut comme avatar 3D."""
-        self.avatar_3d.skin_url = "https://minotar.net/skin/steve"
-        self.avatar_3d.texture_id = None
-        self.avatar_3d.update()
+        """Affiche le skin de Steve par défaut comme avatar (corps entier avec armure)."""
+        url = "https://minotar.net/armor/body/steve/120"
+        try:
+            data = requests.get(url, timeout=5).content
+            pixmap = QPixmap()
+            pixmap.loadFromData(data)
+            self.avatar_label.setPixmap(pixmap.scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        except Exception:
+            # fallback logo si problème réseau
+            default_avatar = QPixmap('assets/textures/logo.png').scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.avatar_label.setPixmap(default_avatar)
 
     def update_stats_on_launch(self, playtime_minutes):
         """Met à jour les stats après un lancement de jeu."""
@@ -2379,3 +1790,21 @@ class MinecraftLauncher(QMainWindow):
                 tr_key = label.property("tr_key")
                 if tr_key:
                     label.setText(translations.tr(tr_key))
+
+    def _retranslate_widget(self, widget):
+        """Helper method to retranslate widget and its children."""
+        if not widget:
+            return
+        # Retranslate QLabel if it has a tr_key property
+        if isinstance(widget, QLabel):
+            tr_key = widget.property("tr_key")
+            if tr_key:
+                widget.setText(translations.tr(tr_key))
+        # Recursively retranslate children
+        if hasattr(widget, 'layout') and widget.layout():
+            for i in range(widget.layout().count()):
+                item = widget.layout().itemAt(i)
+                if item.widget():
+                    self._retranslate_widget(item.widget())
+                elif item.layout():
+                    self._retranslate_widget(item.layout())
