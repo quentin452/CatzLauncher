@@ -1304,14 +1304,17 @@ class MinecraftLauncher(QMainWindow):
 
             self.signals.status.emit(translations.tr("installation.launching_minecraft"))
 
-            # Mesure du temps de jeu
             start_time = time.time()
             process = subprocess.Popen(minecraft_command, cwd=modpack_profile_dir)
+            self.update_launch_stat() 
+            def update_stats_periodically():
+                while process.poll() is None:
+                    elapsed = (time.time() - start_time) / 60
+                    self.update_playtime_stat(elapsed)
+                    time.sleep(10)
+            stats_thread = threading.Thread(target=update_stats_periodically, daemon=True)
+            stats_thread.start()
             process.wait()
-            end_time = time.time()
-            playtime_minutes = (end_time - start_time) / 60
-            self.update_stats_on_launch(playtime_minutes)
-
             self.signals.status.emit(translations.tr("installation.ready"))
         except Exception as e:
             self.signals.status.emit(translations.tr("installation.launch_error"))
@@ -1334,7 +1337,6 @@ class MinecraftLauncher(QMainWindow):
             self.showNormal()
         else:
             self.showMaximized()
-            
     # --- Window Dragging and Native Interactions ---
     def mousePressEvent(self, event):
         """ Captures the initial position and offset to start dragging. """
@@ -1350,6 +1352,7 @@ class MinecraftLauncher(QMainWindow):
         else:
             self.drag_offset = None
             super().mousePressEvent(event)
+        self.update_last_activity_stat()
 
     def mouseMoveEvent(self, event):
         self.particle_system.mouse_move_event(event.pos())
@@ -1535,6 +1538,7 @@ class MinecraftLauncher(QMainWindow):
 
     def show_stats(self):
         """Affiche les statistiques utilisateur dans un overlay moderne et robuste sans ombre portée."""
+        
         # Supprime l'overlay existant s'il y en a un
         if hasattr(self, 'stats_overlay') and self.stats_overlay is not None:
             try:
@@ -1589,7 +1593,7 @@ class MinecraftLauncher(QMainWindow):
         # Affichage stylé des stats
         stat_labels = [
             (translations.tr("stats.last_activity"), last_activity),
-            (translations.tr("stats.playtime"), f"{playtime} {translations.tr('stats.minutes')}"),
+            (translations.tr("stats.playtime"), self.format_playtime_minutes(playtime)),
             (translations.tr("stats.launch_count"), str(launch_count)),
             (translations.tr("stats.login_count"), str(login_count)),
         ]
@@ -1648,16 +1652,37 @@ class MinecraftLauncher(QMainWindow):
             default_avatar = QPixmap('assets/textures/logo.png').scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.avatar_label.setPixmap(default_avatar)
 
-    def update_stats_on_launch(self, playtime_minutes):
-        """Met à jour les stats après un lancement de jeu."""
+    def update_last_activity_stat(self):
         try:
             stats = {}
             if os.path.exists(STATS_FILE):
                 with open(STATS_FILE, 'r', encoding='utf-8') as f:
                     stats = json.load(f)
             stats['last_activity'] = datetime.now().strftime('%d/%m/%Y %H:%M')
-            stats['launch_count'] = stats.get('launch_count', 0) + 1
+            with open(STATS_FILE, 'w', encoding='utf-8') as f:
+                json.dump(stats, f, indent=4)
+        except Exception as e:
+            print(f"Erreur lors de la mise à jour des stats de lancement : {e}")
+
+    def update_playtime_stat(self, playtime_minutes):
+        try:
+            stats = {}
+            if os.path.exists(STATS_FILE):
+                with open(STATS_FILE, 'r', encoding='utf-8') as f:
+                    stats = json.load(f)
             stats['playtime'] = stats.get('playtime', 0) + int(playtime_minutes)
+            with open(STATS_FILE, 'w', encoding='utf-8') as f:
+                json.dump(stats, f, indent=4)
+        except Exception as e:
+            print(f"Erreur lors de la mise à jour des stats de lancement : {e}")
+
+    def update_launch_stat(self):
+        try:
+            stats = {}
+            if os.path.exists(STATS_FILE):
+                with open(STATS_FILE, 'r', encoding='utf-8') as f:
+                    stats = json.load(f)
+            stats['launch_count'] = stats.get('launch_count', 0) + 1
             with open(STATS_FILE, 'w', encoding='utf-8') as f:
                 json.dump(stats, f, indent=4)
         except Exception as e:
@@ -1670,7 +1695,6 @@ class MinecraftLauncher(QMainWindow):
             if os.path.exists(STATS_FILE):
                 with open(STATS_FILE, 'r', encoding='utf-8') as f:
                     stats = json.load(f)
-            stats['last_activity'] = datetime.now().strftime('%d/%m/%Y %H:%M')
             stats['login_count'] = stats.get('login_count', 0) + 1
             with open(STATS_FILE, 'w', encoding='utf-8') as f:
                 json.dump(stats, f, indent=4)
@@ -1808,3 +1832,21 @@ class MinecraftLauncher(QMainWindow):
                     self._retranslate_widget(item.widget())
                 elif item.layout():
                     self._retranslate_widget(item.layout())
+
+    def format_playtime_minutes(self, minutes):
+        """Formate un nombre de minutes en chaîne lisible (ex: '1 h 30 min', '2 j 3 h 5 min')."""
+        try:
+            minutes = int(round(minutes))
+            days = minutes // (24 * 60)
+            hours = (minutes % (24 * 60)) // 60
+            mins = minutes % 60
+            parts = []
+            if days > 0:
+                parts.append(f"{days} j")
+            if hours > 0:
+                parts.append(f"{hours} h")
+            if mins > 0 or not parts:
+                parts.append(f"{mins} min")
+            return ' '.join(parts)
+        except Exception as e:
+            return f"{minutes} min"
