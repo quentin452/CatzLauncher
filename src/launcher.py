@@ -10,7 +10,8 @@ from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import traceback
 import time
-
+import random
+import psutil
 from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QPropertyAnimation, QEasingCurve, QTimer, QParallelAnimationGroup, QPoint
 from PyQt5.QtGui import QTransform
@@ -30,10 +31,10 @@ from src.utils import (
     install_forge_if_needed, refresh_ms_token,
     exchange_code_for_token, authenticate_with_xbox, authenticate_with_xsts,
     login_with_minecraft, get_minecraft_profile, is_modpack_installed,
-    save_github_token, load_github_token, is_connected_to_internet, STATS_FILE, CONFIG_FILE, SAVE_DIR
+    save_github_token, load_github_token, is_connected_to_internet, install_or_update_modpack_github, STATS_FILE, CONFIG_FILE, SAVE_DIR
 )
-from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
-from src.launcher_updater import LauncherUpdateManager, is_git_repo
+from src.particles import ParticleSystem, Particle, AnimatedButton, LoadingSpinner
+from src.launcher_updater import LauncherUpdateManager, is_git_repo, perform_launcher_update as do_update
 
 class TranslationManager:
     """Gestionnaire de traductions pour le launcher."""
@@ -225,7 +226,6 @@ class AnimatedProgressBar(QProgressBar):
         """Update particles for progress bar."""
         if self.value() > 0 and self.value() < self.maximum():
             # Emit particles occasionally during progress
-            import random
             if random.random() < 0.1:
                 self.emit_particles()
                 
@@ -236,10 +236,7 @@ class AnimatedProgressBar(QProgressBar):
         self.update()
         
     def emit_particles(self):
-        """Emit particles from progress bar."""
-        import random
-        from src.particles import Particle
-        
+        """Emit particles from progress bar."""        
         progress_width = (self.value() / self.maximum()) * self.width()
         for _ in range(2):
             particle = Particle(
@@ -767,7 +764,6 @@ class MinecraftLauncher(QMainWindow):
 
         # Max Memory Slider
         try:
-            import psutil
             total_gb = int(psutil.virtual_memory().total / (1024 ** 3))
             total_gb = min(total_gb, 64)  # Cap at 64 GB for sanity
         except ImportError:
@@ -834,7 +830,6 @@ class MinecraftLauncher(QMainWindow):
         self.signals.updates_found.connect(self.prompt_for_updates)
         self.signals.installation_finished.connect(self.refresh_modpack_list)
         self.signals.modpack_list_refreshed.connect(self.update_modpack_list_ui)
-        self.signals.error_dialog.connect(self.show_error_dialog)
         self.signals.single_update_found.connect(self.handle_single_update_found)
         self.signals.launcher_update_found.connect(self.prompt_launcher_update)
 
@@ -1202,7 +1197,6 @@ class MinecraftLauncher(QMainWindow):
 
             # Utiliser la nouvelle logique delta pour les modpacks GitHub
             if 'github.com' in modpack_data["url"] and '/archive/refs/heads/' in modpack_data["url"]:
-                from src.utils import install_or_update_modpack_github
                 success = install_or_update_modpack_github(
                     modpack_data["url"],
                     install_dir,
@@ -1469,8 +1463,6 @@ class MinecraftLauncher(QMainWindow):
             QApplication.processEvents() # Permet à l'UI de rester réactive
 
         try:
-            # Importe la fonction de mise à jour et la lance
-            from src.launcher_updater import perform_launcher_update as do_update
             success, result = do_update(self.launcher_repo_url, update_info, progress_callback)
             
             if success and result:
