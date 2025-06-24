@@ -1301,9 +1301,12 @@ class MinecraftLauncher(QMainWindow):
             process = subprocess.Popen(minecraft_command, cwd=modpack_profile_dir)
             self.update_launch_stat() 
             def update_stats_periodically():
+                last_update_time = start_time
                 while process.poll() is None:
-                    elapsed = (time.time() - start_time) / 60
-                    self.update_playtime_stat(elapsed)
+                    current_time = time.time()
+                    elapsed_increment_seconds = current_time - last_update_time  
+                    self.update_playtime_stat(elapsed_increment_seconds)
+                    last_update_time = current_time
                     time.sleep(10)
             stats_thread = threading.Thread(target=update_stats_periodically, daemon=True)
             stats_thread.start()
@@ -1576,7 +1579,7 @@ class MinecraftLauncher(QMainWindow):
         # Affichage stylé des stats
         stat_labels = [
             (translations.tr("stats.last_activity"), last_activity),
-            (translations.tr("stats.playtime"), self.format_playtime_minutes(playtime)),
+            (translations.tr("stats.playtime"), self.format_playtime_seconds(playtime)),
             (translations.tr("stats.launch_count"), str(launch_count)),
             (translations.tr("stats.login_count"), str(login_count)),
         ]
@@ -1647,13 +1650,13 @@ class MinecraftLauncher(QMainWindow):
         except Exception as e:
             print(f"Erreur lors de la mise à jour des stats de lancement : {e}")
 
-    def update_playtime_stat(self, playtime_minutes):
+    def update_playtime_stat(self, playtime_seconds):
         try:
             stats = {}
             if os.path.exists(STATS_FILE):
                 with open(STATS_FILE, 'r', encoding='utf-8') as f:
                     stats = json.load(f)
-            stats['playtime'] = stats.get('playtime', 0) + int(playtime_minutes)
+            stats['playtime'] = stats.get('playtime', 0) + round(playtime_seconds)  # Stocker en secondes
             with open(STATS_FILE, 'w', encoding='utf-8') as f:
                 json.dump(stats, f, indent=4)
         except Exception as e:
@@ -1816,20 +1819,23 @@ class MinecraftLauncher(QMainWindow):
                 elif item.layout():
                     self._retranslate_widget(item.layout())
 
-    def format_playtime_minutes(self, minutes):
-        """Formate un nombre de minutes en chaîne lisible (ex: '1 h 30 min', '2 j 3 h 5 min')."""
+    def format_playtime_seconds(self, seconds):
+        """Formate un nombre de secondes en chaîne lisible (ex: '1 h 30 min 45 s', '2 j 3 h 5 min 30 s')."""
         try:
-            minutes = int(round(minutes))
-            days = minutes // (24 * 60)
-            hours = (minutes % (24 * 60)) // 60
-            mins = minutes % 60
+            total_seconds = int(round(seconds))  # Convertir en secondes entières
+            days = total_seconds // (24 * 3600)
+            hours = (total_seconds % (24 * 3600)) // 3600
+            mins = (total_seconds % 3600) // 60
+            secs = total_seconds % 60
             parts = []
             if days > 0:
                 parts.append(f"{days} j")
             if hours > 0:
                 parts.append(f"{hours} h")
-            if mins > 0 or not parts:
+            if mins > 0:
                 parts.append(f"{mins} min")
+            if secs > 0 or not parts:
+                parts.append(f"{secs} s")
             return ' '.join(parts)
         except Exception as e:
-            return f"{minutes} min"
+            return f"{seconds} s"
