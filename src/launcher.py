@@ -30,7 +30,7 @@ from src.utils import (
     install_forge_if_needed, refresh_ms_token,
     exchange_code_for_token, authenticate_with_xbox, authenticate_with_xsts,
     login_with_minecraft, get_minecraft_profile, is_modpack_installed,
-    save_github_token, load_github_token, is_connected_to_internet
+    save_github_token, load_github_token, is_connected_to_internet, STATS_FILE
 )
 from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
 from src.launcher_updater import LauncherUpdateManager, is_git_repo
@@ -1502,7 +1502,7 @@ class MinecraftLauncher(QMainWindow):
 
         # Lecture des stats
         try:
-            with open('user_stats.json', 'r', encoding='utf-8') as f:
+            with open(STATS_FILE, 'r', encoding='utf-8') as f:
                 stats = json.load(f)
             last_activity = stats.get('last_activity', "Jamais")
             playtime = stats.get('playtime', 0)
@@ -1581,13 +1581,13 @@ class MinecraftLauncher(QMainWindow):
         """Met à jour les stats après un lancement de jeu."""
         try:
             stats = {}
-            if os.path.exists('user_stats.json'):
-                with open('user_stats.json', 'r', encoding='utf-8') as f:
+            if os.path.exists(STATS_FILE):
+                with open(STATS_FILE, 'r', encoding='utf-8') as f:
                     stats = json.load(f)
             stats['last_activity'] = datetime.now().strftime('%d/%m/%Y %H:%M')
             stats['launch_count'] = stats.get('launch_count', 0) + 1
             stats['playtime'] = stats.get('playtime', 0) + int(playtime_minutes)
-            with open('user_stats.json', 'w', encoding='utf-8') as f:
+            with open(STATS_FILE, 'w', encoding='utf-8') as f:
                 json.dump(stats, f, indent=4)
         except Exception as e:
             print(f"Erreur lors de la mise à jour des stats de lancement : {e}")
@@ -1596,12 +1596,12 @@ class MinecraftLauncher(QMainWindow):
         """Met à jour les stats après une connexion."""
         try:
             stats = {}
-            if os.path.exists('user_stats.json'):
-                with open('user_stats.json', 'r', encoding='utf-8') as f:
+            if os.path.exists(STATS_FILE):
+                with open(STATS_FILE, 'r', encoding='utf-8') as f:
                     stats = json.load(f)
             stats['last_activity'] = datetime.now().strftime('%d/%m/%Y %H:%M')
             stats['login_count'] = stats.get('login_count', 0) + 1
-            with open('user_stats.json', 'w', encoding='utf-8') as f:
+            with open(STATS_FILE, 'w', encoding='utf-8') as f:
                 json.dump(stats, f, indent=4)
         except Exception as e:
             print(f"Erreur lors de la mise à jour des stats de connexion : {e}")

@@ -88,6 +88,7 @@ def get_cumulative_changes(repo_url, old_sha, new_sha):
 SAVE_DIR = os.path.join(os.getcwd(), "saves")
 os.makedirs(SAVE_DIR, exist_ok=True)
 INSTALLED_FILE = os.path.join(SAVE_DIR, "installed_modpacks.json")
+STATS_FILE = os.path.join(SAVE_DIR, "user_stats.json")
 CONFIG_FILE = os.path.join(SAVE_DIR, "launcher_config.json")
 SERVICE_NAME = "CatzLauncher.GitHubToken"
 
