@@ -35,71 +35,6 @@ from src.utils import (
 from src.particles import ParticleSystem, AnimatedButton, LoadingSpinner
 from src.launcher_updater import LauncherUpdateManager, is_git_repo
 
-class TranslationManager:
-    """Gestionnaire de traductions pour le launcher."""
-    
-    def __init__(self):
-        self.translations = {}
-        self.current_language = "fr"
-        self.languages_dir = os.path.join(os.path.dirname(__file__), "../assets/languages/")
-        self.load_language("fr")  # Langue par défaut
-    
-    def get_available_languages(self):
-        """Retourne la liste des langues disponibles."""
-        try:
-            languages = []
-            for file in os.listdir(self.languages_dir):
-                if file.endswith('.json'):
-                    lang_code = file.replace('.json', '')
-                    languages.append(lang_code)
-            return languages
-        except FileNotFoundError:
-            return ["fr", "en"]
-    
-    def load_language(self, language_code):
-        """Charge les traductions pour une langue donnée."""
-        try:
-            lang_file = os.path.join(self.languages_dir, f"{language_code}.json")
-            with open(lang_file, 'r', encoding='utf-8') as f:
-                self.translations = json.load(f)
-            self.current_language = language_code
-            return True
-        except Exception as e:
-            print(f"Erreur lors du chargement de la langue {language_code}: {e}")
-            # Fallback vers français
-            try:
-                lang_file = os.path.join(self.languages_dir, "fr.json")
-                with open(lang_file, 'r', encoding='utf-8') as f:
-                    self.translations = json.load(f)
-                self.current_language = "fr"
-                return True
-            except:
-                return False
-    
-    def tr(self, key, **kwargs):
-        """Traduit une clé avec formatage optionnel."""
-        try:
-            # Navigation dans la structure JSON (ex: "main.modpacks_title")
-            keys = key.split('.')
-            value = self.translations
-            for k in keys:
-                value = value[k]
-            
-            # S'assurer que la valeur est une chaîne
-            if not isinstance(value, str):
-                return str(value)
-            
-            # Formatage si des paramètres sont fournis
-            if kwargs:
-                return value.format(**kwargs)
-            return value
-        except (KeyError, TypeError):
-            # Retourne la clé si la traduction n'est pas trouvée
-            return key
-
-# Instance globale du gestionnaire de traductions
-translations = TranslationManager()
-
 def load_qss_stylesheet(theme_name="vanilla.qss"):
     """Load the QSS stylesheet from file."""
     try:
@@ -293,7 +228,7 @@ class ModpackListItem(QWidget):
         # Bouton de vérification d'update
         self.check_update_btn = AnimatedButton("🔄")
         self.check_update_btn.setFixedSize(35, 35)
-        self.check_update_btn.setToolTip(translations.tr("modpack_item.check_update_tooltip"))
+        self.check_update_btn.setToolTip("Vérifier les mises à jour")
         self.check_update_btn.setProperty("class", "update-btn")
         layout.addWidget(self.check_update_btn)
     
@@ -302,11 +237,11 @@ class ModpackListItem(QWidget):
         if checking:
             self.check_update_btn.setText("⏳")
             self.check_update_btn.setEnabled(False)
-            self.check_update_btn.setToolTip(translations.tr("modpack_item.checking_tooltip"))
+            self.check_update_btn.setToolTip("En cours de vérification")
         else:
             self.check_update_btn.setText("🔄")
             self.check_update_btn.setEnabled(True)
-            self.check_update_btn.setToolTip(translations.tr("modpack_item.check_update_tooltip"))
+            self.check_update_btn.setToolTip("Vérifier les mises à jour")
 
 class AnimatedListWidget(QListWidget):
     """Enhanced list widget with hover effects and animations."""
@@ -344,7 +279,7 @@ class MinecraftLauncher(QMainWindow):
 
         self.client_id = load_azure_client_id()
 
-        self.setWindowTitle(translations.tr("window.title"))
+        self.setWindowTitle("🎮 CatzLauncher")
         self.setWindowIcon(QIcon('assets/textures/logo.png'))
         self.setMinimumSize(900, 700)
         
@@ -358,10 +293,6 @@ class MinecraftLauncher(QMainWindow):
         self.signals = WorkerSignals()
         self.config = self.load_config()
         self.auth_data = None
-        
-        # Charger la langue sauvegardée
-        saved_language = self.config.get("language", "fr")
-        translations.load_language(saved_language)
         
         # Initialize launcher updater
         self.launcher_repo_url = "https://github.com/quentin452/CatzLauncher"
@@ -448,7 +379,7 @@ class MinecraftLauncher(QMainWindow):
         logo_label.setPixmap(pixmap.scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         logo_label.setAlignment(Qt.AlignCenter)
         
-        loading_label = QLabel(translations.tr("loading.loading"), self)
+        loading_label = QLabel("Chargement...", self)
         loading_label.setAlignment(Qt.AlignCenter)
         loading_label.setStyleSheet("color: white; font-size: 16px; font-weight: bold; background: transparent;")
 
@@ -471,8 +402,8 @@ class MinecraftLauncher(QMainWindow):
         tabs = AnimatedTabWidget()
         self.main_tab = self._create_main_tab()
         self.config_tab = self._create_config_tab()
-        tabs.addTab(self.main_tab, translations.tr("tabs.play"))
-        tabs.addTab(self.config_tab, translations.tr("tabs.config"))
+        tabs.addTab(self.main_tab, "🎮 Jouer")
+        tabs.addTab(self.config_tab, "⚙️ Config")
         self.update_login_button_states()
         return tabs
 
@@ -512,7 +443,7 @@ class MinecraftLauncher(QMainWindow):
         layout.addWidget(logo_label)
         
         # Title
-        title_label = QLabel(translations.tr("window.header_title"))
+        title_label = QLabel("🎮 CatzLauncher")
         title_font = QFont()
         title_font.setPointSize(24)
         title_font.setBold(True)
@@ -562,7 +493,7 @@ class MinecraftLauncher(QMainWindow):
         modpack_layout.setSpacing(15)
         modpack_layout.setContentsMargins(0, 0, 0, 0)
 
-        title_label = QLabel(translations.tr("main.modpacks_title"))
+        title_label = QLabel("📦 Modpacks")
         title_font = QFont()
         title_font.setPointSize(18)
         title_font.setBold(True)
@@ -593,38 +524,22 @@ class MinecraftLauncher(QMainWindow):
         login_layout.addWidget(self.avatar_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Label d'état de connexion
-        self.account_info_label = QLabel(translations.tr("login.not_connected"))
+        self.account_info_label = QLabel("🔴 Non connecté")
         self.account_info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.account_info_label.setProperty("class", "status-disconnected")
         login_layout.addWidget(self.account_info_label)
 
         # Boutons (stacked)
-        self.login_btn = AnimatedButton(translations.tr("login.login_microsoft"))
+        self.login_btn = AnimatedButton("🔐 Se connecter avec Microsoft")
         self.login_btn.setFixedSize(220, 40)
-        self.logout_btn = AnimatedButton(translations.tr("login.logout"))
+        self.logout_btn = AnimatedButton("🚪 Déconnexion")
         self.logout_btn.setFixedHeight(40)
         self.logout_btn.setMinimumWidth(200)
         self.logout_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.logout_btn.setStyleSheet('''
-            QPushButton {
-                padding: 0 28px;
-                font-size: 16px;
-                font-weight: bold;
-                border-radius: 10px;
-            }
-        ''')
-        self.stats_btn = AnimatedButton(translations.tr("login.stats"))
+        self.stats_btn = AnimatedButton("📊 Stats")
         self.stats_btn.setFixedHeight(40)
         self.stats_btn.setMinimumWidth(100)
         self.stats_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.stats_btn.setStyleSheet('''
-            QPushButton {
-                padding: 0 28px;
-                font-size: 16px;
-                font-weight: bold;
-                border-radius: 10px;
-            }
-        ''')
 
         # Layout horizontal pour les boutons déconnexion+stats
         btn_row = QHBoxLayout()
@@ -662,18 +577,18 @@ class MinecraftLauncher(QMainWindow):
         self.progress.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         bottom_layout.addWidget(self.progress)
 
-        self.status_label = QLabel(translations.tr("main.ready_to_play"))
+        self.status_label = QLabel("✨ Prêt à jouer !")
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.status_label.setProperty("class", "status")
         bottom_layout.addWidget(self.status_label)
 
         btn_layout = QHBoxLayout()
         btn_layout.setSpacing(15)
-        self.play_btn = AnimatedButton(translations.tr("main.play_button"))
+        self.play_btn = AnimatedButton("🚀 Jouer")
         self.play_btn.setFixedHeight(50)
         self.play_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         btn_layout.addWidget(self.play_btn)
-        self.check_updates_btn = AnimatedButton(translations.tr("main.check_updates_button"))
+        self.check_updates_btn = AnimatedButton("🔄 Vérifier les mises à jour")
         self.check_updates_btn.setFixedHeight(50)
         self.check_updates_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         btn_layout.addWidget(self.check_updates_btn)
@@ -708,8 +623,9 @@ class MinecraftLauncher(QMainWindow):
         layout.setSpacing(20)
 
         # Title
-        title_label = QLabel(translations.tr("config.title"))
+        title_label = QLabel("⚙️ Configuration")
         title_label.setProperty("class", "title")
+        title_label.setProperty("tr_key", "config.title")
         layout.addWidget(title_label)
         
         # Use a container widget for the form for styling purposes
@@ -726,35 +642,52 @@ class MinecraftLauncher(QMainWindow):
         # Java Path
         java_path_layout = QHBoxLayout()
         self.java_path_edit = QLineEdit(self.config.get("java_path", ""))
-        self.browse_java_btn = AnimatedButton(translations.tr("config.browse"))
+        self.java_path_edit.setProperty("tr_key", "config.java_path")
+        self.browse_java_btn = AnimatedButton("📂 Parcourir")
+        self.browse_java_btn.setProperty("tr_key", "config.browse")
         java_path_layout.addWidget(self.java_path_edit)
         java_path_layout.addWidget(self.browse_java_btn)
-        form_layout.addRow(QLabel(translations.tr("config.java_path")), java_path_layout)
+        java_path_label = QLabel("☕ Chemin Java")
+        java_path_label.setProperty("tr_key", "config.java_path")
+        form_layout.addRow(java_path_label, java_path_layout)
 
         # Theme Selector
         self.theme_selector = QComboBox()
+        self.theme_selector.setProperty("tr_key", "config.theme")
         self.populate_themes()
-        form_layout.addRow(QLabel(translations.tr("config.theme")), self.theme_selector)
+        theme_label = QLabel("🎨 Thème")
+        theme_label.setProperty("tr_key", "config.theme")
+        form_layout.addRow(theme_label, self.theme_selector)
 
         # Language Selector
         self.language_selector = QComboBox()
+        self.language_selector.setProperty("tr_key", "config.language")
         self.populate_languages()
-        form_layout.addRow(QLabel(translations.tr("config.language")), self.language_selector)
+        language_label = QLabel("🌍 Langue")
+        language_label.setProperty("tr_key", "config.language")
+        form_layout.addRow(language_label, self.language_selector)
 
         # GitHub Token
         self.github_token_edit = QLineEdit()
-        self.github_token_edit.setPlaceholderText(translations.tr("config.token_placeholder"))
+        self.github_token_edit.setPlaceholderText("🔑 Token GitHub")
+        self.github_token_edit.setProperty("tr_key", "config.token_placeholder")
         self.github_token_edit.setEchoMode(QLineEdit.Password)
-        form_layout.addRow(QLabel(translations.tr("config.github_token")), self.github_token_edit)
+        github_token_label = QLabel("🔑 Token GitHub")
+        github_token_label.setProperty("tr_key", "config.github_token")
+        form_layout.addRow(github_token_label, self.github_token_edit)
         
         # Token Status Label (spans across columns)
         self.token_status_label = QLabel()
+        self.token_status_label.setProperty("tr_key", "config.token_saved") # sera mis à jour dynamiquement
         self.update_token_status_label()
         form_layout.addRow(self.token_status_label)
         
         # JVM Arguments
         self.java_args_edit = QLineEdit(self.config.get("java_args", ""))
-        form_layout.addRow(QLabel(translations.tr("config.jvm_args")), self.java_args_edit)
+        self.java_args_edit.setProperty("tr_key", "config.jvm_args")
+        java_args_label = QLabel("⚡ Arguments JVM")
+        java_args_label.setProperty("tr_key", "config.jvm_args")
+        form_layout.addRow(java_args_label, self.java_args_edit)
 
         # Max Memory Slider
         try:
@@ -769,36 +702,44 @@ class MinecraftLauncher(QMainWindow):
         self.max_memory_slider.setValue(min(int(self.config.get("max_memory", 4)), total_gb))
         self.max_memory_slider.setTickInterval(1)
         self.max_memory_slider.setTickPosition(QSlider.TicksBelow)
-        self.max_memory_label = QLabel(f"RAM Max: {self.max_memory_slider.value()} Go (/{total_gb} Go)")
+        self.max_memory_slider.setProperty("tr_key", "config.max_memory")
+        self.max_memory_label = QLabel(f"💾 RAM Max: {self.max_memory_slider.value()} Go (/{total_gb} Go)")
+        self.max_memory_label.setProperty("tr_key", "config.max_memory")
         def update_mem_label(val):
-            self.max_memory_label.setText(f"RAM Max: {val} Go (/{total_gb} Go)")
+            self.max_memory_label.setText(f"💾 RAM Max: {val} Go (/{total_gb} Go)")
         self.max_memory_slider.valueChanged.connect(update_mem_label)
         mem_layout = QHBoxLayout()
         mem_layout.addWidget(self.max_memory_slider)
         mem_layout.addWidget(self.max_memory_label)
-        form_layout.addRow(QLabel(translations.tr("config.max_memory")), mem_layout)
+        max_memory_label = QLabel("💾 RAM Max")
+        max_memory_label.setProperty("tr_key", "config.max_memory")
+        form_layout.addRow(max_memory_label, mem_layout)
 
         layout.addWidget(form_container)
 
         # Auto-update checkbox
-        self.auto_check_cb = QCheckBox(translations.tr("config.auto_check_updates"))
+        self.auto_check_cb = QCheckBox("🔄 Vérifier les mises à jour automatiquement")
+        self.auto_check_cb.setProperty("tr_key", "config.auto_check_updates")
         self.auto_check_cb.setChecked(self.config.get("auto_check_updates", True))
         layout.addWidget(self.auto_check_cb)
 
         # Launcher auto-update checkbox
-        self.auto_check_launcher_cb = QCheckBox(translations.tr("config.auto_check_launcher"))
+        self.auto_check_launcher_cb = QCheckBox("🚀 Vérifier les mises à jour du launcher automatiquement")
+        self.auto_check_launcher_cb.setProperty("tr_key", "config.auto_check_launcher")
         self.auto_check_launcher_cb.setChecked(self.config.get("auto_check_launcher_updates", True))
         layout.addWidget(self.auto_check_launcher_cb)
 
         # Launcher update button
-        self.check_launcher_updates_btn = AnimatedButton(translations.tr("config.check_launcher_updates"))
+        self.check_launcher_updates_btn = AnimatedButton("🚀 Vérifier les mises à jour du launcher")
+        self.check_launcher_updates_btn.setProperty("tr_key", "config.check_launcher_updates")
         self.check_launcher_updates_btn.setFixedHeight(40)
         layout.addWidget(self.check_launcher_updates_btn)
 
         layout.addStretch()
         
         # Save button (outside the scroll area)
-        self.save_settings_btn = AnimatedButton(translations.tr("config.save_config"))
+        self.save_settings_btn = AnimatedButton("💾 Sauvegarder la configuration")
+        self.save_settings_btn.setProperty("tr_key", "config.save_config")
         self.save_settings_btn.setFixedHeight(50)
         main_layout.addWidget(self.save_settings_btn)
 
@@ -862,13 +803,6 @@ class MinecraftLauncher(QMainWindow):
         self.config["theme"] = self.theme_selector.currentText()
         self.config["max_memory"] = self.max_memory_slider.value()
         
-        # Sauvegarder et appliquer la nouvelle langue
-        new_language = self.language_selector.currentText()
-        if new_language != self.config.get("language", "fr"):
-            self.config["language"] = new_language
-            translations.load_language(new_language)
-            self.retranslate_ui()
-        
         # Gérer la sauvegarde du token séparément et de manière sécurisée
         new_token = self.github_token_edit.text()
         if new_token:
@@ -880,7 +814,7 @@ class MinecraftLauncher(QMainWindow):
         self._apply_styles() # Re-apply styles to reflect theme change instantly
         
         # Show success animation
-        self.status_label.setText(translations.tr("config.config_saved"))
+        self.status_label.setText("✅ Configuration sauvegardée")
         apply_css_class(self.status_label, "status-success")
         
         # Reset style after 3 seconds
@@ -898,20 +832,20 @@ class MinecraftLauncher(QMainWindow):
     def update_token_status_label(self):
         """Met à jour le label de statut du token."""
         if load_github_token():
-            self.token_status_label.setText(translations.tr("config.token_saved"))
+            self.token_status_label.setText("✅ Token sauvegardé")
             apply_css_class(self.token_status_label, "token-status-ok")
         else:
-            self.token_status_label.setText(translations.tr("config.token_not_saved"))
+            self.token_status_label.setText("⚠️ Token non sauvegardé")
             apply_css_class(self.token_status_label, "token-status-warning")
 
     def show_client_id_error(self):
         """Affiche une erreur si le Client ID n'est pas configuré."""
-        error_msg = translations.tr("login.config_required_message")
-        QMessageBox.warning(self, translations.tr("login.config_required"), error_msg)
+        error_msg = "Le Client ID n'est pas configuré. Veuillez configurer le Client ID dans le fichier azure_config.json."
+        QMessageBox.warning(self, "Erreur de configuration", error_msg)
         # On pourrait aussi désactiver le bouton de login
         self.login_btn.setEnabled(False)
-        self.login_btn.setText(translations.tr("login.config_required_button"))
-        self.login_btn.setToolTip(translations.tr("login.config_required_tooltip"))
+        self.login_btn.setText("Configuration requise")
+        self.login_btn.setToolTip("Configuration requise")
 
     def microsoft_login(self):
         """Start Microsoft login, handling user interaction in the main thread."""
@@ -926,13 +860,13 @@ class MinecraftLauncher(QMainWindow):
         try:
             webbrowser.open(login_url)
         except Exception as e:
-            QMessageBox.critical(self, translations.tr("errors.critical_error"), translations.tr("errors.browser_error", error=str(e)))
+            QMessageBox.critical(self, "❌ Erreur critique", "Erreur lors de l'ouverture du navigateur: " + str(e))
             return
 
-        full_redirect_url, ok = QInputDialog.getText(self, "Code d'authentification", translations.tr("login.auth_code_prompt"))
+        full_redirect_url, ok = QInputDialog.getText(self, "🔐 Code d'authentification", "Entrez le code d'authentification:")
 
         if not (ok and full_redirect_url):
-            self.status_label.setText(translations.tr("login.login_cancelled"))
+            self.status_label.setText("❌ Connexion annulée")
             return
 
         try:
@@ -942,12 +876,12 @@ class MinecraftLauncher(QMainWindow):
             auth_code = None
 
         if not auth_code:
-            QMessageBox.warning(self, translations.tr("errors.critical_error"), translations.tr("login.auth_code_error"))
+            QMessageBox.warning(self, "❌ Erreur critique", "Erreur lors de la récupération du code d'authentification")
             return
 
         self.header_spinner.show()
         self.login_btn.setEnabled(False)
-        self.status_label.setText(translations.tr("login.login_in_progress"))
+        self.status_label.setText("🔄 Connexion en cours...")
         self._do_microsoft_auth_flow(auth_code=auth_code)
 
     def try_refresh_login(self):
@@ -955,7 +889,7 @@ class MinecraftLauncher(QMainWindow):
         refresh_token = self.config.get("refresh_token")
         if refresh_token:
             self.header_spinner.show()
-            self.status_label.setText(translations.tr("login.reconnecting"))
+            self.status_label.setText("Reconnexion en cours...")
             self._do_microsoft_auth_flow(refresh_token=refresh_token)
 
     @run_in_thread
@@ -1002,16 +936,16 @@ class MinecraftLauncher(QMainWindow):
             error_message = f"{type(e).__name__}: {e}"
             if hasattr(e, 'response') and e.response is not None:
                 error_message = f"HTTP {e.response.status_code} pour {e.response.url}"
-            self.signals.login_error.emit(translations.tr("login.auth_error", error=error_message))
+            self.signals.login_error.emit("Erreur lors de la connexion: " + error_message)
 
     def handle_login_complete(self, profile):
         """Handle successful login with animation."""
         self.header_spinner.hide()
         self.login_btn.setEnabled(True)
-        self.account_info_label.setText(translations.tr("login.connected", name=profile['name']))
+        self.account_info_label.setText("🟢 Connecté: " + profile['name'])
         apply_css_class(self.account_info_label, "status-connected")
         self.update_login_button_states()
-        self.status_label.setText(translations.tr("login.login_success", name=profile['name']))
+        self.status_label.setText("✅ Connexion réussie: " + profile['name'])
         # Afficher la tête Minecraft du joueur
         self.update_avatar(profile['name'])
         self.update_stats_on_login()
@@ -1020,10 +954,10 @@ class MinecraftLauncher(QMainWindow):
         """Handle login error with animation."""
         self.header_spinner.hide()
         self.login_btn.setEnabled(True)
-        self.account_info_label.setText(f"❌ {error}")
+        self.account_info_label.setText("❌ " + error)
         apply_css_class(self.account_info_label, "status-error")
         self.update_login_button_states()
-        self.status_label.setText(translations.tr("login.connection_error"))
+        self.status_label.setText("❌ Erreur de connexion")
         self.set_default_avatar()
 
     def logout(self):
@@ -1031,10 +965,10 @@ class MinecraftLauncher(QMainWindow):
         self.auth_data = None
         self.config.pop("refresh_token", None)
         self.save_config()
-        self.account_info_label.setText(translations.tr("login.not_connected"))
+        self.account_info_label.setText("🔴 Non connecté")
         apply_css_class(self.account_info_label, "status-disconnected")
         self.update_login_button_states()
-        self.status_label.setText(translations.tr("login.logout_success"))
+        self.status_label.setText("👋 Déconnexion réussie")
         # Remettre l'avatar par défaut
         self.set_default_avatar()
 
@@ -1053,14 +987,14 @@ class MinecraftLauncher(QMainWindow):
     def check_modpack_updates(self):
         """Check for modpack updates with enhanced progress."""
         try:
-            self.signals.status.emit(translations.tr("main.checking_updates"))
+            self.signals.status.emit("Vérification des mises à jour...")
             modpacks = self.load_modpacks()
             updates = []
             
             for i, modpack in enumerate(modpacks):
                 progress = int((i / len(modpacks)) * 100)
                 self.signals.progress.emit(progress)
-                self.signals.status.emit(translations.tr("main.checking_single", name=modpack['name']))
+                self.signals.status.emit(f"Vérification de {modpack['name']}...")
                 
                 update_needed, _ = check_update(modpack['name'], modpack['url'], modpack.get('last_modified'))
                 if update_needed:
@@ -1070,7 +1004,7 @@ class MinecraftLauncher(QMainWindow):
             if updates:
                 self.signals.updates_found.emit(updates)
             else:
-                self.signals.status.emit(translations.tr("main.no_updates"))
+                self.signals.status.emit("Aucune mise à jour disponible")
                 
         except Exception as e:
             traceback.print_exc()
@@ -1079,23 +1013,23 @@ class MinecraftLauncher(QMainWindow):
     def manual_check_updates(self):
         """Manual check for updates with animation."""
         self.check_updates_btn.setEnabled(False)
-        self.check_updates_btn.setText(translations.tr("main.checking_updates"))
+        self.check_updates_btn.setText("Vérification...")
         self.check_modpack_updates()
         
         def reenable_button():
             self.check_updates_btn.setEnabled(True)
-            self.check_updates_btn.setText(translations.tr("main.check_updates_button"))
+            self.check_updates_btn.setText("Vérifier les mises à jour")
 
         QTimer.singleShot(5000, reenable_button)
 
     def prompt_for_updates(self, updates):
         """Prompt for updates with enhanced UI."""
         update_names = [modpack['name'] for modpack in updates]
-        msg = translations.tr("main.updates_found") + ":\n" + "\n".join(f"• {name}" for name in update_names)
+        msg = "Mises à jour disponibles:\n" + "\n".join(f"• {name}" for name in update_names)
         
         reply = QMessageBox.question(
-            self, translations.tr("main.updates_found"),
-            msg + "\n\n" + translations.tr("main.install_updates"),
+            self, "Mises à jour disponibles",
+            msg + "\n\nVoulez-vous installer ces mises à jour ?",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.Yes
         )
@@ -1108,7 +1042,7 @@ class MinecraftLauncher(QMainWindow):
         """Récupère le dossier Minecraft et lance l'installation dans un thread."""
         minecraft_dir = get_minecraft_directory()
         if not minecraft_dir:
-            self.signals.error_dialog.emit(translations.tr("errors.critical_error"), translations.tr("errors.minecraft_dir_not_found"))
+            self.signals.error_dialog.emit("Erreur critique", "Dossier Minecraft non trouvé")
             return
         
         # Lance la méthode threadée avec le bon chemin
@@ -1118,12 +1052,12 @@ class MinecraftLauncher(QMainWindow):
     def refresh_modpack_list(self):
         """Refresh modpack list with enhanced loading."""
         try:
-            self.signals.status.emit(translations.tr("main.checking_updates"))
+            self.signals.status.emit("Chargement des modpacks...")
             modpacks = self.load_modpacks()
             self.signals.modpack_list_refreshed.emit(modpacks)
-            self.signals.status.emit(translations.tr("main.ready_to_play"))
+            self.signals.status.emit("Prêt à jouer")
         except Exception as e:
-            self.signals.status.emit(translations.tr("main.check_error", name="modpacks", error=str(e)))
+            self.signals.status.emit(f"Erreur lors du chargement des modpacks: {str(e)}")
 
     def update_modpack_list_ui(self, modpacks):
         """Update modpack list UI with animations."""
@@ -1164,18 +1098,18 @@ class MinecraftLauncher(QMainWindow):
     def _do_check_single_modpack_update(self, modpack_data):
         """Vérifie les mises à jour pour un seul modpack dans un thread."""
         try:
-            self.signals.status.emit(translations.tr("main.checking_single", name=modpack_data['name']))
+            self.signals.status.emit(f"Vérification de {modpack_data['name']}...")
             
             update_needed, reason = check_update(modpack_data['name'], modpack_data['url'], modpack_data.get('last_modified'))
             
             if update_needed:
                 self.signals.single_update_found.emit(modpack_data)
-                self.signals.status.emit(translations.tr("main.update_available", name=modpack_data['name']))
+                self.signals.status.emit(f"Mise à jour disponible pour {modpack_data['name']}")
             else:
-                self.signals.status.emit(translations.tr("main.up_to_date", name=modpack_data['name']))
+                self.signals.status.emit(f"{modpack_data['name']} est à jour")
                 
         except Exception as e:
-            self.signals.status.emit(translations.tr("main.check_error", name=modpack_data['name'], error=str(e)))
+            self.signals.status.emit(f"Erreur lors de la vérification de {modpack_data['name']}: {str(e)}")
         finally:
             # Remettre le bouton dans son état normal
             for i in range(self.modpack_list.count()):
@@ -1190,7 +1124,7 @@ class MinecraftLauncher(QMainWindow):
         """Installe le modpack dans un thread d'arrière-plan."""
         self.play_btn.setEnabled(False)
         try:
-            self.signals.status.emit(translations.tr("installation.installing", name=modpack_data['name']))
+            self.signals.status.emit(f"Installation de {modpack_data['name']}...")
             self.signals.progress.emit(0)
 
             install_dir = os.path.join(minecraft_directory, "modpacks")
@@ -1208,7 +1142,7 @@ class MinecraftLauncher(QMainWindow):
                 )
                 
                 if not success:
-                    raise Exception(translations.tr("installation.installation_failed", name=modpack_data['name']))
+                    raise Exception(f"Échec de l'installation de {modpack_data['name']}")
             else:
                 # Installation classique pour les autres types d'URL
                 install_modpack_files_fresh(
@@ -1220,13 +1154,13 @@ class MinecraftLauncher(QMainWindow):
                 )
 
             self.signals.progress.emit(100)
-            self.signals.status.emit(translations.tr("installation.installation_complete"))
+            self.signals.status.emit("Installation terminée")
             self.signals.installation_finished.emit()
         except Exception as e:
-            error_msg = translations.tr("installation.installation_error", name=modpack_data['name'], error=str(e))
+            error_msg = f"Erreur lors de l'installation de {modpack_data['name']}: {str(e)}"
             print(f"ERROR [Échec de l'installation]: {error_msg}")
-            self.signals.error_dialog.emit(translations.tr("errors.critical_error"), error_msg)
-            self.signals.status.emit(translations.tr("installation.launch_error"))
+            self.signals.error_dialog.emit("Erreur critique", error_msg)
+            self.signals.status.emit("Erreur de lancement")
         finally:
             self.play_btn.setEnabled(True)
             self.signals.progress.emit(0)
@@ -1234,30 +1168,30 @@ class MinecraftLauncher(QMainWindow):
     def launch_game(self):
         """Vérifie si le modpack est installé, puis lance le jeu ou l'installation."""
         if not is_connected_to_internet():
-            QMessageBox.critical(self, translations.tr("errors.offline"), 
-                                 translations.tr("errors.internet_required"))
+            QMessageBox.critical(self, "Hors ligne", 
+                                 "Une connexion Internet est requise")
             return
 
         if not self.auth_data:
-            QMessageBox.warning(self, translations.tr("errors.connection_required"), translations.tr("login.login_required"))
+            QMessageBox.warning(self, "Connexion requise", "Vous devez vous connecter pour jouer")
             return
 
         selected_item = self.modpack_list.currentItem()
         if not selected_item:
-            QMessageBox.warning(self, translations.tr("errors.selection_required"), translations.tr("errors.select_modpack"))
+            QMessageBox.warning(self, "Sélection requise", "Veuillez sélectionner un modpack")
             return
 
         # Récupérer le widget personnalisé à partir de l'item sélectionné
         widget = self.modpack_list.itemWidget(selected_item)
         if not widget:
-            QMessageBox.critical(self, translations.tr("errors.critical_error"), translations.tr("errors.modpack_data_error"))
+            QMessageBox.critical(self, "Erreur critique", "Erreur lors de la récupération des données du modpack")
             return
 
         # Le widget contient déjà toutes les données du modpack
         modpack = widget.modpack_data
         
         if not modpack:
-            QMessageBox.critical(self, translations.tr("errors.critical_error"), translations.tr("errors.modpack_not_found"))
+            QMessageBox.critical(self, "Erreur critique", "Modpack non trouvé")
             return
 
         # Si le modpack est installé, lance le jeu. Sinon, propose l'installation.
@@ -1265,8 +1199,8 @@ class MinecraftLauncher(QMainWindow):
             self._do_launch_game(modpack)
         else:
             reply = QMessageBox.question(
-                self, translations.tr("main.modpack_not_installed", name=modpack['name']),
-                translations.tr("main.modpack_not_installed", name=modpack['name']) + "\n" + translations.tr("main.install_modpack"),
+                self, f"Modpack {modpack['name']} non installé",
+                f"Le modpack {modpack['name']} n'est pas installé.\nVoulez-vous l'installer maintenant ?",
                 QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes
             )
             if reply == QMessageBox.Yes:
@@ -1276,13 +1210,13 @@ class MinecraftLauncher(QMainWindow):
     def _do_launch_game(self, modpack):
         """Lance le jeu (en supposant que les vérifications sont faites)."""
         self.play_btn.setEnabled(False)
-        self.signals.status.emit(translations.tr("installation.preparing_launch"))
+        self.signals.status.emit("Préparation du lancement...")
         try:
             minecraft_dir = get_minecraft_directory()
             modpack_profile_dir = os.path.join(minecraft_dir, "modpacks", modpack["name"])
             forge_version = modpack['forge_version']
             if not os.path.exists(os.path.join(minecraft_dir, "versions", f"{modpack['version']}-forge-{forge_version}")):
-                self.signals.status.emit(translations.tr("installation.installing_forge", version=modpack['version'], forge_version=forge_version))
+                self.signals.status.emit(f"Installation de Forge {modpack['version']}-{forge_version}...")
                 install_forge_if_needed(modpack['version'], forge_version, minecraft_dir)
 
             options = {
@@ -1297,7 +1231,7 @@ class MinecraftLauncher(QMainWindow):
             forge_launch_id = f"{modpack['version']}-forge-{modpack['forge_version']}"
             minecraft_command = get_minecraft_command(forge_launch_id, minecraft_dir, options)
 
-            self.signals.status.emit(translations.tr("installation.launching_minecraft"))
+            self.signals.status.emit("Lancement de Minecraft...")
 
             # Mesure du temps de jeu
             start_time = time.time()
@@ -1307,9 +1241,9 @@ class MinecraftLauncher(QMainWindow):
             playtime_minutes = (end_time - start_time) / 60
             self.update_stats_on_launch(playtime_minutes)
 
-            self.signals.status.emit(translations.tr("installation.ready"))
+            self.signals.status.emit("Prêt")
         except Exception as e:
-            self.signals.status.emit(translations.tr("installation.launch_error"))
+            self.signals.status.emit("Erreur de lancement")
             print(f"Erreur de Lancement: {e}")
         finally:
             self.play_btn.setEnabled(True)
@@ -1384,8 +1318,8 @@ class MinecraftLauncher(QMainWindow):
         """Handle the signal for a single update found."""
         # Afficher une boîte de dialogue pour proposer l'installation de la mise à jour
         reply = QMessageBox.question(
-            self, translations.tr("main.single_update_available", name=modpack_data['name']),
-            translations.tr("main.single_update_available", name=modpack_data['name']) + "\n\n" + translations.tr("main.install_single_update"),
+            self, "Mise à jour disponible",
+            f"Une mise à jour est disponible pour {modpack_data['name']}.\nVoulez-vous l'installer maintenant ?",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.Yes
         )
@@ -1407,7 +1341,7 @@ class MinecraftLauncher(QMainWindow):
     def populate_languages(self):
         """Populates the language selector combobox."""
         self.language_selector.clear()
-        languages = translations.get_available_languages()
+        languages = ["fr", "en"]
         current_language = self.config.get("language", "fr")
         
         for language in languages:
@@ -1421,20 +1355,20 @@ class MinecraftLauncher(QMainWindow):
     def check_launcher_updates(self):
         """Check for launcher updates in background thread"""
         try:
-            self.signals.status.emit(translations.tr("launcher_updates.checking"))
+            self.signals.status.emit("Vérification des mises à jour du launcher...")
             update_available, update_info = self.launcher_updater.check_launcher_update()
             
             if update_available:
-                self.signals.status.emit(translations.tr("launcher_updates.available"))
+                self.signals.status.emit("Mise à jour du launcher disponible")
                 self.signals.launcher_update_found.emit(update_info)
             else:
-                self.signals.status.emit(translations.tr("launcher_updates.up_to_date"))
+                self.signals.status.emit("Launcher à jour")
                 if self.config.get("auto_check_updates", True):
                     self.check_modpack_updates()
                 
         except Exception as e:
             print(f"Error checking launcher updates: {e}")
-            self.signals.status.emit(translations.tr("launcher_updates.check_failed"))
+            self.signals.status.emit("Erreur lors de la vérification des mises à jour du launcher")
             if self.config.get("auto_check_updates", True):
                 self.check_modpack_updates()
     
@@ -1445,8 +1379,8 @@ class MinecraftLauncher(QMainWindow):
         
         reply = QMessageBox.question(
             self,
-            translations.tr("launcher_updates.update_available_title"),
-            translations.tr("launcher_updates.update_available_message", new_version=new_version, current_version=current_version),
+            "Mise à jour du launcher disponible",
+            f"Une nouvelle version du launcher est disponible : {new_version} (actuel : {current_version})\nVoulez-vous mettre à jour maintenant ?",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No
         )
@@ -1455,9 +1389,9 @@ class MinecraftLauncher(QMainWindow):
 
     def perform_launcher_update(self, update_info):
         """Lance le processus de mise à jour du launcher dans une boîte de dialogue."""
-        progress_dialog = QProgressDialog(translations.tr("launcher_updates.updating"), translations.tr("stats.close"), 0, 100, self)
+        progress_dialog = QProgressDialog("Mise à jour en cours...", "Fermer", 0, 100, self)
         progress_dialog.setWindowModality(Qt.WindowModal)
-        progress_dialog.setWindowTitle(translations.tr("launcher_updates.updating"))
+        progress_dialog.setWindowTitle("Mise à jour du launcher")
         progress_dialog.show()
 
         def progress_callback(current, total):
@@ -1472,19 +1406,19 @@ class MinecraftLauncher(QMainWindow):
             
             if success and result:
                 script_path = result
-                progress_dialog.setLabelText(translations.tr("launcher_updates.update_complete"))
+                progress_dialog.setLabelText("Mise à jour terminée")
                 progress_dialog.setValue(100)
                 
                 # Attendre un court instant pour que l'utilisateur voie le message
                 QTimer.singleShot(1500, lambda: self._execute_update_script(script_path))
             else:
-                error_message = result or translations.tr("stats.error")
-                QMessageBox.critical(self, translations.tr("errors.critical_error"), translations.tr("launcher_updates.update_error", error=error_message))
+                error_message = result or "Erreur"
+                QMessageBox.critical(self, "Erreur critique", f"Erreur lors de la mise à jour : {error_message}")
                 progress_dialog.close()
 
         except Exception as e:
             traceback.print_exc()
-            QMessageBox.critical(self, translations.tr("errors.critical_error"), translations.tr("launcher_updates.update_unexpected_error", error=str(e)))
+            QMessageBox.critical(self, "Erreur critique", f"Erreur inattendue lors de la mise à jour : {str(e)}")
             progress_dialog.close()
 
     def _execute_update_script(self, script_path):
@@ -1503,7 +1437,7 @@ class MinecraftLauncher(QMainWindow):
             self.close() # Ferme le launcher pour permettre la mise à jour des fichiers
         except Exception as e:
             traceback.print_exc()
-            QMessageBox.critical(self, translations.tr("errors.critical_error"), translations.tr("launcher_updates.restart_error", error=str(e)))
+            QMessageBox.critical(self, "Erreur critique", f"Erreur lors du redémarrage : {str(e)}")
 
     def manual_check_launcher_updates(self):
         """Bouton pour vérifier manuellement les mises à jour du launcher."""
@@ -1561,7 +1495,7 @@ class MinecraftLauncher(QMainWindow):
         layout.setContentsMargins(30, 30, 30, 30)
         layout.setSpacing(18)
 
-        title = QLabel(translations.tr("stats.title"))
+        title = QLabel("📊 Stats")
         title.setStyleSheet("font-size: 22px; font-weight: bold; color: #fff;")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
@@ -1570,23 +1504,23 @@ class MinecraftLauncher(QMainWindow):
         try:
             with open('user_stats.json', 'r', encoding='utf-8') as f:
                 stats = json.load(f)
-            last_activity = stats.get('last_activity', translations.tr("stats.never"))
+            last_activity = stats.get('last_activity', "Jamais")
             playtime = stats.get('playtime', 0)
             launch_count = stats.get('launch_count', 0)
             login_count = stats.get('login_count', 0)
         except Exception as e:
             print(f"[DEBUG] Erreur lecture stats : {e}")
-            last_activity = translations.tr("stats.error")
+            last_activity = "❌ Erreur"
             playtime = 0
             launch_count = 0
             login_count = 0
 
         # Affichage stylé des stats
         stat_labels = [
-            (translations.tr("stats.last_activity"), last_activity),
-            (translations.tr("stats.playtime"), f"{playtime} {translations.tr('stats.minutes')}"),
-            (translations.tr("stats.launch_count"), str(launch_count)),
-            (translations.tr("stats.login_count"), str(login_count)),
+            ("🕒 Dernière activité", last_activity),
+            ("⏱️ Temps de jeu", f"{playtime} minutes"),
+            ("🚀 Nombre de lancements", str(launch_count)),
+            ("🔐 Nombre de connexions", str(login_count)),
         ]
         for icon, value in stat_labels:
             row = QHBoxLayout()
@@ -1603,7 +1537,7 @@ class MinecraftLauncher(QMainWindow):
         layout.addStretch(1)
 
         # Bouton fermer
-        close_btn = QPushButton(translations.tr("stats.close"))
+        close_btn = QPushButton("❌ Fermer")
         close_btn.setFixedHeight(38)
         close_btn.setStyleSheet('''
             QPushButton {
@@ -1673,189 +1607,159 @@ class MinecraftLauncher(QMainWindow):
             print(f"Erreur lors de la mise à jour des stats de connexion : {e}")
 
     def retranslate_ui(self):
-        """Re-translate the UI elements."""
+        """Re-translate ALL UI elements exhaustively."""
+        print("=== DÉBUT RE-TRADUCTION ===")
+        
         # Window title
-        self.setWindowTitle(translations.tr("window.title"))
+        self.setWindowTitle("🎮 CatzLauncher")
+        print(f"Window title: CatzLauncher")
         
         # Tab titles
-        self.tabs.setTabText(0, translations.tr("tabs.play"))
-        self.tabs.setTabText(1, translations.tr("tabs.config"))
+        self.tabs.setTabText(0, "🎮 Jouer")
+        self.tabs.setTabText(1, "⚙️ Configuration")
+        print(f"Tab 0: Jouer")
+        print(f"Tab 1: Configuration")
         
-        # Main tab - Titre des modpacks
-        # Chercher le label du titre dans le layout principal
-        main_layout = self.main_tab.layout()
-        if main_layout:
-            # Chercher dans le premier layout horizontal (top_layout)
-            top_layout_item = main_layout.itemAt(0)
-            if top_layout_item and top_layout_item.layout():
-                top_layout = top_layout_item.layout()
-                # Le premier widget est le widget modpack
-                modpack_widget_item = top_layout.itemAt(0)
-                if modpack_widget_item and modpack_widget_item.widget():
-                    modpack_widget = modpack_widget_item.widget()
-                    modpack_layout = modpack_widget.layout()
-                    if modpack_layout:
-                        # Le premier élément est le titre
-                        title_item = modpack_layout.itemAt(0)
-                        if title_item and title_item.widget() and isinstance(title_item.widget(), QLabel):
-                            title_item.widget().setText(translations.tr("main.modpacks_title"))
+        # Force translation of known widgets
+        self._force_translate_known_widgets()
         
-        # Status et boutons principaux
-        self.status_label.setText(translations.tr("main.ready_to_play"))
-        self.play_btn.setText(translations.tr("main.play_button"))
-        self.check_updates_btn.setText(translations.tr("main.check_updates_button"))
+        # Recursive translation for widgets with tr_key
+        self._retranslate_widget_recursive(self.header)
+        self._retranslate_widget_recursive(self.main_tab)
+        self._retranslate_widget_recursive(self.config_tab)
         
-        # Login section
-        self.account_info_label.setText(translations.tr("login.not_connected"))
-        self.login_btn.setText(translations.tr("login.login_microsoft"))
-        self.logout_btn.setText(translations.tr("login.logout"))
-        self.stats_btn.setText(translations.tr("login.stats"))
-        
-        # Config tab - Titre
-        # Chercher le label du titre dans le layout de config
-        config_layout = self.config_tab.layout()
-        if config_layout:
-            # Chercher dans le scroll area
-            scroll_area_item = config_layout.itemAt(0)
-            if scroll_area_item and scroll_area_item.widget() and isinstance(scroll_area_item.widget(), QScrollArea):
-                scroll_area = scroll_area_item.widget()
-                scroll_content = scroll_area.widget()
-                if scroll_content and scroll_content.layout():
-                    content_layout = scroll_content.layout()
-                    # Le premier élément est le titre
-                    title_item = content_layout.itemAt(0)
-                    if title_item and title_item.widget() and isinstance(title_item.widget(), QLabel):
-                        title_item.widget().setText(translations.tr("config.title"))
-        
-        # Config form labels - Mettre à jour tous les labels du formulaire
-        self._retranslate_config_form()
-        
-        # Config form buttons
-        self.browse_java_btn.setText(translations.tr("config.browse"))
-        self.github_token_edit.setPlaceholderText(translations.tr("config.token_placeholder"))
-        self.auto_check_cb.setText(translations.tr("config.auto_check_updates"))
-        self.auto_check_launcher_cb.setText(translations.tr("config.auto_check_launcher"))
-        self.check_launcher_updates_btn.setText(translations.tr("config.check_launcher_updates"))
-        self.save_settings_btn.setText(translations.tr("config.save_config"))
-        
-        # Mettre à jour le statut du token
-        self.update_token_status_label()
-        
-        # Re-peupler les sélecteurs
+        # Re-populate selectors
         self.populate_languages()
         self.populate_themes()
-
-    def _retranslate_config_form(self):
-        """Met à jour tous les labels du formulaire de configuration."""
-        config_layout = self.config_tab.layout()
-        if not config_layout:
-            return
-            
-        # Chercher dans le scroll area
-        scroll_area_item = config_layout.itemAt(0)
-        if not scroll_area_item or not scroll_area_item.widget() or not isinstance(scroll_area_item.widget(), QScrollArea):
-            return
-            
-        scroll_area = scroll_area_item.widget()
-        scroll_content = scroll_area.widget()
-        if not scroll_content or not scroll_content.layout():
-            return
-            
-        content_layout = scroll_content.layout()
         
-        # Chercher le widget form_container
-        for i in range(content_layout.count()):
-            item = content_layout.itemAt(i)
-            if item.widget() and hasattr(item.widget(), 'objectName') and item.widget().objectName() == "configFormContainer":
-                form_container = item.widget()
-                self._retranslate_form_container(form_container)
-                break
+        # Update token status
+        self.update_token_status_label()
+        
+        print("=== FIN RE-TRADUCTION ===")
 
-    def _retranslate_form_container(self, form_container):
-        """Met à jour les labels dans le conteneur de formulaire."""
-        if not form_container.layout():
+    def _force_translate_known_widgets(self):
+        """Force translation of all known widgets in the interface."""
+        # Header
+        if hasattr(self, 'header'):
+            title_label = self.header.findChild(QLabel, "")
+            if title_label:
+                title_label.setText("🎮 CatzLauncher")
+                print(f"Header title: 🎮 CatzLauncher")
+        
+        # Main tab widgets
+        if hasattr(self, 'status_label'):
+            self.status_label.setText("✨ Prêt à jouer !")
+            print(f"Status label: ✨ Prêt à jouer !")
+            
+        if hasattr(self, 'play_btn'):
+            self.play_btn.setText("🚀 Jouer")
+            print(f"Play button: 🚀 Jouer")
+            
+        if hasattr(self, 'check_updates_btn'):
+            self.check_updates_btn.setText("🔄 Vérifier les mises à jour")
+            print(f"Check updates button: 🔄 Vérifier les mises à jour")
+            
+        if hasattr(self, 'account_info_label'):
+            if not self.auth_data:
+                self.account_info_label.setText("🔴 Non connecté")
+                print(f"Account info: 🔴 Non connecté")
+                
+        if hasattr(self, 'login_btn'):
+            self.login_btn.setText("🔐 Se connecter avec Microsoft")
+            print(f"Login button: 🔐 Se connecter avec Microsoft")
+            
+        if hasattr(self, 'logout_btn'):
+            self.logout_btn.setText("🚪 Déconnexion")
+            print(f"Logout button: 🚪 Déconnexion")
+            
+        if hasattr(self, 'stats_btn'):
+            self.stats_btn.setText("📊 Stats")
+            print(f"Stats button: 📊 Stats")
+        
+        # Config tab widgets
+        if hasattr(self, 'browse_java_btn'):
+            self.browse_java_btn.setText("📂 Parcourir")
+            print(f"Browse button: Parcourir")
+            
+        if hasattr(self, 'save_settings_btn'):
+            self.save_settings_btn.setText("💾 Sauvegarder la configuration")
+            print(f"Save button: 💾 Sauvegarder la configuration")
+            
+        if hasattr(self, 'check_launcher_updates_btn'):
+            self.check_launcher_updates_btn.setText("🚀 Vérifier les mises à jour du launcher")
+            print(f"Check launcher updates button: 🚀 Vérifier les mises à jour du launcher")
+            
+        if hasattr(self, 'auto_check_cb'):
+            self.auto_check_cb.setText("🔄 Vérifier les mises à jour automatiquement")
+            print(f"Auto check checkbox: 🔄 Vérifier les mises à jour automatiquement")
+            
+        if hasattr(self, 'auto_check_launcher_cb'):
+            self.auto_check_launcher_cb.setText("🚀 Vérifier les mises à jour du launcher automatiquement")
+            print(f"Auto check launcher checkbox: 🚀 Vérifier les mises à jour du launcher automatiquement")
+            
+        # Update placeholders
+        if hasattr(self, 'github_token_edit'):
+            self.github_token_edit.setPlaceholderText("🔑 Token GitHub")
+            print(f"Token placeholder: 🔑 Token GitHub")
+
+    def _retranslate_widget_recursive(self, widget):
+        """Recursively translate all widgets and their children."""
+        if widget is None:
             return
             
-        form_layout = form_container.layout()
+        # Translate this widget
+        self._translate_single_widget(widget)
         
-        # Parcourir toutes les lignes du formulaire
-        for i in range(form_layout.rowCount()):
-            label_item = form_layout.itemAt(i, QFormLayout.LabelRole)
-            if label_item and label_item.widget() and isinstance(label_item.widget(), QLabel):
-                label = label_item.widget()
-                # Identifier le label par son texte actuel et le mettre à jour
-                current_text = label.text()
-                
-                # Mapping des textes actuels vers les clés de traduction
-                text_mapping = {
-                    "📁 Chemin Java:": "config.java_path",
-                    "📁 Java Path:": "config.java_path",
-                    "🎨 Thème de l'application:": "config.theme",
-                    "🎨 Application theme:": "config.theme",
-                    "🌍 Langue:": "config.language",
-                    "🌍 Language:": "config.language",
-                    "🔑 Token d'accès personnel GitHub:": "config.github_token",
-                    "🔑 GitHub Personal Access Token:": "config.github_token",
-                    "🔧 Arguments JVM:": "config.jvm_args",
-                    "🔧 JVM Arguments:": "config.jvm_args",
-                    "🧠 Mémoire Max (Go):": "config.max_memory",
-                    "🧠 Max Memory (GB):": "config.max_memory"
-                }
-                
-                if current_text in text_mapping:
-                    label.setText(translations.tr(text_mapping[current_text]))
-
-    def _retranslate_widget(self, widget):
-        """Helper method to retranslate widget and its children."""
-        if not widget:
-            return
+        # Recursively translate all children
+        for child in widget.findChildren(QWidget, "", Qt.FindDirectChildrenOnly):
+            self._retranslate_widget_recursive(child)
             
-        # Retranslate specific widget types
-        if isinstance(widget, QLabel):
-            # Check if it's a known label that needs translation
-            current_text = widget.text()
-            text_mapping = {
-                "📁 Chemin Java:": "config.java_path",
-                "📁 Java Path:": "config.java_path",
-                "🎨 Thème de l'application:": "config.theme",
-                "🎨 Application theme:": "config.theme",
-                "🌍 Langue:": "config.language",
-                "🌍 Language:": "config.language",
-                "🔑 Token d'accès personnel GitHub:": "config.github_token",
-                "🔑 GitHub Personal Access Token:": "config.github_token",
-                "🔧 Arguments JVM:": "config.jvm_args",
-                "🔧 JVM Arguments:": "config.jvm_args",
-                "🧠 Mémoire Max (Go):": "config.max_memory",
-                "🧠 Max Memory (GB):": "config.max_memory"
-            }
-            
-            if current_text in text_mapping:
-                widget.setText(translations.tr(text_mapping[current_text]))
-                
-        elif isinstance(widget, QPushButton):
-            # Check if it's a known button that needs translation
-            current_text = widget.text()
-            text_mapping = {
-                "📂 Parcourir": "config.browse",
-                "📂 Browse": "config.browse",
-                "🔄 Vérifier automatiquement les mises à jour au démarrage": "config.auto_check_updates",
-                "🔄 Automatically check for updates on startup": "config.auto_check_updates",
-                "🚀 Vérifier automatiquement les mises à jour du launcher": "config.auto_check_launcher",
-                "🚀 Automatically check for launcher updates": "config.auto_check_launcher",
-                "🚀 Vérifier les mises à jour du launcher": "config.check_launcher_updates",
-                "🚀 Check for launcher updates": "config.check_launcher_updates",
-                "💾 Sauvegarder la Configuration": "config.save_config",
-                "💾 Save Configuration": "config.save_config"
-            }
-            
-            if current_text in text_mapping:
-                widget.setText(translations.tr(text_mapping[current_text]))
-        
-        # Recursively retranslate children
+        # Also check layout items
         if hasattr(widget, 'layout') and widget.layout():
-            for i in range(widget.layout().count()):
-                item = widget.layout().itemAt(i)
-                if item.widget():
-                    self._retranslate_widget(item.widget())
-                elif item.layout():
-                    self._retranslate_widget(item.layout())
+            self._retranslate_layout_recursive(widget.layout())
+
+    def _retranslate_layout_recursive(self, layout):
+        """Recursively translate widgets in layouts."""
+        if layout is None:
+            return
+            
+        for i in range(layout.count()):
+            item = layout.itemAt(i)
+            if item.widget():
+                self._retranslate_widget_recursive(item.widget())
+            elif item.layout():
+                self._retranslate_layout_recursive(item.layout())
+
+    def _translate_single_widget(self, widget):
+        """Translate a single widget based on its type and properties."""
+        tr_key = widget.property("tr_key")
+        
+        if not tr_key:
+            return
+            
+        print(f"Translating {type(widget).__name__}: {tr_key}")
+        
+        # QLabel, QPushButton, QCheckBox, etc.
+        if hasattr(widget, 'setText'):
+            widget.setText("Texte traduit")
+            
+        # QLineEdit placeholder
+        if hasattr(widget, 'setPlaceholderText') and isinstance(widget, QLineEdit):
+            widget.setPlaceholderText("Placeholder traduit")
+            
+        # QComboBox items (special handling)
+        if isinstance(widget, QComboBox):
+            if tr_key == "config.language":
+                current = widget.currentText()
+                widget.clear()
+                for lang in ["fr", "en"]:
+                    widget.addItem(lang)
+                if current in ["fr", "en"]:
+                    widget.setCurrentText(current)
+            elif tr_key == "config.theme":
+                current = widget.currentText()
+                widget.clear()
+                for theme in get_available_themes():
+                    widget.addItem(theme)
+                if current in get_available_themes():
+                    widget.setCurrentText(current)
