@@ -36,7 +36,6 @@ QPushButton {
     font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
     font-size: 15px;
     font-weight: bold;
-    box-shadow: 0px 2px 8px #b5d6fb;
 }
 QPushButton:hover {
     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #eaf6fd, stop:0.5 #b5d6fb, stop:1 #7eb4ea);

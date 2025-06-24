@@ -43,7 +43,6 @@ QLabel {
     color: #ff0000;
     font-size: 30px;
     font-family: 'Impact', 'Comic Sans MS', fantasy;
-    text-shadow: 2px 2px #00ffea;
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #00ffea, stop:1 #fffb00);
     border: 2px solid #ff00ff;
     border-radius: 10px;

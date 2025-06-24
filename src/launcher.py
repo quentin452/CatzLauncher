@@ -9,16 +9,18 @@ import webbrowser
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import traceback
+import time
 
 from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QPropertyAnimation, QEasingCurve, QTimer, QParallelAnimationGroup, QPoint
+from PyQt5.QtGui import QTransform
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QProgressBar, QListWidget, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
     QInputDialog, QTabWidget, QFrame, QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
     QListWidgetItem, QStackedWidget, QSizePolicy, QComboBox, QFormLayout, QScrollArea, QSlider, QProgressDialog
 )
-from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient
+from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient, QPen
 from PyQt5.QtWidgets import QApplication
 
 from minecraft_launcher_lib.utils import (get_minecraft_directory)
@@ -398,15 +400,10 @@ class MinecraftLauncher(QMainWindow):
 
     def _create_main_content_widget(self):
         tabs = AnimatedTabWidget()
-        
         self.main_tab = self._create_main_tab()
         self.config_tab = self._create_config_tab()
-        self.account_tab = self._create_account_tab()
-
         tabs.addTab(self.main_tab, "Jouer")
         tabs.addTab(self.config_tab, "Config")
-        tabs.addTab(self.account_tab, "Compte")
-
         self.update_login_button_states()
         return tabs
 
@@ -482,51 +479,138 @@ class MinecraftLauncher(QMainWindow):
 
     def _create_main_tab(self):
         tab = QWidget()
-        layout = QVBoxLayout(tab)
-        layout.setContentsMargins(30, 30, 30, 30)
-        layout.setSpacing(20)
+        main_layout = QVBoxLayout(tab)
+        main_layout.setContentsMargins(30, 30, 30, 30)
+        main_layout.setSpacing(20)
 
-        # Title with particles
+        # --- SECTION HAUT : Modpack à gauche, Login à droite ---
+        top_layout = QHBoxLayout()
+        top_layout.setSpacing(20)
+
+        # Modpack (gauche)
+        modpack_widget = QWidget()
+        modpack_layout = QVBoxLayout(modpack_widget)
+        modpack_layout.setSpacing(15)
+        modpack_layout.setContentsMargins(0, 0, 0, 0)
+
         title_label = QLabel("🎯 Modpacks Disponibles")
         title_font = QFont()
         title_font.setPointSize(18)
         title_font.setBold(True)
         title_label.setFont(title_font)
         title_label.setProperty("class", "title")
-        layout.addWidget(title_label)
+        modpack_layout.addWidget(title_label)
 
-        # Enhanced list widget
         self.modpack_list = AnimatedListWidget()
         self.modpack_list.setMinimumHeight(250)
-        layout.addWidget(self.modpack_list)
+        modpack_layout.addWidget(self.modpack_list)
 
-        # Enhanced progress bar
+        top_layout.addWidget(modpack_widget, 2)
+
+        # Login (droite)
+        login_widget = QWidget()
+        login_widget.setMinimumWidth(340)
+        login_widget.setMaximumWidth(340)
+        login_layout = QVBoxLayout(login_widget)
+        login_layout.setSpacing(15)
+        login_layout.setContentsMargins(0, 0, 0, 0)
+        login_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        # Avatar Minecraft (toujours affiché)
+        self.avatar_label = QLabel()
+        self.avatar_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.avatar_label.setFixedSize(120, 240)
+        self.set_default_avatar()
+        login_layout.addWidget(self.avatar_label, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        # Label d'état de connexion
+        self.account_info_label = QLabel("❌ Non connecté")
+        self.account_info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.account_info_label.setProperty("class", "status-disconnected")
+        login_layout.addWidget(self.account_info_label)
+
+        # Boutons (stacked)
+        self.login_btn = AnimatedButton("🔐 Login avec Microsoft")
+        self.login_btn.setFixedSize(220, 40)
+        self.logout_btn = AnimatedButton("🚪 Se déconnecter")
+        self.logout_btn.setFixedHeight(40)
+        self.logout_btn.setMinimumWidth(200)
+        self.logout_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.logout_btn.setStyleSheet('''
+            QPushButton {
+                padding: 0 28px;
+                font-size: 16px;
+                font-weight: bold;
+                border-radius: 10px;
+            }
+        ''')
+        self.stats_btn = AnimatedButton("📊 Stats")
+        self.stats_btn.setFixedHeight(40)
+        self.stats_btn.setMinimumWidth(100)
+        self.stats_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.stats_btn.setStyleSheet('''
+            QPushButton {
+                padding: 0 28px;
+                font-size: 16px;
+                font-weight: bold;
+                border-radius: 10px;
+            }
+        ''')
+
+        # Layout horizontal pour les boutons déconnexion+stats
+        btn_row = QHBoxLayout()
+        btn_row.setSpacing(16)
+        btn_row.setContentsMargins(0, 0, 0, 0)
+        btn_row.addWidget(self.logout_btn)
+        btn_row.addWidget(self.stats_btn)
+
+        # Widget conteneur pour le layout horizontal
+        self.logout_stats_widget = QWidget()
+        self.logout_stats_widget.setLayout(btn_row)
+
+        # Ajouter les widgets de boutons (login OU logout+stats)
+        login_layout.addWidget(self.login_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        login_layout.addWidget(self.logout_stats_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        # Espacement flexible en bas
+        login_layout.addStretch(1)
+
+        # Afficher/cacher selon l'état de connexion
+        self.update_login_button_states()
+
+        top_layout.addWidget(login_widget, 1)
+        main_layout.addLayout(top_layout)
+
+        # --- SECTION BAS : Progression, status, boutons ---
+        bottom_widget = QWidget()
+        bottom_layout = QVBoxLayout(bottom_widget)
+        bottom_layout.setSpacing(10)
+        bottom_layout.setContentsMargins(0, 0, 0, 0)
+
         self.progress = AnimatedProgressBar()
         self.progress.setRange(0, 100)
         self.progress.setTextVisible(True)
-        layout.addWidget(self.progress)
+        self.progress.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        bottom_layout.addWidget(self.progress)
 
-        # Status label with animation
         self.status_label = QLabel("✨ Prêt à jouer !")
-        self.status_label.setAlignment(Qt.AlignCenter)
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.status_label.setProperty("class", "status")
-        layout.addWidget(self.status_label)
+        bottom_layout.addWidget(self.status_label)
 
-        # Button layout with animated buttons
         btn_layout = QHBoxLayout()
         btn_layout.setSpacing(15)
-        
         self.play_btn = AnimatedButton("🚀 Jouer")
         self.play_btn.setFixedHeight(50)
-        self.play_btn.setMinimumWidth(150)
+        self.play_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         btn_layout.addWidget(self.play_btn)
-
         self.check_updates_btn = AnimatedButton("🔄 Vérifier les mises à jour")
         self.check_updates_btn.setFixedHeight(50)
-        self.check_updates_btn.setMinimumWidth(200)
+        self.check_updates_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         btn_layout.addWidget(self.check_updates_btn)
-        
-        layout.addLayout(btn_layout)
+        bottom_layout.addLayout(btn_layout)
+
+        main_layout.addWidget(bottom_widget)
 
         return tab
 
@@ -605,7 +689,7 @@ class MinecraftLauncher(QMainWindow):
             total_gb = min(total_gb, 64)  # Cap at 64 GB for sanity
         except ImportError:
             total_gb = 16
-        self.max_memory_slider = QSlider(Qt.Horizontal)
+        self.max_memory_slider = QSlider(Qt.Orientation.Horizontal)
         self.max_memory_slider.setMinimum(1)
         self.max_memory_slider.setMaximum(total_gb)
         self.max_memory_slider.setValue(min(int(self.config.get("max_memory", 4)), total_gb))
@@ -646,34 +730,6 @@ class MinecraftLauncher(QMainWindow):
 
         return tab
 
-    def _create_account_tab(self):
-        tab = QWidget()
-        layout = QVBoxLayout(tab)
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(30)
-
-        # Account info with enhanced styling
-        account_frame = QFrame()
-        account_frame.setProperty("class", "account-frame")
-        account_layout = QVBoxLayout(account_frame)
-        account_layout.setSpacing(20)
-
-        self.account_info_label = QLabel("❌ Non connecté")
-        self.account_info_label.setAlignment(Qt.AlignCenter)
-        self.account_info_label.setProperty("class", "status-disconnected")
-        account_layout.addWidget(self.account_info_label)
-
-        self.login_btn = AnimatedButton("🔐 Login avec Microsoft")
-        self.login_btn.setFixedSize(280, 50)
-        account_layout.addWidget(self.login_btn, alignment=Qt.AlignCenter)
-
-        self.logout_btn = AnimatedButton("🚪 Se déconnecter")
-        self.logout_btn.setFixedSize(280, 50)
-        account_layout.addWidget(self.logout_btn, alignment=Qt.AlignCenter)
-
-        layout.addWidget(account_frame, alignment=Qt.AlignCenter)
-        return tab
-
     def _connect_signals(self):
         # Button clicks
         self.play_btn.clicked.connect(self.launch_game)
@@ -683,6 +739,7 @@ class MinecraftLauncher(QMainWindow):
         self.save_settings_btn.clicked.connect(self.save_settings)
         self.login_btn.clicked.connect(self.microsoft_login)
         self.logout_btn.clicked.connect(self.logout)
+        self.stats_btn.clicked.connect(self.show_stats)
 
         # Window controls
         self.minimize_btn.clicked.connect(self.showMinimized)
@@ -752,10 +809,10 @@ class MinecraftLauncher(QMainWindow):
         """Update login button states with animations."""
         if self.auth_data:
             self.login_btn.hide()
-            self.logout_btn.show()
+            self.logout_stats_widget.show()
         else:
             self.login_btn.show()
-            self.logout_btn.hide()
+            self.logout_stats_widget.hide()
 
     def update_token_status_label(self):
         """Met à jour le label de statut du token."""
@@ -876,6 +933,9 @@ class MinecraftLauncher(QMainWindow):
         apply_css_class(self.account_info_label, "status-connected")
         self.update_login_button_states()
         self.status_label.setText(f"🎉 Bienvenue, {profile['name']}!")
+        # Afficher la tête Minecraft du joueur
+        self.update_avatar(profile['name'])
+        self.update_stats_on_login()
 
     def handle_login_error(self, error):
         """Handle login error with animation."""
@@ -885,17 +945,19 @@ class MinecraftLauncher(QMainWindow):
         apply_css_class(self.account_info_label, "status-error")
         self.update_login_button_states()
         self.status_label.setText("Erreur de connexion.")
+        self.set_default_avatar()
 
     def logout(self):
         """Logout with animation."""
         self.auth_data = None
         self.config.pop("refresh_token", None)
         self.save_config()
-        
         self.account_info_label.setText("❌ Non connecté")
         apply_css_class(self.account_info_label, "status-disconnected")
         self.update_login_button_states()
         self.status_label.setText("🚪 Déconnexion réussie")
+        # Remettre l'avatar par défaut
+        self.set_default_avatar()
 
     def load_modpacks(self):
         url = self.config.get("modpack_url", "modpacks.json")
@@ -1139,7 +1201,6 @@ class MinecraftLauncher(QMainWindow):
         try:
             minecraft_dir = get_minecraft_directory()
             modpack_profile_dir = os.path.join(minecraft_dir, "modpacks", modpack["name"])
-
             forge_version = modpack['forge_version']
             if not os.path.exists(os.path.join(minecraft_dir, "versions", f"{modpack['version']}-forge-{forge_version}")):
                 self.signals.status.emit(f"Installation de Forge {modpack['version']}-forge-{forge_version}...")
@@ -1159,8 +1220,13 @@ class MinecraftLauncher(QMainWindow):
 
             self.signals.status.emit("Lancement de Minecraft...")
 
+            # Mesure du temps de jeu
+            start_time = time.time()
             process = subprocess.Popen(minecraft_command, cwd=modpack_profile_dir)
-            process.wait()  
+            process.wait()
+            end_time = time.time()
+            playtime_minutes = (end_time - start_time) / 60
+            self.update_stats_on_launch(playtime_minutes)
 
             self.signals.status.emit("Prêt")
         except Exception as e:
@@ -1354,3 +1420,166 @@ class MinecraftLauncher(QMainWindow):
     def manual_check_launcher_updates(self):
         """Bouton pour vérifier manuellement les mises à jour du launcher."""
         self.check_launcher_updates()
+
+    def update_avatar(self, pseudo):
+        """Met à jour l'avatar Minecraft du joueur à partir de minotar.net."""
+        print(f"[DEBUG] update_avatar appelé avec pseudo = {pseudo}")
+        try:
+            url = f'https://minotar.net/armor/body/{pseudo}/120'
+            data = requests.get(url, timeout=5).content
+            pixmap = QPixmap()
+            pixmap.loadFromData(data)
+            if pixmap.isNull():
+                print(f"[ERREUR] Impossible de charger l'avatar pour {pseudo} depuis {url}")
+                default_avatar = QPixmap('assets/textures/logo.png').scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                self.avatar_label.setPixmap(default_avatar)
+            else:
+                self.avatar_label.setPixmap(pixmap.scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        except Exception as e:
+            print(f"[ERREUR] Exception lors du chargement de l'avatar pour {pseudo} : {e}")
+            default_avatar = QPixmap('assets/textures/logo.png').scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.avatar_label.setPixmap(default_avatar)
+
+    def show_stats(self):
+        """Affiche les statistiques utilisateur dans un overlay moderne et robuste sans ombre portée."""
+        # Supprime l'overlay existant s'il y en a un
+        if hasattr(self, 'stats_overlay') and self.stats_overlay is not None:
+            try:
+                self.stats_overlay.deleteLater()
+            except Exception:
+                pass
+            self.stats_overlay = None
+
+        # Overlay semi-transparent
+        self.stats_overlay = QWidget(self)
+        self.stats_overlay.setGeometry(self.rect())
+        self.stats_overlay.setStyleSheet("background: rgba(0, 0, 0, 128);")
+        self.stats_overlay.setAttribute(Qt.WA_StyledBackground, True)
+        self.stats_overlay.show()
+        self.stats_overlay.raise_()
+
+        # Carte centrale sans ombre ni contour
+        card = QWidget(self.stats_overlay)
+        card.setFixedSize(400, 320)
+        card.setStyleSheet('''
+            background: rgba(35, 39, 46, 0.98);
+            border-radius: 28px;
+        ''')
+        card.move((self.width() - card.width()) // 2, (self.height() - card.height()) // 2)
+        card.show()
+        card.raise_()
+
+        layout = QVBoxLayout(card)
+        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(18)
+
+        title = QLabel("📊 Statistiques utilisateur")
+        title.setStyleSheet("font-size: 22px; font-weight: bold; color: #fff;")
+        title.setAlignment(Qt.AlignCenter)
+        layout.addWidget(title)
+
+        # Lecture des stats
+        try:
+            with open('user_stats.json', 'r', encoding='utf-8') as f:
+                stats = json.load(f)
+            last_activity = stats.get('last_activity', 'Jamais')
+            playtime = stats.get('playtime', 0)
+            launch_count = stats.get('launch_count', 0)
+            login_count = stats.get('login_count', 0)
+        except Exception as e:
+            print(f"[DEBUG] Erreur lecture stats : {e}")
+            last_activity = 'Erreur'
+            playtime = 0
+            launch_count = 0
+            login_count = 0
+
+        # Affichage stylé des stats
+        stat_labels = [
+            ("🕒 Dernière activité", last_activity),
+            ("⏳ Temps de jeu total", f"{playtime} min"),
+            ("🚀 Nombre de lancements", str(launch_count)),
+            ("🔑 Nombre de connexions", str(login_count)),
+        ]
+        for icon, value in stat_labels:
+            row = QHBoxLayout()
+            row.setSpacing(12)
+            icon_label = QLabel(icon)
+            icon_label.setStyleSheet("font-size: 18px; color: #ffd700;")
+            row.addWidget(icon_label)
+            value_label = QLabel(value)
+            value_label.setStyleSheet("font-size: 17px; color: #fff;")
+            row.addWidget(value_label)
+            row.addStretch(1)
+            layout.addLayout(row)
+
+        layout.addStretch(1)
+
+        # Bouton fermer
+        close_btn = QPushButton("Fermer")
+        close_btn.setFixedHeight(38)
+        close_btn.setStyleSheet('''
+            QPushButton {
+                background: #3b82f6;
+                color: #fff;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: bold;
+                padding: 0 18px;
+            }
+            QPushButton:hover {
+                background: #2563eb;
+            }
+        ''')
+        def close_overlay():
+            if hasattr(self, 'stats_overlay') and self.stats_overlay is not None:
+                self.stats_overlay.deleteLater()
+                self.stats_overlay = None
+        close_btn.clicked.connect(close_overlay)
+        layout.addWidget(close_btn, alignment=Qt.AlignCenter)
+
+    def resizeEvent(self, event):
+        # L'avatar garde sa taille fixe définie dans _create_main_tab
+        # Pas de redimensionnement ici pour éviter les incohérences
+        super().resizeEvent(event)
+
+    def set_default_avatar(self):
+        """Affiche le skin de Steve par défaut comme avatar (corps entier avec armure)."""
+        url = "https://minotar.net/armor/body/steve/120"
+        try:
+            data = requests.get(url, timeout=5).content
+            pixmap = QPixmap()
+            pixmap.loadFromData(data)
+            self.avatar_label.setPixmap(pixmap.scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        except Exception:
+            # fallback logo si problème réseau
+            default_avatar = QPixmap('assets/textures/logo.png').scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.avatar_label.setPixmap(default_avatar)
+
+    def update_stats_on_launch(self, playtime_minutes):
+        """Met à jour les stats après un lancement de jeu."""
+        try:
+            stats = {}
+            if os.path.exists('user_stats.json'):
+                with open('user_stats.json', 'r', encoding='utf-8') as f:
+                    stats = json.load(f)
+            stats['last_activity'] = datetime.now().strftime('%d/%m/%Y %H:%M')
+            stats['launch_count'] = stats.get('launch_count', 0) + 1
+            stats['playtime'] = stats.get('playtime', 0) + int(playtime_minutes)
+            with open('user_stats.json', 'w', encoding='utf-8') as f:
+                json.dump(stats, f, indent=4)
+        except Exception as e:
+            print(f"Erreur lors de la mise à jour des stats de lancement : {e}")
+
+    def update_stats_on_login(self):
+        """Met à jour les stats après une connexion."""
+        try:
+            stats = {}
+            if os.path.exists('user_stats.json'):
+                with open('user_stats.json', 'r', encoding='utf-8') as f:
+                    stats = json.load(f)
+            stats['last_activity'] = datetime.now().strftime('%d/%m/%Y %H:%M')
+            stats['login_count'] = stats.get('login_count', 0) + 1
+            with open('user_stats.json', 'w', encoding='utf-8') as f:
+                json.dump(stats, f, indent=4)
+        except Exception as e:
+            print(f"Erreur lors de la mise à jour des stats de connexion : {e}")
