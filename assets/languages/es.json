@@ -1,0 +1,126 @@
+{
+  "window": {
+    "title": "CatzLauncher - Lanzador de Modpacks",
+    "header_title": "CatzLauncher"
+  },
+  "tabs": {
+    "play": "Jugar",
+    "config": "Config"
+  },
+  "main": {
+    "modpacks_title": "🎯 Modpacks Disponibles",
+    "ready_to_play": "✨ ¡Listo para jugar!",
+    "play_button": "🚀 Jugar",
+    "check_updates_button": "🔄 Verificar actualizaciones",
+    "checking_updates": "🔄 Verificando...",
+    "checking_single": "🔍 Verificando {name}...",
+    "update_available": "✅ Actualización disponible para {name}",
+    "up_to_date": "✅ {name} está actualizado",
+    "check_error": "❌ Error al verificar {name}: {error}",
+    "no_updates": "✅ No hay actualizaciones disponibles",
+    "updates_found": "Actualizaciones disponibles para",
+    "install_updates": "¿Quieres instalar las actualizaciones?",
+    "single_update_available": "Una actualización está disponible para '{name}'.",
+    "install_single_update": "¿Quieres instalarla ahora?",
+    "modpack_not_installed": "El modpack '{name}' no está instalado.",
+    "install_modpack": "¿Quieres instalarlo ahora?"
+  },
+  "login": {
+    "not_connected": "❌ No conectado",
+    "connected": "✅ Conectado: {name}",
+    "login_microsoft": "🔐 Iniciar sesión con Microsoft",
+    "logout": "🚪 Cerrar sesión",
+    "stats": "📊 Estadísticas",
+    "login_in_progress": "🔄 Conectando...",
+    "reconnecting": "🔄 Reconectando...",
+    "login_cancelled": "⚠️ Autenticación cancelada.",
+    "login_success": "🎉 ¡Bienvenido, {name}!",
+    "logout_success": "🚪 Sesión cerrada exitosamente",
+    "login_required": "Por favor inicia sesión antes de jugar.",
+    "connection_error": "Error de conexión.",
+    "auth_code_prompt": "Después de conectar, copia y pega aquí la URL completa de la página en blanco:",
+    "auth_code_error": "No se pudo encontrar el código de autenticación en la URL.",
+    "auth_error": "Error de autenticación: {error}",
+    "config_required": "Configuración Requerida",
+    "config_required_message": "El ID de Cliente de Azure no está configurado.\n\nPor favor llena el archivo `azure_config.json` en la raíz del proyecto con tu propio 'ID de aplicación (cliente)' para que la conexión funcione.",
+    "config_required_button": "🔐 Configuración Requerida",
+    "config_required_tooltip": "Por favor configura el ID de Cliente en azure_config.json"
+  },
+  "stats": {
+    "title": "📊 Estadísticas del Usuario",
+    "last_activity": "🕒 Última actividad",
+    "playtime": "⏳ Tiempo total de juego",
+    "launch_count": "🚀 Número de lanzamientos",
+    "login_count": "🔑 Número de inicios de sesión",
+    "close": "Cerrar",
+    "never": "Nunca",
+    "minutes": "min",
+    "error": "Error"
+  },
+  "config": {
+    "title": "⚙️ Configuración",
+    "java_path": "📁 Ruta de Java:",
+    "browse": "📂 Examinar",
+    "theme": "🎨 Tema de la aplicación:",
+    "github_token": "🔑 Token de acceso personal de GitHub:",
+    "token_placeholder": "Pega un nuevo token para guardarlo",
+    "token_saved": "✅ Un token está guardado de forma segura.",
+    "token_not_saved": "❌ No hay token guardado actualmente. Recomendado.",
+    "jvm_args": "🔧 Argumentos JVM:",
+    "max_memory": "🧠 Memoria Máxima (GB):",
+    "auto_check_updates": "🔄 Verificar automáticamente actualizaciones al iniciar",
+    "auto_check_launcher": "🚀 Verificar automáticamente actualizaciones del launcher",
+    "check_launcher_updates": "🚀 Verificar actualizaciones del launcher",
+    "save_config": "💾 Guardar Configuración",
+    "config_saved": "✅ ¡Configuración guardada!",
+    "language": "🌍 Idioma:"
+  },
+  "launcher_updates": {
+    "checking": "Verificando actualizaciones del launcher...",
+    "available": "¡Actualización del launcher disponible!",
+    "up_to_date": "El launcher está actualizado",
+    "check_failed": "Falló la verificación de actualizaciones",
+    "update_available_title": "Actualización del launcher disponible",
+    "update_available_message": "Una nueva versión del launcher está disponible: <b>{new_version}</b><br>Tu versión actual es: <b>{current_version}</b><br><br>¿Quieres actualizar ahora? La aplicación se reiniciará.",
+    "updating": "Actualizando launcher...",
+    "update_complete": "¡Actualización completada! Reiniciando...",
+    "update_error": "Ocurrió un error durante la actualización: {error}",
+    "update_unexpected_error": "Ocurrió un error inesperado: {error}",
+    "restart_error": "No se pudo lanzar el script de actualización: {error}"
+  },
+  "installation": {
+    "installing": "Instalando {name}...",
+    "installation_complete": "¡Instalación completada!",
+    "installation_error": "Error al instalar '{name}': {error}",
+    "installation_failed": "La instalación de '{name}' falló.",
+    "preparing_launch": "Preparando lanzamiento...",
+    "installing_forge": "Instalando Forge {version}-forge-{forge_version}...",
+    "launching_minecraft": "Lanzando Minecraft...",
+    "ready": "Listo",
+    "launch_error": "Error de lanzamiento"
+  },
+  "errors": {
+    "critical_error": "Error Crítico",
+    "minecraft_dir_not_found": "No se encontró el directorio de Minecraft. Por favor configúralo.",
+    "selection_required": "Selección Requerida",
+    "select_modpack": "Por favor selecciona un modpack.",
+    "modpack_data_error": "No se pudo recuperar los datos del modpack.",
+    "modpack_not_found": "Datos del modpack no encontrados.",
+    "browser_error": "No se pudo abrir el navegador: {error}",
+    "offline": "Sin Conexión",
+    "internet_required": "Se requiere una conexión a Internet para verificar la autenticación y lanzar el juego.",
+    "connection_required": "Conexión Requerida"
+  },
+  "loading": {
+    "loading": "Cargando CatzLauncher..."
+  },
+  "window_controls": {
+    "minimize": "—",
+    "maximize": "▢",
+    "close": "✕"
+  },
+  "modpack_item": {
+    "check_update_tooltip": "Verificar actualizaciones para este modpack",
+    "checking_tooltip": "Verificando..."
+  }
+} 

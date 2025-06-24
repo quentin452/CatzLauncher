@@ -1,0 +1,126 @@
+{
+  "window": {
+    "title": "CatzLauncher - Modpack Launcher",
+    "header_title": "CatzLauncher"
+  },
+  "tabs": {
+    "play": "Spelen",
+    "config": "Config"
+  },
+  "main": {
+    "modpacks_title": "🎯 Beschikbare Modpacks",
+    "ready_to_play": "✨ Klaar om te spelen!",
+    "play_button": "🚀 Spelen",
+    "check_updates_button": "🔄 Updates controleren",
+    "checking_updates": "🔄 Controleren...",
+    "checking_single": "🔍 Controleren van {name}...",
+    "update_available": "✅ Update beschikbaar voor {name}",
+    "up_to_date": "✅ {name} is up-to-date",
+    "check_error": "❌ Fout bij controleren van {name}: {error}",
+    "no_updates": "✅ Geen updates beschikbaar",
+    "updates_found": "Updates beschikbaar voor",
+    "install_updates": "Wil je de updates installeren?",
+    "single_update_available": "Een update is beschikbaar voor '{name}'.",
+    "install_single_update": "Wil je het nu installeren?",
+    "modpack_not_installed": "De modpack '{name}' is niet geïnstalleerd.",
+    "install_modpack": "Wil je het nu installeren?"
+  },
+  "login": {
+    "not_connected": "❌ Niet verbonden",
+    "connected": "✅ Verbonden: {name}",
+    "login_microsoft": "🔐 Inloggen met Microsoft",
+    "logout": "🚪 Uitloggen",
+    "stats": "📊 Statistieken",
+    "login_in_progress": "🔄 Verbinden...",
+    "reconnecting": "🔄 Opnieuw verbinden...",
+    "login_cancelled": "⚠️ Authenticatie geannuleerd.",
+    "login_success": "🎉 Welkom, {name}!",
+    "logout_success": "🚪 Uitloggen succesvol",
+    "login_required": "Log eerst in voordat je speelt.",
+    "connection_error": "Verbindingsfout.",
+    "auth_code_prompt": "Na het verbinden, kopieer en plak hier de volledige URL van de witte pagina:",
+    "auth_code_error": "Authenticatiecode kon niet worden gevonden in de URL.",
+    "auth_error": "Authenticatiefout: {error}",
+    "config_required": "Configuratie Vereist",
+    "config_required_message": "De Azure Client-ID is niet geconfigureerd.\n\nVul het bestand `azure_config.json` in de projectroot in met je eigen 'Toepassings-ID (client)' om de verbinding te laten werken.",
+    "config_required_button": "🔐 Configuratie Vereist",
+    "config_required_tooltip": "Configureer de Client-ID in azure_config.json"
+  },
+  "stats": {
+    "title": "📊 Gebruikersstatistieken",
+    "last_activity": "🕒 Laatste activiteit",
+    "playtime": "⏳ Totale speeltijd",
+    "launch_count": "🚀 Aantal starts",
+    "login_count": "🔑 Aantal logins",
+    "close": "Sluiten",
+    "never": "Nooit",
+    "minutes": "min",
+    "error": "Fout"
+  },
+  "config": {
+    "title": "⚙️ Configuratie",
+    "java_path": "📁 Java-pad:",
+    "browse": "📂 Bladeren",
+    "theme": "🎨 Applicatiethema:",
+    "github_token": "🔑 GitHub Personal Access Token:",
+    "token_placeholder": "Plak een nieuw token om het op te slaan",
+    "token_saved": "✅ Een token is veilig opgeslagen.",
+    "token_not_saved": "❌ Er is momenteel geen token opgeslagen. Aanbevolen.",
+    "jvm_args": "🔧 JVM-argumenten:",
+    "max_memory": "🧠 Max. Geheugen (GB):",
+    "auto_check_updates": "🔄 Automatisch updates controleren bij opstarten",
+    "auto_check_launcher": "🚀 Automatisch launcher-updates controleren",
+    "check_launcher_updates": "🚀 Launcher-updates controleren",
+    "save_config": "💾 Configuratie Opslaan",
+    "config_saved": "✅ Configuratie opgeslagen!",
+    "language": "🌍 Taal:"
+  },
+  "launcher_updates": {
+    "checking": "Launcher-updates controleren...",
+    "available": "Launcher-update beschikbaar!",
+    "up_to_date": "Launcher is up-to-date",
+    "check_failed": "Update-controle mislukt",
+    "update_available_title": "Launcher-update beschikbaar",
+    "update_available_message": "Een nieuwe versie van de launcher is beschikbaar: <b>{new_version}</b><br>Je huidige versie is: <b>{current_version}</b><br><br>Wil je nu updaten? De applicatie wordt opnieuw opgestart.",
+    "updating": "Launcher updaten...",
+    "update_complete": "Update voltooid! Opnieuw opstarten...",
+    "update_error": "Er is een fout opgetreden tijdens de update: {error}",
+    "update_unexpected_error": "Er is een onverwachte fout opgetreden: {error}",
+    "restart_error": "Update-script kon niet worden gestart: {error}"
+  },
+  "installation": {
+    "installing": "Installeren van {name}...",
+    "installation_complete": "Installatie voltooid!",
+    "installation_error": "Fout bij installeren van '{name}': {error}",
+    "installation_failed": "Installatie van '{name}' mislukt.",
+    "preparing_launch": "Voorbereiden van start...",
+    "installing_forge": "Installeren van Forge {version}-forge-{forge_version}...",
+    "launching_minecraft": "Minecraft starten...",
+    "ready": "Klaar",
+    "launch_error": "Startfout"
+  },
+  "errors": {
+    "critical_error": "Kritieke Fout",
+    "minecraft_dir_not_found": "Minecraft-map niet gevonden. Configureer deze.",
+    "selection_required": "Selectie Vereist",
+    "select_modpack": "Selecteer een modpack.",
+    "modpack_data_error": "Modpack-gegevens konden niet worden opgehaald.",
+    "modpack_not_found": "Modpack-gegevens niet gevonden.",
+    "browser_error": "Browser kon niet worden geopend: {error}",
+    "offline": "Offline",
+    "internet_required": "Een internetverbinding is vereist om authenticatie te verifiëren en het spel te starten.",
+    "connection_required": "Verbinding Vereist"
+  },
+  "loading": {
+    "loading": "CatzLauncher laden..."
+  },
+  "window_controls": {
+    "minimize": "—",
+    "maximize": "▢",
+    "close": "✕"
+  },
+  "modpack_item": {
+    "check_update_tooltip": "Updates controleren voor deze modpack",
+    "checking_tooltip": "Controleren..."
+  }
+} 
