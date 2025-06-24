@@ -8,9 +8,6 @@ from zipfile import ZipFile
 import zipfile
 from minecraft_launcher_lib.forge import install_forge_version
 import sys
-import subprocess
-import importlib
-import re
 import urllib.request
 import urllib.error
 import urllib.parse
@@ -39,19 +36,6 @@ INSTALLED_FILE = os.path.join(SAVE_DIR, "installed_modpacks.json")
 STATS_FILE = os.path.join(SAVE_DIR, "user_stats.json")
 CONFIG_FILE = os.path.join(SAVE_DIR, "launcher_config.json")
 SERVICE_NAME = "CatzLauncher.GitHubToken"
-
-# Placeholder functions for GUI integration
-def show_error(title, message):
-    """Placeholder for GUI error dialog"""
-    msg = QMessageBox()
-    msg.setIcon(QMessageBox.Critical)
-    msg.setWindowTitle(title)
-    msg.setText(message)
-    msg.exec_()
-
-def show_message(title, message):
-    """Placeholder for GUI message dialog"""
-    print(f"INFO [{title}]: {message}")
 
 def save_local_github_commit(modpack_name, commit_info):
     """Saves the GitHub commit information locally"""
@@ -157,48 +141,6 @@ def get_preserved_items():
         "backups",       
         "local"    
     ]
-
-def preserve_player_data(modpack_profile_dir, temp_backup_dir):
-    """
-    Sauvegarde les données du joueur avant une mise à jour.
-    Retourne un dictionnaire des chemins sauvegardés.
-    """
-    preserved_items = get_preserved_items()
-    saved_items = {}
-    
-    for item in preserved_items:
-        item_path = os.path.join(modpack_profile_dir, item)
-        if os.path.exists(item_path):
-            saved_path = os.path.join(temp_backup_dir, item)
-            if os.path.isdir(item_path):
-                shutil.copytree(item_path, saved_path)
-            else:
-                shutil.copy2(item_path, saved_path)
-            saved_items[item] = saved_path
-            print(f"Sauvegarde de {item} pour le modpack")
-    
-    return saved_items
-
-def restore_player_data(modpack_profile_dir, saved_items):
-    """
-    Restaure les données du joueur après une mise à jour.
-    """
-    for item, saved_path in saved_items.items():
-        if os.path.exists(saved_path):
-            target_path = os.path.join(modpack_profile_dir, item)
-            
-            if os.path.exists(target_path):
-                if os.path.isdir(target_path):
-                    shutil.rmtree(target_path)
-                else:
-                    os.remove(target_path)
-            
-            if os.path.isdir(saved_path):
-                shutil.move(saved_path, target_path)
-            else:
-                shutil.copy2(saved_path, target_path)
-            
-            print(f"Restauration de {item} pour le modpack")
 
 def install_forge_if_needed(mc_version, forge_version, minecraft_directory):
     from minecraft_launcher_lib.forge import install_forge_version
@@ -477,80 +419,6 @@ def check_update(name, url, last_modified):
         print(f"Erreur lors de la vérification de mise à jour: {e}")
         return False, f"Erreur de connexion: {e}"
 
-def get_local_etag(url):
-    """Récupère l'ETag stocké localement pour une URL"""
-    installed_data = {}
-    if os.path.exists(INSTALLED_FILE):
-        with open(INSTALLED_FILE, 'r') as f:
-            installed_data = json.load(f)
-    
-    return installed_data.get(url, {}).get('etag')
-
-def get_local_file_size(url):
-    """Récupère la taille du fichier stockée localement"""
-    installed_data = {}
-    if os.path.exists(INSTALLED_FILE):
-        with open(INSTALLED_FILE, 'r') as f:
-            installed_data = json.load(f)
-    
-    return installed_data.get(url, {}).get('file_size')
-
-def update_installed_info(modpack_name, url, timestamp, etag=None, file_size=None):
-    """Met à jour les informations d'installation pour un modpack (clé = nom du modpack)."""
-    installed_data = {}
-    if os.path.exists(INSTALLED_FILE):
-        with open(INSTALLED_FILE, 'r') as f:
-            installed_data = json.load(f)
-    installed_data[modpack_name] = {
-        'url': url,
-        'timestamp': timestamp,
-        'etag': etag,
-        'file_size': file_size
-    }
-    with open(INSTALLED_FILE, 'w') as f:
-        json.dump(installed_data, f, indent=4)
-
-def update_modpack_info(modpack, new_timestamp):
-    """Met à jour les informations d'un modpack dans modpacks.json"""
-    try:
-        with open('modpacks.json', 'r') as f:
-            modpacks = json.load(f)
-        
-        for pack in modpacks:
-            if pack['url'] == modpack['url']:
-                pack['last_modified'] = new_timestamp
-                break
-        
-        with open('modpacks.json', 'w') as f:
-            json.dump(modpacks, f, indent=4)
-            
-    except Exception as e:
-        print(f"Erreur lors de la mise à jour de modpacks.json: {e}")
-
-def get_file_hash(file_path):
-    """Calcule le hash SHA256 d'un fichier"""
-    hash_sha256 = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash_sha256.update(chunk)
-    return hash_sha256.hexdigest()
-
-def remove_from_installed_log(modpack_name):
-    """Supprime une entrée de modpack du journal d'installation."""
-    if not os.path.exists(INSTALLED_FILE):
-        return
-    try:
-        with open(INSTALLED_FILE, 'r', encoding='utf-8') as f:
-            installed_data = json.load(f)
-        
-        if modpack_name in installed_data:
-            del installed_data[modpack_name]
-            with open(INSTALLED_FILE, 'w', encoding='utf-8') as f:
-                json.dump(installed_data, f, indent=4)
-            print(f"'{modpack_name}' a été retiré du journal d'installation.")
-    except (json.JSONDecodeError, IOError) as e:
-        print(f"Avertissement: Erreur lors du nettoyage du journal pour '{modpack_name}': {e}")
-
 def is_modpack_installed(modpack_name):
     """Vérifie si un modpack est enregistré comme étant installé."""
     if not os.path.exists(INSTALLED_FILE):
@@ -647,25 +515,6 @@ def get_installed_modpacks():
     except (IOError, json.JSONDecodeError):
         return {}
 
-def add_to_installed_log(modpack_name, version, timestamp, install_dir, commit_info=None):
-    """
-    Ajoute un modpack au journal des installations avec les informations du commit GitHub.
-    """
-    installed = get_installed_modpacks()
-    installed[modpack_name] = {
-        "version": version,
-        "timestamp": timestamp,
-        "path": install_dir,
-        "first_install": True  # Marquer comme première installation
-    }
-    
-    # Ajouter les informations du commit si disponibles
-    if commit_info:
-        installed[modpack_name]["github_commit"] = commit_info
-    
-    with open(INSTALLED_FILE, 'w') as f:
-        json.dump(installed, f, indent=4)
-
 def get_github_last_commit(repo_url):
     """
     Récupère le dernier commit d'une branche GitHub.
@@ -732,46 +581,6 @@ def check_github_update(url, last_commit_info):
         print(f"Erreur lors de la vérification GitHub: {e}")
         return False
 
-def get_commits_between(repo_url, old_sha, new_sha):
-    """
-    Récupère tous les commits entre old_sha et new_sha (exclusif vers inclusif).
-    """
-    try:
-        if 'github.com' in repo_url and '/archive/refs/heads/' in repo_url:
-            # Extraire les informations du repo
-            start_marker = '/archive/refs/heads/'
-            start_pos = repo_url.find(start_marker)
-            if start_pos != -1:
-                branch_start = start_pos + len(start_marker)
-                branch_end = repo_url.find('.zip', branch_start)
-                if branch_end != -1:
-                    branch = repo_url[branch_start:branch_end]
-                    parts = repo_url.split('/')
-                    owner = parts[3]
-                    repo = parts[4]
-                    
-                    # API GitHub pour récupérer les commits entre les deux SHA
-                    api_url = f"https://api.github.com/repos/{owner}/{repo}/compare/{old_sha}...{new_sha}"
-                    headers = _get_github_auth_headers()
-                    
-                    response = requests.get(api_url, headers=headers, timeout=15)
-                    response.raise_for_status()
-                    
-                    compare_data = response.json()
-                    commits = compare_data.get('commits', [])
-                    
-                    # Trier par date (plus ancien en premier)
-                    commits.sort(key=lambda x: x['commit']['author']['date'])
-                    
-                    print(f"Trouvé {len(commits)} commits entre {old_sha[:8]} et {new_sha[:8]}")
-                    return commits
-                    
-    except Exception as e:
-        print(f"Erreur lors de la récupération des commits: {e}")
-        return []
-    
-    return []
-
 def analyze_commit_changes(repo_url, commit_sha):
     """
     Analyse un commit et retourne les fichiers ajoutés/supprimés/modifiés.
@@ -828,41 +637,6 @@ def analyze_commit_changes(repo_url, commit_sha):
         return {'added': [], 'modified': [], 'removed': []}
     
     return {'added': [], 'modified': [], 'removed': []}
-
-def analyze_all_commits(repo_url, commits):
-    """
-    Analyse tous les commits et retourne tous les changements cumulés.
-    """
-    all_changes = {
-        'added': set(),
-        'modified': set(),
-        'removed': set()
-    }
-    
-    for commit in commits:
-        commit_sha = commit['sha']
-        changes = analyze_commit_changes(repo_url, commit_sha)
-        
-        # Ajouter les nouveaux fichiers
-        all_changes['added'].update(changes['added'])
-        # Ajouter les fichiers modifiés
-        all_changes['modified'].update(changes['modified'])
-        # Ajouter les fichiers supprimés
-        all_changes['removed'].update(changes['removed'])
-    
-    # Nettoyer les conflits (un fichier ne peut pas être ajouté ET supprimé)
-    for filename in all_changes['added'].copy():
-        if filename in all_changes['removed']:
-            all_changes['added'].remove(filename)
-            all_changes['removed'].remove(filename)
-            all_changes['modified'].add(filename)
-    
-    # Convertir les sets en listes
-    return {
-        'added': list(all_changes['added']),
-        'modified': list(all_changes['modified']),
-        'removed': list(all_changes['removed'])
-    }
 
 def get_github_file_size(repo_url, file_path, commit_sha):
     """
@@ -1000,17 +774,6 @@ def get_local_github_commit(modpack_name):
     installed_data = get_installed_modpacks()
     modpack_info = installed_data.get(modpack_name, {})
     return modpack_info.get('github_commit')
-
-def update_local_commit(modpack_name, new_commit_info):
-    """
-    Met à jour les informations du commit local.
-    """
-    installed_data = get_installed_modpacks()
-    if modpack_name in installed_data:
-        installed_data[modpack_name]['github_commit'] = new_commit_info
-        with open(INSTALLED_FILE, 'w') as f:
-            json.dump(installed_data, f, indent=4)
-        print(f"Commit local mis à jour pour '{modpack_name}': {new_commit_info['sha'][:8]}")
 
 def install_or_update_modpack_github(url, install_dir, modpack_name, estimated_mb, progress_callback=None):
     """

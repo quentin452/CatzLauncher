@@ -791,7 +791,7 @@ class MinecraftLauncher(QMainWindow):
 
         layout.addWidget(form_container)
 
-        # Auto-update checkbox
+        # Modpack Auto-update checkbox
         self.auto_check_cb = QCheckBox(translations.tr("config.auto_check_updates"))
         self.auto_check_cb.setChecked(self.config.get("auto_check_updates", True))
         layout.addWidget(self.auto_check_cb)
@@ -1199,7 +1199,6 @@ class MinecraftLauncher(QMainWindow):
             self.signals.progress.emit(0)
 
             install_dir = os.path.join(minecraft_directory, "modpacks")
-            backup_dir = os.path.join(install_dir, "backups")
 
             # Utiliser la nouvelle logique delta pour les modpacks GitHub
             if 'github.com' in modpack_data["url"] and '/archive/refs/heads/' in modpack_data["url"]:
@@ -1512,10 +1511,6 @@ class MinecraftLauncher(QMainWindow):
         except Exception as e:
             traceback.print_exc()
             QMessageBox.critical(self, translations.tr("errors.critical_error"), translations.tr("launcher_updates.restart_error", error=str(e)))
-
-    def manual_check_launcher_updates(self):
-        """Bouton pour vérifier manuellement les mises à jour du launcher."""
-        self.check_launcher_updates(trigger_modpack_check_if_up_to_date=False)
 
     def update_avatar(self, pseudo):
         """Met à jour l'avatar Minecraft du joueur à partir de minotar.net."""
