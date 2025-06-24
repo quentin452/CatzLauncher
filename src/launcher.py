@@ -1383,10 +1383,6 @@ class MinecraftLauncher(QMainWindow):
         self.drag_offset = None
         event.accept()
 
-    def show_error_dialog(self, title, message):
-        """Shows a critical error message box in the main thread."""
-        QMessageBox.critical(self, title, message)
-
     def handle_single_update_found(self, modpack_data):
         """Handle the signal for a single update found."""
         # Afficher une boîte de dialogue pour proposer l'installation de la mise à jour
