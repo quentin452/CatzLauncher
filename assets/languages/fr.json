@@ -122,5 +122,23 @@
   "modpack_item": {
     "check_update_tooltip": "Vérifier les mises à jour pour ce modpack",
     "checking_tooltip": "Vérification en cours..."
-  }
+  },
+  "tips": [
+    "Astuce : Les chats dans Minecraft éloignent les creepers !",
+    "Fun fact : Les chats retombent toujours sur leurs pattes.",
+    "Astuce : Clique sur 📊 pour voir tes statistiques !",
+    "Fun fact : Le launcher supporte plusieurs thèmes.",
+    "Astuce : Tu peux changer de langue dans les paramètres !",
+    "Fun fact : Les ocelots peuvent être apprivoisés avec du poisson.",
+    "Astuce : Utilise la touche F5 pour changer de vue dans Minecraft.",
+    "Fun fact : Les creepers ont été créés par accident !",
+    "Astuce : Tu peux personnaliser ton launcher dans les paramètres.",
+    "Fun fact : Le saviez-vous ? Mojang a été racheté par Microsoft en 2014.",
+    "Astuce : Pense à sauvegarder régulièrement tes mondes.",
+    "Fun fact : Le bloc le plus rare de Minecraft est l'éponge !",
+    "Astuce : Les chats ne prennent pas de dégâts de chute dans Minecraft.",
+    "Fun fact : Le premier nom de Minecraft était 'Cave Game'.",
+    "Astuce : Tu peux changer de skin sur le site officiel Minecraft.",
+    "Fun fact : Il existe plus de 3000 types de poissons tropicaux dans Minecraft !"
+  ]
 } 

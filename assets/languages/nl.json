@@ -122,5 +122,23 @@
   "modpack_item": {
     "check_update_tooltip": "Updates controleren voor deze modpack",
     "checking_tooltip": "Controleren..."
-  }
+  },
+  "tips": [
+    "Tip: Katten in Minecraft jagen creepers weg!",
+    "Feitje: Katten landen altijd op hun poten.",
+    "Tip: Klik op 📊 om je statistieken te bekijken!",
+    "Feitje: De launcher ondersteunt meerdere thema's.",
+    "Tip: Je kunt de taal wijzigen in de instellingen!",
+    "Feitje: Ocelots kunnen worden getemd met vis.",
+    "Tip: Gebruik de F5-toets om van camera te wisselen in Minecraft.",
+    "Feitje: Creepers zijn per ongeluk ontstaan!",
+    "Tip: Je kunt je launcher aanpassen in de instellingen.",
+    "Feitje: Wist je dat Mojang in 2014 door Microsoft is gekocht?",
+    "Tip: Vergeet niet regelmatig je werelden te back-uppen.",
+    "Feitje: Het zeldzaamste blok in Minecraft is de spons!",
+    "Tip: Katten krijgen geen valschade in Minecraft.",
+    "Feitje: De eerste naam van Minecraft was 'Cave Game'.",
+    "Tip: Je kunt je skin wijzigen op de officiële Minecraft-website.",
+    "Feitje: Er zijn meer dan 3000 soorten tropische vissen in Minecraft!"
+  ]
 } 

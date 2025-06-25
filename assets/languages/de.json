@@ -122,5 +122,23 @@
   "modpack_item": {
     "check_update_tooltip": "Nach Updates für dieses Modpack suchen",
     "checking_tooltip": "Prüfe..."
-  }
+  },
+  "tips": [
+    "Tipp: Katzen in Minecraft vertreiben Creeper!",
+    "Fun Fact: Katzen landen immer auf ihren Pfoten.",
+    "Tipp: Klicke auf 📊, um deine Statistiken zu sehen!",
+    "Fun Fact: Der Launcher unterstützt mehrere Themes.",
+    "Tipp: Du kannst die Sprache in den Einstellungen ändern!",
+    "Fun Fact: Ozelots können mit Fisch gezähmt werden.",
+    "Tipp: Mit der F5-Taste kannst du die Ansicht in Minecraft wechseln.",
+    "Fun Fact: Creeper wurden aus Versehen erschaffen!",
+    "Tipp: Du kannst deinen Launcher in den Einstellungen anpassen.",
+    "Fun Fact: Wusstest du? Mojang wurde 2014 von Microsoft gekauft.",
+    "Tipp: Denke daran, deine Welten regelmäßig zu sichern.",
+    "Fun Fact: Der seltenste Block in Minecraft ist der Schwamm!",
+    "Tipp: Katzen erleiden in Minecraft keinen Fallschaden.",
+    "Fun Fact: Der erste Name von Minecraft war 'Cave Game'.",
+    "Tipp: Du kannst dein Skin auf der offiziellen Minecraft-Website ändern.",
+    "Fun Fact: Es gibt über 3000 Arten von tropischen Fischen in Minecraft!"
+  ]
 } 

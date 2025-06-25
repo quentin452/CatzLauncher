@@ -122,5 +122,23 @@
   "modpack_item": {
     "check_update_tooltip": "Verificar actualizaciones para este modpack",
     "checking_tooltip": "Verificando..."
-  }
+  },
+  "tips": [
+    "Consejo: ¡Los gatos en Minecraft ahuyentan a los creepers!",
+    "Dato curioso: Los gatos siempre caen de pie.",
+    "Consejo: ¡Haz clic en 📊 para ver tus estadísticas!",
+    "Dato curioso: El launcher soporta varios temas.",
+    "Consejo: ¡Puedes cambiar el idioma en la configuración!",
+    "Dato curioso: Los ocelotes pueden ser domesticados con pescado.",
+    "Consejo: Usa la tecla F5 para cambiar la vista en Minecraft.",
+    "Dato curioso: ¡Los creepers fueron creados por accidente!",
+    "Consejo: Puedes personalizar tu launcher en la configuración.",
+    "Dato curioso: ¿Sabías que Mojang fue comprado por Microsoft en 2014?",
+    "Consejo: Recuerda hacer copias de seguridad de tus mundos regularmente.",
+    "Dato curioso: ¡El bloque más raro de Minecraft es la esponja!",
+    "Consejo: Los gatos no reciben daño por caída en Minecraft.",
+    "Dato curioso: El primer nombre de Minecraft fue 'Cave Game'.",
+    "Consejo: Puedes cambiar tu skin en el sitio oficial de Minecraft.",
+    "Dato curioso: ¡Hay más de 3000 tipos de peces tropicales en Minecraft!"
+  ]
 } 

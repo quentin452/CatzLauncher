@@ -122,5 +122,23 @@
   "modpack_item": {
     "check_update_tooltip": "Check for updates for this modpack",
     "checking_tooltip": "Checking..."
-  }
+  },
+  "tips": [
+    "Tip: Cats in Minecraft scare away creepers!",
+    "Fun fact: Cats always land on their feet.",
+    "Tip: Click on 📊 to see your stats!",
+    "Fun fact: The launcher supports multiple themes.",
+    "Tip: You can change the language in the settings!",
+    "Fun fact: Ocelots can be tamed with fish.",
+    "Tip: Use the F5 key to change the camera view in Minecraft.",
+    "Fun fact: Creepers were created by accident!",
+    "Tip: You can customize your launcher in the settings.",
+    "Fun fact: Did you know? Mojang was bought by Microsoft in 2014.",
+    "Tip: Remember to back up your worlds regularly.",
+    "Fun fact: The rarest block in Minecraft is the sponge!",
+    "Tip: Cats don't take fall damage in Minecraft.",
+    "Fun fact: The first name of Minecraft was 'Cave Game'.",
+    "Tip: You can change your skin on the official Minecraft website.",
+    "Fun fact: There are over 3000 types of tropical fish in Minecraft!"
+  ]
 } 
