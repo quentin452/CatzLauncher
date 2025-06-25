@@ -1826,6 +1826,8 @@ class LoadingScreen(QWidget):
         gif_files = [f"assets/loading gif/{i}.gif" for i in range(1, 6)]
         chosen_gif = random.choice(gif_files)
         self.cat_label = QLabel()
+        self.cat_label.setFixedSize(180, 180)
+        self.cat_label.setScaledContents(True)
         self.cat_movie = QMovie(chosen_gif)
         self.cat_label.setMovie(self.cat_movie)
         self.cat_movie.start()
