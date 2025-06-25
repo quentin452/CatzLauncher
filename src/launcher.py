@@ -495,7 +495,7 @@ class MinecraftLauncher(QMainWindow):
     def _create_header(self):
         """Create a beautiful header with logo and title."""
         header = QFrame()
-        header.setFixedHeight(80)
+        header.setFixedHeight(56)
         header.setObjectName("header")
         
         layout = QHBoxLayout(header)
