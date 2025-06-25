@@ -23,6 +23,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient, QPen
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import Qt as QtCoreQt
 
 from minecraft_launcher_lib.utils import (get_minecraft_directory)
 from minecraft_launcher_lib.command import get_minecraft_command
@@ -35,6 +36,7 @@ from src.utils import (
 )
 from src.particles import ParticleSystem, Particle, AnimatedButton, LoadingSpinner
 from src.launcher_updater import LauncherUpdateManager, is_git_repo, perform_launcher_update as do_update
+from src.no_scroll_combobox import NoScrollComboBox, NoScrollSlider
 
 class TranslationManager:
     """Gestionnaire de traductions pour le launcher."""
@@ -730,14 +732,14 @@ class MinecraftLauncher(QMainWindow):
         form_layout.addRow(java_path_label, java_path_layout)
 
         # Theme Selector
-        self.theme_selector = QComboBox()
+        self.theme_selector = NoScrollComboBox()
         self.populate_themes()
         theme_label = QLabel(translations.tr("config.theme"))
         theme_label.setProperty("tr_key", "config.theme")
         form_layout.addRow(theme_label, self.theme_selector)
 
         # Language Selector
-        self.language_selector = QComboBox()
+        self.language_selector = NoScrollComboBox()
         self.populate_languages()
         language_label = QLabel(translations.tr("config.language"))
         language_label.setProperty("tr_key", "config.language")
@@ -768,10 +770,10 @@ class MinecraftLauncher(QMainWindow):
             total_gb = min(total_gb, 64)  # Cap at 64 GB for sanity
         except ImportError:
             total_gb = 16
-        self.max_memory_slider = QSlider(Qt.Orientation.Horizontal)
-        self.max_memory_slider.setMinimum(1)
+        self.max_memory_slider = NoScrollSlider(Qt.Orientation.Horizontal)
+        self.max_memory_slider.setMinimum(8)
         self.max_memory_slider.setMaximum(total_gb)
-        self.max_memory_slider.setValue(min(int(self.config.get("max_memory", 4)), total_gb))
+        self.max_memory_slider.setValue(min(max(int(self.config.get("max_memory", 8)), 8), total_gb))
         self.max_memory_slider.setTickInterval(1)
         self.max_memory_slider.setTickPosition(QSlider.TicksBelow)
         self.max_memory_label = QLabel(f"RAM Max: {self.max_memory_slider.value()} Go (/{total_gb} Go)")
