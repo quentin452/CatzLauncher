@@ -30,7 +30,7 @@
     "connected": "✅ Connecté: {name}",
     "login_microsoft": "🔐 Login avec Microsoft",
     "logout": "🚪 Se déconnecter",
-    "stats": "📊 Stats",
+    "stats": "📊",
     "login_in_progress": "🔄 Connexion en cours...",
     "reconnecting": "🔄 Reconnexion...",
     "login_cancelled": "⚠️ Authentification annulée.",

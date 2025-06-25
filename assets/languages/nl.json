@@ -30,7 +30,7 @@
     "connected": "✅ Verbonden: {name}",
     "login_microsoft": "🔐 Inloggen met Microsoft",
     "logout": "🚪 Uitloggen",
-    "stats": "📊 Statistieken",
+    "stats": "📊",
     "login_in_progress": "🔄 Verbinden...",
     "reconnecting": "🔄 Opnieuw verbinden...",
     "login_cancelled": "⚠️ Authenticatie geannuleerd.",
