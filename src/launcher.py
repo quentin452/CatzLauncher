@@ -20,9 +20,9 @@ from PyQt5.QtWidgets import (
     QProgressBar, QListWidget, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
     QInputDialog, QTabWidget, QFrame, QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
     QListWidgetItem, QStackedWidget, QSizePolicy, QComboBox, QFormLayout, QScrollArea, QSlider, QProgressDialog,
-    QMenu, QAction, QApplication, QGraphicsBlurEffect, QStyleFactory, QShortcut
+    QMenu, QAction
 )
-from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient, QPen, QMovie, QKeySequence
+from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient, QPen
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt as QtCoreQt
 from PyQt5.QtGui import QMovie
@@ -471,7 +471,6 @@ class MinecraftLauncher(QMainWindow):
 
         self._setup_ui()
         self._connect_signals()
-        self._setup_dev_menu()
         self._apply_styles()
 
         # Show loading screen for a few seconds, then switch to main content
@@ -2024,57 +2023,6 @@ class MinecraftLauncher(QMainWindow):
         data.SizeOfData = ctypes.sizeof(accent)
         hwnd = int(self.winId())
         ctypes.windll.user32.SetWindowCompositionAttribute(hwnd, ctypes.byref(data))
-
-    def _setup_dev_menu(self):
-        """Ajoute un menu Développement avec outils utiles."""
-        if hasattr(self, 'menuBar'):
-            dev_menu = self.menuBar().addMenu('🛠️ Développement')
-            dev_menu.setObjectName('dev_menu')
-
-            # Action : Recharger QSS
-            reload_qss_action = QAction('🔄 Recharger le style QSS', self)
-            reload_qss_action.triggered.connect(self.reload_styles)
-            dev_menu.addAction(reload_qss_action)
-
-            # Action : Ouvrir Qt Designer
-            open_designer_action = QAction('🎨 Ouvrir Qt Designer', self)
-            open_designer_action.triggered.connect(self.open_qt_designer)
-            dev_menu.addAction(open_designer_action)
-
-            # Action : Changer de style Qt
-            style_menu = QMenu('🎭 Changer de style Qt', self)
-            for style in QStyleFactory.keys():
-                style_action = QAction(style, self)
-                style_action.triggered.connect(lambda checked, s=style: self.change_qt_style(s))
-                style_menu.addAction(style_action)
-            dev_menu.addMenu(style_menu)
-
-            # Raccourci F12 pour ouvrir le menu
-            shortcut = QShortcut(QKeySequence('F12'), self)
-            shortcut.activated.connect(lambda: dev_menu.exec_(self.mapToGlobal(self.rect().topRight())))
-
-    def reload_styles(self):
-        """Recharge le QSS courant."""
-        try:
-            current_theme = getattr(self, 'current_theme', 'light.qss')
-            stylesheet = load_qss_stylesheet(current_theme)
-            self.setStyleSheet(stylesheet)
-            QMessageBox.information(self, "Styles", "Styles rechargés !")
-        except Exception as e:
-            QMessageBox.warning(self, "Erreur", f"Erreur lors du rechargement: {e}")
-
-    def open_qt_designer(self):
-        """Ouvre Qt Designer (si installé dans le PATH)."""
-        import subprocess
-        try:
-            subprocess.Popen(['designer'])
-        except FileNotFoundError:
-            QMessageBox.warning(self, "Qt Designer", "Qt Designer n'est pas installé ou n'est pas dans le PATH.")
-
-    def change_qt_style(self, style_name):
-        """Change le style Qt de l'application."""
-        QApplication.setStyle(QStyleFactory.create(style_name))
-        QMessageBox.information(self, "Style Qt", f"Style Qt changé pour : {style_name}")
 
 class LoadingScreen(QWidget):
     def __init__(self, parent=None):
