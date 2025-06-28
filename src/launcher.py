@@ -1983,7 +1983,7 @@ class MinecraftLauncher(QMainWindow):
             html_row(str(translations.tr('modpack_item.info.forge_version')) + " :", modpack_data.get('forge_version', None)),
             html_row(str(translations.tr('modpack_item.info.url')) + " :", url_html),
             html_row(str(translations.tr('modpack_item.info.last_modified')) + " :", modpack_data.get('last_modified', None)),
-            html_row(str(translations.tr('modpack_item.info.estimated_size')) + " :", str(modpack_data.get('estimated_mb', str(translations.tr('modpack_item.info.not_specified')))) + " MB"),
+            html_row(str(translations.tr('modpack_item.info.estimated_size')) + " :", str(modpack_data.get('estimated_mb', str(translations.tr('modpack_item.info.not_specified'))))),
             f"<b>{str(translations.tr('modpack_item.info.install_path'))} :</b> <br>{install_path_html}"
         ])
 
