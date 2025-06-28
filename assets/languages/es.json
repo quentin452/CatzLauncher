@@ -120,8 +120,31 @@
     "close": "✕"
   },
   "modpack_item": {
-    "check_update_tooltip": "Verificar actualizaciones para este modpack",
-    "checking_tooltip": "Verificando..."
+    "check_update_tooltip": "Buscar actualizaciones para este modpack",
+    "checking_tooltip": "Comprobando...",
+    "context_menu": {
+      "open_folder": "📁 Abrir carpeta del modpack",
+      "check_updates": "🔄 Buscar actualizaciones",
+      "show_info": "ℹ️ Información del modpack"
+    },
+    "info": {
+      "title": "Información del modpack",
+      "name": "Nombre",
+      "version": "Versión",
+      "forge_version": "Versión Forge",
+      "url": "URL",
+      "last_modified": "Última modificación",
+      "estimated_size": "Tamaño estimado",
+      "install_path": "Ruta de instalación",
+      "not_specified": "No especificado"
+    },
+    "folder": {
+      "not_found_title": "Carpeta no encontrada",
+      "not_found_message": "La carpeta del modpack '{name}' aún no existe.",
+      "expected_path": "Ruta esperada: {path}",
+      "error_title": "Error",
+      "error_message": "No se pudo abrir la carpeta del modpack: {error}"
+    }
   },
   "tips": [
     "Consejo: ¡Los gatos en Minecraft ahuyentan a los creepers!",

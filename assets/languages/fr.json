@@ -121,7 +121,30 @@
   },
   "modpack_item": {
     "check_update_tooltip": "Vérifier les mises à jour pour ce modpack",
-    "checking_tooltip": "Vérification en cours..."
+    "checking_tooltip": "Vérification en cours...",
+    "context_menu": {
+      "open_folder": "📁 Ouvrir le dossier du modpack",
+      "check_updates": "🔄 Vérifier les mises à jour",
+      "show_info": "ℹ️ Informations du modpack"
+    },
+    "info": {
+      "title": "Informations du modpack",
+      "name": "Nom",
+      "version": "Version",
+      "forge_version": "Version Forge",
+      "url": "URL",
+      "last_modified": "Dernière modification",
+      "estimated_size": "Taille estimée",
+      "install_path": "Chemin d'installation",
+      "not_specified": "Non spécifiée"
+    },
+    "folder": {
+      "not_found_title": "Dossier non trouvé",
+      "not_found_message": "Le dossier du modpack '{name}' n'existe pas encore.",
+      "expected_path": "Chemin attendu : {path}",
+      "error_title": "Erreur",
+      "error_message": "Impossible d'ouvrir le dossier du modpack : {error}"
+    }
   },
   "tips": [
     "Astuce : Les chats dans Minecraft éloignent les creepers !",

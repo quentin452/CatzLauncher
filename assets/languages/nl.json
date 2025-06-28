@@ -120,8 +120,31 @@
     "close": "✕"
   },
   "modpack_item": {
-    "check_update_tooltip": "Updates controleren voor deze modpack",
-    "checking_tooltip": "Controleren..."
+    "check_update_tooltip": "Controleer op updates voor dit modpack",
+    "checking_tooltip": "Bezig met controleren...",
+    "context_menu": {
+      "open_folder": "📁 Modpack-map openen",
+      "check_updates": "🔄 Controleer op updates",
+      "show_info": "ℹ️ Modpack-informatie"
+    },
+    "info": {
+      "title": "Modpack-informatie",
+      "name": "Naam",
+      "version": "Versie",
+      "forge_version": "Forge-versie",
+      "url": "URL",
+      "last_modified": "Laatst gewijzigd",
+      "estimated_size": "Geschatte grootte",
+      "install_path": "Installatiepad",
+      "not_specified": "Niet gespecificeerd"
+    },
+    "folder": {
+      "not_found_title": "Map niet gevonden",
+      "not_found_message": "De modpack-map '{name}' bestaat nog niet.",
+      "expected_path": "Verwacht pad: {path}",
+      "error_title": "Fout",
+      "error_message": "Kan de modpack-map niet openen: {error}"
+    }
   },
   "tips": [
     "Tip: Katten in Minecraft jagen creepers weg!",

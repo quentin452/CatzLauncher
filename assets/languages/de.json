@@ -121,7 +121,30 @@
   },
   "modpack_item": {
     "check_update_tooltip": "Nach Updates für dieses Modpack suchen",
-    "checking_tooltip": "Prüfe..."
+    "checking_tooltip": "Überprüfung läuft...",
+    "context_menu": {
+      "open_folder": "📁 Modpack-Ordner öffnen",
+      "check_updates": "🔄 Nach Updates suchen",
+      "show_info": "ℹ️ Modpack-Informationen"
+    },
+    "info": {
+      "title": "Modpack-Informationen",
+      "name": "Name",
+      "version": "Version",
+      "forge_version": "Forge-Version",
+      "url": "URL",
+      "last_modified": "Letzte Änderung",
+      "estimated_size": "Geschätzte Größe",
+      "install_path": "Installationspfad",
+      "not_specified": "Nicht angegeben"
+    },
+    "folder": {
+      "not_found_title": "Ordner nicht gefunden",
+      "not_found_message": "Der Modpack-Ordner '{name}' existiert noch nicht.",
+      "expected_path": "Erwarteter Pfad: {path}",
+      "error_title": "Fehler",
+      "error_message": "Modpack-Ordner konnte nicht geöffnet werden: {error}"
+    }
   },
   "tips": [
     "Tipp: Katzen in Minecraft vertreiben Creeper!",

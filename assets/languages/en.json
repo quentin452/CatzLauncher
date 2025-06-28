@@ -121,7 +121,30 @@
   },
   "modpack_item": {
     "check_update_tooltip": "Check for updates for this modpack",
-    "checking_tooltip": "Checking..."
+    "checking_tooltip": "Checking...",
+    "context_menu": {
+      "open_folder": "📁 Open modpack folder",
+      "check_updates": "🔄 Check for updates",
+      "show_info": "ℹ️ Modpack information"
+    },
+    "info": {
+      "title": "Modpack Information",
+      "name": "Name",
+      "version": "Version",
+      "forge_version": "Forge Version",
+      "url": "URL",
+      "last_modified": "Last Modified",
+      "estimated_size": "Estimated Size",
+      "install_path": "Installation Path",
+      "not_specified": "Not specified"
+    },
+    "folder": {
+      "not_found_title": "Folder not found",
+      "not_found_message": "The modpack folder '{name}' does not exist yet.",
+      "expected_path": "Expected path: {path}",
+      "error_title": "Error",
+      "error_message": "Unable to open modpack folder: {error}"
+    }
   },
   "tips": [
     "Tip: Cats in Minecraft scare away creepers!",

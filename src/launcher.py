@@ -19,7 +19,8 @@ from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QProgressBar, QListWidget, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
     QInputDialog, QTabWidget, QFrame, QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
-    QListWidgetItem, QStackedWidget, QSizePolicy, QComboBox, QFormLayout, QScrollArea, QSlider, QProgressDialog
+    QListWidgetItem, QStackedWidget, QSizePolicy, QComboBox, QFormLayout, QScrollArea, QSlider, QProgressDialog,
+    QMenu, QAction
 )
 from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLinearGradient, QFont, QRadialGradient, QPen
 from PyQt5.QtWidgets import QApplication
@@ -295,6 +296,10 @@ class ModpackListItem(QWidget):
         self.check_update_btn.setToolTip(str(translations.tr("modpack_item.check_update_tooltip")))
         self.check_update_btn.setProperty("class", "update-btn")
         layout.addWidget(self.check_update_btn)
+        
+        # Activer le menu contextuel
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.show_context_menu)
     
     def set_checking_state(self, checking=True):
         """Change l'état du bouton pendant la vérification."""
@@ -306,6 +311,104 @@ class ModpackListItem(QWidget):
             self.check_update_btn.setText("🔄")
             self.check_update_btn.setEnabled(True)
             self.check_update_btn.setToolTip(str(translations.tr("modpack_item.check_update_tooltip")))
+    
+    def show_context_menu(self, position):
+        """Affiche le menu contextuel pour le modpack."""
+        context_menu = QMenu(self)
+        
+        # Action pour ouvrir le dossier du modpack
+        open_folder_action = QAction(str(translations.tr("modpack_item.context_menu.open_folder")), self)
+        open_folder_action.triggered.connect(self.open_modpack_folder)
+        context_menu.addAction(open_folder_action)
+        
+        # Action pour vérifier les mises à jour
+        check_update_action = QAction(str(translations.tr("modpack_item.context_menu.check_updates")), self)
+        check_update_action.triggered.connect(self.trigger_update_check)
+        context_menu.addAction(check_update_action)
+        
+        # Action pour afficher les informations du modpack
+        info_action = QAction(str(translations.tr("modpack_item.context_menu.show_info")), self)
+        info_action.triggered.connect(self.show_modpack_info)
+        context_menu.addAction(info_action)
+        
+        # Afficher le menu à la position du clic
+        context_menu.exec_(self.mapToGlobal(position))
+    
+    def open_modpack_folder(self):
+        """Ouvre le dossier du modpack dans l'explorateur de fichiers."""
+        try:
+            minecraft_dir = get_minecraft_directory()
+            modpack_dir = os.path.join(minecraft_dir, "modpacks", self.modpack_data['name'])
+            
+            if os.path.exists(modpack_dir):
+                # Ouvrir le dossier dans l'explorateur de fichiers
+                if sys.platform == "win32":
+                    os.startfile(modpack_dir)
+                elif sys.platform == "darwin":  # macOS
+                    subprocess.run(["open", modpack_dir])
+                else:  # Linux
+                    subprocess.run(["xdg-open", modpack_dir])
+            else:
+                QMessageBox.information(
+                    self, 
+                    str(translations.tr("modpack_item.folder.not_found_title")), 
+                    str(translations.tr("modpack_item.folder.not_found_message", name=self.modpack_data['name'])) + "\n\n" + 
+                    str(translations.tr("modpack_item.folder.expected_path", path=modpack_dir))
+                )
+        except Exception as e:
+            QMessageBox.critical(
+                self, 
+                str(translations.tr("modpack_item.folder.error_title")), 
+                str(translations.tr("modpack_item.folder.error_message", error=str(e)))
+            )
+    
+    def trigger_update_check(self):
+        """Déclenche la vérification des mises à jour pour ce modpack."""
+        # Trouver le launcher principal en remontant la hiérarchie des widgets
+        current_widget = self
+        launcher = None
+        
+        while current_widget and not launcher:
+            if hasattr(current_widget, 'check_single_modpack_update'):
+                launcher = current_widget
+                break
+            current_widget = current_widget.parent()
+        
+        if launcher:
+            launcher.check_single_modpack_update(self.modpack_data)
+        else:
+            # Fallback : essayer de trouver le launcher via la liste des modpacks
+            try:
+                # Chercher dans la liste des modpacks pour trouver le launcher
+                list_widget = self.parent()
+                if list_widget and hasattr(list_widget, 'parent'):
+                    main_window = list_widget.parent()
+                    if main_window and hasattr(main_window, 'check_single_modpack_update'):
+                        main_window.check_single_modpack_update(self.modpack_data)
+                    else:
+                        print("Impossible de trouver le launcher principal pour la vérification des mises à jour")
+            except Exception as e:
+                print(f"Erreur lors de la vérification des mises à jour : {e}")
+    
+    def show_modpack_info(self):
+        """Affiche les informations détaillées du modpack."""
+        info_text = f"""
+<b>{str(translations.tr('modpack_item.info.title'))} :</b><br><br>
+<b>{str(translations.tr('modpack_item.info.name'))} :</b> {self.modpack_data['name']}<br>
+<b>{str(translations.tr('modpack_item.info.version'))} :</b> {self.modpack_data['version']}<br>
+<b>{str(translations.tr('modpack_item.info.forge_version'))} :</b> {self.modpack_data.get('forge_version', str(translations.tr('modpack_item.info.not_specified')))}<br>
+<b>{str(translations.tr('modpack_item.info.url'))} :</b> {self.modpack_data.get('url', str(translations.tr('modpack_item.info.not_specified')))}<br>
+<b>{str(translations.tr('modpack_item.info.last_modified'))} :</b> {self.modpack_data.get('last_modified', str(translations.tr('modpack_item.info.not_specified')))}<br>
+<b>{str(translations.tr('modpack_item.info.estimated_size'))} :</b> {self.modpack_data.get('estimated_mb', str(translations.tr('modpack_item.info.not_specified')))} MB<br>
+<b>{str(translations.tr('modpack_item.info.install_path'))} :</b><br>
+{os.path.join(get_minecraft_directory(), 'modpacks', self.modpack_data['name'])}
+        """
+        
+        QMessageBox.information(
+            self, 
+            f"{str(translations.tr('modpack_item.info.title'))} - {self.modpack_data['name']}", 
+            info_text
+        )
 
 class AnimatedListWidget(QListWidget):
     """Enhanced list widget with hover effects and animations."""
