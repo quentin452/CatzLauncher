@@ -97,3 +97,22 @@ QTabBar::tab:hover:!selected {
 QTabBar::tab:!selected {
     opacity: 0.92;
 } 
+
+/* ===== OVERLAY MODPACK INFO ===== */
+QWidget#modpackInfoOverlay {
+    background: #F0F0F5;
+    border-radius: 24px;
+    border: 2.5px solid #E0E6F0; 
+    color: #e6e6e6;
+    font-size: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+}
+
+QWidget#statsInfoOverlay {
+    background: #F0F0F5;
+    border-radius: 24px;
+    border: 2.5px solid #E0E6F0; 
+    color: #e6e6e6;
+    font-size: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+} 

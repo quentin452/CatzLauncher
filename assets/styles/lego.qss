@@ -377,3 +377,22 @@ QLabel.config-label {
     font-weight: bold;
     margin-bottom: 5px;
 } 
+
+/* ===== OVERLAY MODPACK INFO ===== */
+QWidget#modpackInfoOverlay {
+    background: #2a2d47;
+    border-radius: 24px;
+    border: 2.5px solid #0059a3; 
+    color: #e6e6e6;
+    font-size: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+}
+
+QWidget#statsInfoOverlay {
+    background: #2a2d47;
+    border-radius: 24px;
+    border: 2.5px solid #0059a3; 
+    color: #e6e6e6;
+    font-size: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+} 

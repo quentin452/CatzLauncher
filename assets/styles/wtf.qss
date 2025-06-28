@@ -98,3 +98,22 @@ QTabBar::tab:selected {
     border: 4px solid #00ffea;
     font-size: 28px;
 } 
+
+/* ===== OVERLAY MODPACK INFO ===== */
+QWidget#modpackInfoOverlay {
+    background: #fffb00;
+    border-radius: 24px;
+    border: 2.5px solid #ff00ff; 
+    color: #e6e6e6;
+    font-size: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+}
+
+QWidget#statsInfoOverlay {
+    background: #fffb00;
+    border-radius: 24px;
+    border: 2.5px solid #ff00ff; 
+    color: #e6e6e6;
+    font-size: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+} 
