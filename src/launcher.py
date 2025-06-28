@@ -676,26 +676,10 @@ class MinecraftLauncher(QMainWindow):
         self.logout_btn.setFixedHeight(40)
         self.logout_btn.setMinimumWidth(200)
         self.logout_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.logout_btn.setStyleSheet('''
-            QPushButton {
-                padding: 0 28px;
-                font-size: 16px;
-                font-weight: bold;
-                border-radius: 10px;
-            }
-        ''')
         self.stats_btn = AnimatedButton(str(translations.tr("login.stats")))
         self.stats_btn.setFixedHeight(40)
         self.stats_btn.setMinimumWidth(100)
         self.stats_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.stats_btn.setStyleSheet('''
-            QPushButton {
-                padding: 0 28px;
-                font-size: 16px;
-                font-weight: bold;
-                border-radius: 10px;
-            }
-        ''')
 
         # Layout horizontal pour les boutons déconnexion+stats
         btn_row = QHBoxLayout()
@@ -1614,7 +1598,6 @@ class MinecraftLauncher(QMainWindow):
         # Overlay semi-transparent
         self.stats_overlay = QWidget(self)
         self.stats_overlay.setGeometry(self.rect())
-        self.stats_overlay.setStyleSheet("background: rgba(0, 0, 0, 128);")
         self.stats_overlay.setAttribute(Qt.WA_StyledBackground, True)
         self.stats_overlay.show()
         self.stats_overlay.raise_()
@@ -1622,11 +1605,8 @@ class MinecraftLauncher(QMainWindow):
         # Carte centrale sans ombre ni contour
         card = QWidget(self.stats_overlay)
         card.setFixedSize(400, 320)
-        card.setStyleSheet('''
-            background: rgba(35, 39, 46, 0.98);
-            border-radius: 28px;
-        ''')
         card.move((self.width() - card.width()) // 2, (self.height() - card.height()) // 2)
+        card.setObjectName("statsInfoOverlay")
         card.show()
         card.raise_()
 
@@ -1635,7 +1615,6 @@ class MinecraftLauncher(QMainWindow):
         layout.setSpacing(18)
 
         title = QLabel(str(translations.tr("stats.title")))
-        title.setStyleSheet("font-size: 22px; font-weight: bold; color: #fff;")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
 
@@ -1665,10 +1644,8 @@ class MinecraftLauncher(QMainWindow):
             row = QHBoxLayout()
             row.setSpacing(12)
             icon_label = QLabel(icon)
-            icon_label.setStyleSheet("font-size: 18px; color: #ffd700;")
             row.addWidget(icon_label)
             value_label = QLabel(value)
-            value_label.setStyleSheet("font-size: 17px; color: #fff;")
             row.addWidget(value_label)
             row.addStretch(1)
             layout.addLayout(row)
@@ -1678,19 +1655,6 @@ class MinecraftLauncher(QMainWindow):
         # Bouton fermer
         close_btn = QPushButton(str(translations.tr("stats.close")))
         close_btn.setFixedHeight(38)
-        close_btn.setStyleSheet('''
-            QPushButton {
-                background: #3b82f6;
-                color: #fff;
-                border-radius: 10px;
-                font-size: 16px;
-                font-weight: bold;
-                padding: 0 18px;
-            }
-            QPushButton:hover {
-                background: #2563eb;
-            }
-        ''')
         def close_overlay():
             if hasattr(self, 'stats_overlay') and self.stats_overlay is not None:
                 self.stats_overlay.deleteLater()
@@ -1919,8 +1883,7 @@ class MinecraftLauncher(QMainWindow):
             return f"{seconds} s"
 
     def show_modpack_info_with_data(self, modpack_data):
-        """Affiche l'overlay d'informations du modpack, centré et en plein écran, avec effet acrylic (blur + transparence)."""
-        # Supprime l'overlay existant s'il y en a un
+        # Supprime l'overlay existant
         if hasattr(self, 'modpack_info_overlay') and self.modpack_info_overlay is not None:
             try:
                 self.modpack_info_overlay.deleteLater()
@@ -1928,32 +1891,18 @@ class MinecraftLauncher(QMainWindow):
                 pass
             self.modpack_info_overlay = None
 
-        # Overlay principal (plein écran)
+        # Overlay semi-transparent
         self.modpack_info_overlay = QWidget(self)
         self.modpack_info_overlay.setGeometry(self.rect())
         self.modpack_info_overlay.setAttribute(Qt.WA_StyledBackground, True)
-        self.modpack_info_overlay.setStyleSheet("background: transparent;")
         self.modpack_info_overlay.show()
         self.modpack_info_overlay.raise_()
 
-        # Fond acrylic (blur + transparence)
-        acrylic_bg = QWidget(self.modpack_info_overlay)
-        acrylic_bg.setGeometry(self.modpack_info_overlay.rect())
-        acrylic_bg.setStyleSheet("background: rgba(40, 40, 50, 0.55); border-radius: 0px;")
-        blur = QGraphicsBlurEffect()
-        blur.setBlurRadius(32)
-        acrylic_bg.setGraphicsEffect(blur)
-        acrylic_bg.lower()
-        acrylic_bg.show()
-
-        # Carte centrale
+        # Carte centrale (rectangle d'info)
         card = QWidget(self.modpack_info_overlay)
-        card.setFixedSize(520, 420)
-        card.setStyleSheet('''
-            background: rgba(35, 39, 46, 0.98);
-            border-radius: 28px;
-        ''')
+        card.setFixedSize(400, 400)
         card.move((self.width() - card.width()) // 2, (self.height() - card.height()) // 2)
+        card.setObjectName("modpackInfoOverlay")
         card.show()
         card.raise_()
 
@@ -1963,7 +1912,6 @@ class MinecraftLauncher(QMainWindow):
 
         # Titre
         title = QLabel(f"<b>{str(translations.tr('modpack_item.info.title'))}</b>")
-        title.setStyleSheet("font-size: 22px; font-weight: bold; color: #fff;")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
 
@@ -1971,9 +1919,7 @@ class MinecraftLauncher(QMainWindow):
             return f"<b>{label}</b> {value}" if value else f"<b>{label}</b> <i>{str(translations.tr('modpack_item.info.not_specified'))}</i>"
 
         url = modpack_data.get('url', str(translations.tr('modpack_item.info.not_specified')))
-        # Si c'est un lien GitHub zip, on affiche la page du dépôt
         if url and 'github.com' in url and '/archive/refs/heads/' in url:
-            # Extraire l'URL du dépôt
             try:
                 parts = url.split('/archive/refs/heads/')[0]
                 url_display = parts
@@ -2003,8 +1949,8 @@ class MinecraftLauncher(QMainWindow):
         info_label = QLabel(info_html)
         info_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
         info_label.setOpenExternalLinks(True)
-        info_label.setStyleSheet("color: #fff; font-size: 15px; margin-top: 8px;")
         info_label.setWordWrap(True)
+        info_label.setMaximumWidth(340)  # ou une valeur légèrement inférieure à la largeur du card
         layout.addWidget(info_label)
 
         def handle_link(link):
@@ -2027,19 +1973,6 @@ class MinecraftLauncher(QMainWindow):
         # Bouton fermer
         close_btn = QPushButton(str(translations.tr("stats.close")))
         close_btn.setFixedHeight(38)
-        close_btn.setStyleSheet('''
-            QPushButton {
-                background: #3b82f6;
-                color: #fff;
-                border-radius: 10px;
-                font-size: 16px;
-                font-weight: bold;
-                padding: 0 18px;
-            }
-            QPushButton:hover {
-                background: #2563eb;
-            }
-        ''')
         def close_overlay():
             if hasattr(self, 'modpack_info_overlay') and self.modpack_info_overlay is not None:
                 self.modpack_info_overlay.deleteLater()
@@ -2169,17 +2102,6 @@ class LoadingScreen(QWidget):
         self.progress.setValue(0)
         self.progress.setTextVisible(False)
         self.progress.setFixedHeight(18)
-        self.progress.setStyleSheet('''
-            QProgressBar {
-                background: rgba(255,255,255,0.08);
-                border-radius: 9px;
-            }
-            QProgressBar::chunk {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                                           stop:0 #57f287, stop:1 #5865f2);
-                border-radius: 9px;
-            }
-        ''')
         layout.addWidget(self.progress)
 
         # Tips multilingues depuis le fichier de langue courant
@@ -2197,7 +2119,6 @@ class LoadingScreen(QWidget):
         else:
             self.tips = [str(tips)]
         self.tip_label = QLabel(random.choice(self.tips))
-        self.tip_label.setStyleSheet("color: #fff; font-size: 15px; font-style: italic; padding: 8px;")
         self.tip_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.tip_label, alignment=Qt.AlignCenter)
 

@@ -466,4 +466,23 @@ QComboBox QAbstractItemView {
     border: 1px solid #4a90e2;
     selection-background-color: #ffd580;
     color: #e6e6e6;
+}
+
+/* ===== OVERLAY MODPACK INFO ===== */
+QWidget#modpackInfoOverlay {
+    background: rgba(24, 28, 36, 0.92); /* bleu nuit semi-transparent */
+    border-radius: 24px;
+    border: 2.5px solid #4a90e2; /* bleu clair */
+    color: #e6e6e6;
+    font-size: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+}
+
+QWidget#statsInfoOverlay {
+    background: rgba(24, 28, 36, 0.92); /* bleu nuit semi-transparent */
+    border-radius: 24px;
+    border: 2.5px solid #4a90e2; /* bleu clair */
+    color: #e6e6e6;
+    font-size: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
 } 

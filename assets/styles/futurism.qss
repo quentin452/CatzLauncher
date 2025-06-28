@@ -350,3 +350,22 @@ QComboBox QAbstractItemView {
     selection-background-color: rgba(0, 255, 255, 0.2);
     color: #f0f0f0;
 } 
+
+/* ===== OVERLAY MODPACK INFO ===== */
+QWidget#modpackInfoOverlay {
+    background: #0a0f1f;
+    border-radius: 24px;
+    border: 2.5px solid #00ffff; 
+    color: #e6e6e6;
+    font-size: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+}
+
+QWidget#statsInfoOverlay {
+    background: #0a0f1f;
+    border-radius: 24px;
+    border: 2.5px solid #00ffff; 
+    color: #e6e6e6;
+    font-size: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+} 
