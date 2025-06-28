@@ -1,0 +1,29 @@
+cmake_minimum_required(VERSION 3.15)
+
+project(catzlauncher LANGUAGES CXX)
+
+add_executable(${PROJECT_NAME})
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
+
+file(GLOB_RECURSE ${PROJECT_NAME}_src "game/src/*.cpp")
+
+target_sources(${PROJECT_NAME} PRIVATE
+  "${${PROJECT_NAME}_src}"
+  "src/cpp/main.cpp"
+  "assets/exe/app.rc")
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG_MODE=1)
+    target_compile_options(${PROJECT_NAME} PRIVATE /Zi /Od)
+    set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build/Debug)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE RELEASE_MODE=1)
+    target_compile_options(${PROJECT_NAME} PRIVATE /O2 /DNDEBUG)
+    set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build/Release)
+endif()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    $<TARGET_FILE:${PROJECT_NAME}>
+    ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.exe
+)
