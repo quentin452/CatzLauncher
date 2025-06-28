@@ -13,7 +13,7 @@ import time
 import random
 import psutil
 from PyQt5.QtGui import QFontMetrics
-from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QPropertyAnimation, QEasingCurve, QTimer, QParallelAnimationGroup, QPoint, QLoggingCategory, QDebug
+from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QPropertyAnimation, QEasingCurve, QTimer, QParallelAnimationGroup, QPoint, QLoggingCategory
 from PyQt5.QtGui import QTransform
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
@@ -31,8 +31,6 @@ import ctypes
 from PyQt5.QtTest import QTest
 from PyQt5.QtWidgets import QStyleFactory
 from PyQt5.QtDesigner import QDesignerFormEditorInterface
-from PyQt5.QtUiTools import QUiLoader
-from PyQt5.QtCore import QKeySequence
 
 from minecraft_launcher_lib.utils import (get_minecraft_directory)
 from minecraft_launcher_lib.command import get_minecraft_command
