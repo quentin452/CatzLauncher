@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+      {
+          "label": "build-windows-release",
+          "type": "shell",
+          "command": "powershell.exe",
+          "args": [
+              "-Command",
+              "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release; cmake --build build --config Release;"
+          ],
+          "group": {
+              "kind": "build",
+              "isDefault": true
+          },
+          "presentation": {
+              "reveal": "silent",
+              "panel": "new"
+          },
+          "problemMatcher": []
+      },
+      {
+          "label": "build-windows-debug",
+          "type": "shell",
+          "command": "powershell.exe",
+          "args": [
+              "-Command",
+              "cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug; cmake --build build --config Debug;"
+          ],
+          "group": {
+              "kind": "build",
+              "isDefault": true
+          },
+          "presentation": {
+              "reveal": "silent",
+              "panel": "new"
+          },
+          "problemMatcher": []
+      },    
+  ]
+}
