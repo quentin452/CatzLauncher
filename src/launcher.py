@@ -1976,13 +1976,13 @@ class MinecraftLauncher(QMainWindow):
         else:
             url_display = url
         if url_display and url_display != str(translations.tr('modpack_item.info.not_specified')):
-            url_html = f'<a href="{url_display}">{url_display}</a>'
+            url_html = f'<a href="{url_display}"><span style="color:#fff">{url_display}</span></a>'
         else:
             url_html = str(translations.tr('modpack_item.info.not_specified'))
 
         install_path = os.path.join(get_minecraft_directory(), 'modpacks', modpack_data['name'])
         install_path_url = install_path.replace("\\", "/")
-        install_path_html = f'<a href="file:///{install_path_url}">{install_path}</a>'
+        install_path_html = f'<a href="file:///{install_path_url}"><span style="color:#fff">{install_path}</span></a>'
 
         info_html = "<br>".join([
             html_row(str(translations.tr('modpack_item.info.name')) + " :", modpack_data['name']),
@@ -1990,7 +1990,7 @@ class MinecraftLauncher(QMainWindow):
             html_row(str(translations.tr('modpack_item.info.forge_version')) + " :", modpack_data.get('forge_version', None)),
             html_row(str(translations.tr('modpack_item.info.url')) + " :", url_html),
             html_row(str(translations.tr('modpack_item.info.last_modified')) + " :", modpack_data.get('last_modified', None)),
-            html_row(str(translations.tr('modpack_item.info.estimated_size')) + " :", str(modpack_data.get('estimated_mb', str(translations.tr('modpack_item.info.not_specified')))) + " MB"),
+            html_row(str(translations.tr('modpack_item.info.estimated_size')) + " :", str(modpack_data.get('estimated_mb', str(translations.tr('modpack_item.info.not_specified'))))),
             f"<b>{str(translations.tr('modpack_item.info.install_path'))} :</b> <br>{install_path_html}"
         ])
 
