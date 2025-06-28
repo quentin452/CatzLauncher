@@ -27,6 +27,7 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt as QtCoreQt
 from PyQt5.QtGui import QMovie
 from PyQt5.QtWidgets import QGraphicsBlurEffect
+import ctypes
 
 from minecraft_launcher_lib.utils import (get_minecraft_directory)
 from minecraft_launcher_lib.command import get_minecraft_command
@@ -293,7 +294,7 @@ class ModpackListItem(QWidget):
         
         # Bouton de vérification d'update
         self.check_update_btn = AnimatedButton("🔄")
-        self.check_update_btn.setFixedSize(35, 35)
+        self.check_update_btn.setFixedSize(16, 16)
         self.check_update_btn.setToolTip(str(translations.tr("modpack_item.check_update_tooltip")))
         self.check_update_btn.setProperty("class", "update-btn")
         layout.addWidget(self.check_update_btn)
@@ -886,6 +887,12 @@ class MinecraftLauncher(QMainWindow):
         """Apply beautiful modern styling to the entire application."""
         theme = self.config.get("theme", "dark.qss")
         self.setStyleSheet(load_qss_stylesheet(theme))
+        if theme == "acrylic.qss":
+            self.setAttribute(Qt.WA_TranslucentBackground)
+            self.enable_blur()  # Flou + voile acrylic
+        else:
+            self.setAttribute(Qt.WA_NoSystemBackground, False)
+            self.disable_blur()
 
     def load_config(self):
         """Load configuration from file."""
@@ -1966,6 +1973,53 @@ class MinecraftLauncher(QMainWindow):
                 self.modpack_info_overlay = None
         close_btn.clicked.connect(close_overlay)
         layout.addWidget(close_btn, alignment=Qt.AlignCenter)
+
+    def enable_blur(self):
+        class ACCENTPOLICY(ctypes.Structure):
+            _fields_ = [
+                ("AccentState", ctypes.c_int),
+                ("AccentFlags", ctypes.c_int),
+                ("GradientColor", ctypes.c_int),
+                ("AnimationId", ctypes.c_int)
+            ]
+        class WINCOMPATTRDATA(ctypes.Structure):
+            _fields_ = [
+                ("Attribute", ctypes.c_int),
+                ("Data", ctypes.c_void_p),
+                ("SizeOfData", ctypes.c_size_t)
+            ]
+        accent = ACCENTPOLICY()
+        accent.AccentState = 3  # 3 = Acrylic (effet Fluent Design)
+        accent.GradientColor = 0x33FFFFFF  # 0xAABBGGRR (33 = alpha très léger)
+        data = WINCOMPATTRDATA()
+        data.Attribute = 19
+        data.Data = ctypes.addressof(accent)
+        data.SizeOfData = ctypes.sizeof(accent)
+        hwnd = int(self.winId())
+        ctypes.windll.user32.SetWindowCompositionAttribute(hwnd, ctypes.byref(data))
+
+    def disable_blur(self):
+        class ACCENTPOLICY(ctypes.Structure):
+            _fields_ = [
+                ("AccentState", ctypes.c_int),
+                ("AccentFlags", ctypes.c_int),
+                ("GradientColor", ctypes.c_int),
+                ("AnimationId", ctypes.c_int)
+            ]
+        class WINCOMPATTRDATA(ctypes.Structure):
+            _fields_ = [
+                ("Attribute", ctypes.c_int),
+                ("Data", ctypes.c_void_p),
+                ("SizeOfData", ctypes.c_size_t)
+            ]
+        accent = ACCENTPOLICY()
+        accent.AccentState = 0  # ACCENT_DISABLED
+        data = WINCOMPATTRDATA()
+        data.Attribute = 19
+        data.Data = ctypes.addressof(accent)
+        data.SizeOfData = ctypes.sizeof(accent)
+        hwnd = int(self.winId())
+        ctypes.windll.user32.SetWindowCompositionAttribute(hwnd, ctypes.byref(data))
 
 class LoadingScreen(QWidget):
     def __init__(self, parent=None):
