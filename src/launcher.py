@@ -26,6 +26,7 @@ from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon, QPainter, QColor, QLin
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt as QtCoreQt
 from PyQt5.QtGui import QMovie
+from PyQt5.QtWidgets import QGraphicsBlurEffect
 
 from minecraft_launcher_lib.utils import (get_minecraft_directory)
 from minecraft_launcher_lib.command import get_minecraft_command
@@ -391,24 +392,10 @@ class ModpackListItem(QWidget):
                 print(f"Erreur lors de la vérification des mises à jour : {e}")
     
     def show_modpack_info(self):
-        """Affiche les informations détaillées du modpack."""
-        info_text = f"""
-<b>{str(translations.tr('modpack_item.info.title'))} :</b><br><br>
-<b>{str(translations.tr('modpack_item.info.name'))} :</b> {self.modpack_data['name']}<br>
-<b>{str(translations.tr('modpack_item.info.version'))} :</b> {self.modpack_data['version']}<br>
-<b>{str(translations.tr('modpack_item.info.forge_version'))} :</b> {self.modpack_data.get('forge_version', str(translations.tr('modpack_item.info.not_specified')))}<br>
-<b>{str(translations.tr('modpack_item.info.url'))} :</b> {self.modpack_data.get('url', str(translations.tr('modpack_item.info.not_specified')))}<br>
-<b>{str(translations.tr('modpack_item.info.last_modified'))} :</b> {self.modpack_data.get('last_modified', str(translations.tr('modpack_item.info.not_specified')))}<br>
-<b>{str(translations.tr('modpack_item.info.estimated_size'))} :</b> {self.modpack_data.get('estimated_mb', str(translations.tr('modpack_item.info.not_specified')))} MB<br>
-<b>{str(translations.tr('modpack_item.info.install_path'))} :</b><br>
-{os.path.join(get_minecraft_directory(), 'modpacks', self.modpack_data['name'])}
-        """
-        
-        QMessageBox.information(
-            self, 
-            f"{str(translations.tr('modpack_item.info.title'))} - {self.modpack_data['name']}", 
-            info_text
-        )
+        """Demande à la fenêtre principale d'afficher l'overlay d'informations du modpack."""
+        main_window = self.window()
+        if hasattr(main_window, 'show_modpack_info_with_data'):
+            main_window.show_modpack_info_with_data(self.modpack_data)
 
 class AnimatedListWidget(QListWidget):
     """Enhanced list widget with hover effects and animations."""
@@ -1917,6 +1904,135 @@ class MinecraftLauncher(QMainWindow):
             return ' '.join(parts)
         except Exception as e:
             return f"{seconds} s"
+
+    def show_modpack_info_with_data(self, modpack_data):
+        """Affiche l'overlay d'informations du modpack, centré et en plein écran, avec effet acrylic (blur + transparence)."""
+        # Supprime l'overlay existant s'il y en a un
+        if hasattr(self, 'modpack_info_overlay') and self.modpack_info_overlay is not None:
+            try:
+                self.modpack_info_overlay.deleteLater()
+            except Exception:
+                pass
+            self.modpack_info_overlay = None
+
+        # Overlay principal (plein écran)
+        self.modpack_info_overlay = QWidget(self)
+        self.modpack_info_overlay.setGeometry(self.rect())
+        self.modpack_info_overlay.setAttribute(Qt.WA_StyledBackground, True)
+        self.modpack_info_overlay.setStyleSheet("background: transparent;")
+        self.modpack_info_overlay.show()
+        self.modpack_info_overlay.raise_()
+
+        # Fond acrylic (blur + transparence)
+        acrylic_bg = QWidget(self.modpack_info_overlay)
+        acrylic_bg.setGeometry(self.modpack_info_overlay.rect())
+        acrylic_bg.setStyleSheet("background: rgba(40, 40, 50, 0.55); border-radius: 0px;")
+        blur = QGraphicsBlurEffect()
+        blur.setBlurRadius(32)
+        acrylic_bg.setGraphicsEffect(blur)
+        acrylic_bg.lower()
+        acrylic_bg.show()
+
+        # Carte centrale
+        card = QWidget(self.modpack_info_overlay)
+        card.setFixedSize(520, 420)
+        card.setStyleSheet('''
+            background: rgba(35, 39, 46, 0.98);
+            border-radius: 28px;
+        ''')
+        card.move((self.width() - card.width()) // 2, (self.height() - card.height()) // 2)
+        card.show()
+        card.raise_()
+
+        layout = QVBoxLayout(card)
+        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(16)
+
+        # Titre
+        title = QLabel(f"<b>{str(translations.tr('modpack_item.info.title'))}</b>")
+        title.setStyleSheet("font-size: 22px; font-weight: bold; color: #fff;")
+        title.setAlignment(Qt.AlignCenter)
+        layout.addWidget(title)
+
+        def html_row(label, value):
+            return f"<b>{label}</b> {value}" if value else f"<b>{label}</b> <i>{str(translations.tr('modpack_item.info.not_specified'))}</i>"
+
+        url = modpack_data.get('url', str(translations.tr('modpack_item.info.not_specified')))
+        # Si c'est un lien GitHub zip, on affiche la page du dépôt
+        if url and 'github.com' in url and '/archive/refs/heads/' in url:
+            # Extraire l'URL du dépôt
+            try:
+                parts = url.split('/archive/refs/heads/')[0]
+                url_display = parts
+            except Exception:
+                url_display = url
+        else:
+            url_display = url
+        if url_display and url_display != str(translations.tr('modpack_item.info.not_specified')):
+            url_html = f'<a href="{url_display}">{url_display}</a>'
+        else:
+            url_html = str(translations.tr('modpack_item.info.not_specified'))
+
+        install_path = os.path.join(get_minecraft_directory(), 'modpacks', modpack_data['name'])
+        install_path_url = install_path.replace("\\", "/")
+        install_path_html = f'<a href="file:///{install_path_url}">{install_path}</a>'
+
+        info_html = "<br>".join([
+            html_row(str(translations.tr('modpack_item.info.name')) + " :", modpack_data['name']),
+            html_row(str(translations.tr('modpack_item.info.version')) + " :", modpack_data['version']),
+            html_row(str(translations.tr('modpack_item.info.forge_version')) + " :", modpack_data.get('forge_version', None)),
+            html_row(str(translations.tr('modpack_item.info.url')) + " :", url_html),
+            html_row(str(translations.tr('modpack_item.info.last_modified')) + " :", modpack_data.get('last_modified', None)),
+            html_row(str(translations.tr('modpack_item.info.estimated_size')) + " :", str(modpack_data.get('estimated_mb', str(translations.tr('modpack_item.info.not_specified')))) + " MB"),
+            f"<b>{str(translations.tr('modpack_item.info.install_path'))} :</b> <br>{install_path_html}"
+        ])
+
+        info_label = QLabel(info_html)
+        info_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        info_label.setOpenExternalLinks(True)
+        info_label.setStyleSheet("color: #fff; font-size: 15px; margin-top: 8px;")
+        info_label.setWordWrap(True)
+        layout.addWidget(info_label)
+
+        def handle_link(link):
+            if link.startswith("file:///"):
+                local_path = link[8:] if link.startswith("file:///") else link
+                local_path = local_path.replace("/", os.sep)
+                try:
+                    if sys.platform == "win32":
+                        os.startfile(local_path)
+                    elif sys.platform == "darwin":
+                        subprocess.run(["open", local_path])
+                    else:
+                        subprocess.run(["xdg-open", local_path])
+                except Exception as e:
+                    QMessageBox.critical(self, "Erreur", f"Impossible d'ouvrir le dossier : {e}")
+        info_label.linkActivated.connect(handle_link)
+
+        layout.addStretch(1)
+
+        # Bouton fermer
+        close_btn = QPushButton(str(translations.tr("stats.close")))
+        close_btn.setFixedHeight(38)
+        close_btn.setStyleSheet('''
+            QPushButton {
+                background: #3b82f6;
+                color: #fff;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: bold;
+                padding: 0 18px;
+            }
+            QPushButton:hover {
+                background: #2563eb;
+            }
+        ''')
+        def close_overlay():
+            if hasattr(self, 'modpack_info_overlay') and self.modpack_info_overlay is not None:
+                self.modpack_info_overlay.deleteLater()
+                self.modpack_info_overlay = None
+        close_btn.clicked.connect(close_overlay)
+        layout.addWidget(close_btn, alignment=Qt.AlignCenter)
 
 class LoadingScreen(QWidget):
     def __init__(self, parent=None):
