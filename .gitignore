@@ -1,3 +1,5 @@
 /src/__pycache__
 /saves
 /build
+/node_modules
+/out
