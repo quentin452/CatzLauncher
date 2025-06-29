@@ -174,16 +174,15 @@ def load_azure_client_id():
     Charge le Client ID depuis azure_config.json ou crée le fichier s'il n'existe pas.
     """
     config_path = "azure_config.json"
-    placeholder = "VOTRE_CLIENT_ID_AZURE_ICI"
+    placeholder = "00000000402b5328"
     
     if not os.path.exists(config_path):
         print(f"INFO: Le fichier '{config_path}' n'a pas été trouvé. Création du fichier par défaut.")
         config_data = {
-            "//": "Veuillez remplacer la valeur ci-dessous par votre 'ID d'application (client)' depuis le portail Azure.",
             "client_id": placeholder
         }
         save_json_file(config_path, config_data)
-        return None  # Retourne None pour indiquer qu'il doit être configuré
+        return None
 
     try:
         config = load_json_file(config_path, {})

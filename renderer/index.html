@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatzLauncher - Modpack Launcher</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/themes/dark.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="icon" type="image/x-icon" href="../assets/exe/app.ico">
+</head>
+<body>
+    <!-- Barre de titre personnalisée -->
+    <div class="titlebar">
+        <div class="titlebar-title">
+            <img src="../assets/textures/logo.png" alt="Logo" class="titlebar-logo">
+            <span>CatzLauncher</span>
+        </div>
+        <div class="titlebar-controls">
+            <button class="titlebar-button" id="minimizeBtn" title="Minimiser">—</button>
+            <button class="titlebar-button" id="maximizeBtn" title="Maximiser">▢</button>
+            <button class="titlebar-button close" id="closeBtn" title="Fermer">✕</button>
+        </div>
+    </div>
+
+    <!-- Écran de chargement -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <img src="../assets/textures/logo.png" alt="Logo" class="loading-logo">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Chargement de CatzLauncher...</div>
+            <div class="loading-tip" id="loadingTip"></div>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div id="mainContent" class="main-content" style="display: none;">
+        <!-- En-tête -->
+        <header class="header">
+            <div class="header-left">
+                <img src="../assets/textures/logo.png" alt="Logo" class="header-logo">
+                <h1 class="header-title">CatzLauncher</h1>
+            </div>
+            <div class="header-center">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="play">
+                        <span class="tab-icon">🎮</span>
+                        <span class="tab-text">Jouer</span>
+                    </button>
+                    <button class="tab-button" data-tab="config">
+                        <span class="tab-icon">⚙️</span>
+                        <span class="tab-text">Config</span>
+                    </button>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-section">
+                    <div class="avatar-container">
+                        <img id="userAvatar" src="../assets/textures/logo.png" alt="Avatar" class="user-avatar">
+                    </div>
+                    <div class="user-info">
+                        <div id="userStatus" class="user-status">❌ Non connecté</div>
+                        <div class="user-actions">
+                            <button id="loginBtn" class="btn btn-primary">🔐 Login avec Microsoft</button>
+                            <button id="logoutBtn" class="btn btn-secondary" style="display: none;">🚪 Se déconnecter</button>
+                            <button id="statsBtn" class="btn btn-icon" title="Statistiques">📊</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenu des onglets -->
+        <main class="tab-content">
+            <!-- Onglet Jouer -->
+            <div id="playTab" class="tab-panel active">
+                <div class="play-container">
+                    <div class="modpacks-section">
+                        <h2 class="section-title">🎯 Modpacks Disponibles</h2>
+                        <div class="modpacks-controls">
+                            <button id="refreshModpacksBtn" class="btn btn-secondary">
+                                <span class="btn-icon">🔄</span>
+                                Actualiser
+                            </button>
+                            <button id="checkUpdatesBtn" class="btn btn-secondary">
+                                <span class="btn-icon">🔍</span>
+                                Vérifier les mises à jour
+                            </button>
+                        </div>
+                        <div id="modpacksList" class="modpacks-list">
+                            <!-- Les modpacks seront chargés ici -->
+                        </div>
+                    </div>
+                    
+                    <div class="play-section">
+                        <div id="playReady" class="play-ready" style="display: none;">
+                            <h3>✨ Prêt à jouer !</h3>
+                            <div class="selected-modpack-info">
+                                <span id="selectedModpackName"></span>
+                            </div>
+                            <button id="playBtn" class="btn btn-primary btn-large">
+                                <span class="btn-icon">🚀</span>
+                                Jouer
+                            </button>
+                        </div>
+                        
+                        <div id="playNotReady" class="play-not-ready">
+                            <h3>🎮 Sélectionnez un modpack</h3>
+                            <p>Choisissez un modpack dans la liste pour commencer à jouer.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet Configuration -->
+            <div id="configTab" class="tab-panel">
+                <div class="config-container">
+                    <h2 class="section-title">⚙️ Configuration</h2>
+                    
+                    <div class="config-sections">
+                        <!-- Configuration Java -->
+                        <div class="config-section">
+                            <h3>📁 Configuration Java</h3>
+                            <div class="config-item">
+                                <label for="javaPath">Chemin Java:</label>
+                                <div class="input-group">
+                                    <input type="text" id="javaPath" placeholder="Chemin vers java.exe">
+                                    <button id="browseJavaBtn" class="btn btn-secondary">📂 Parcourir</button>
+                                </div>
+                            </div>
+                            <div class="config-item">
+                                <label for="maxMemory">Mémoire Max (Go):</label>
+                                <input type="number" id="maxMemory" min="1" max="32" value="4">
+                            </div>
+                            <div class="config-item">
+                                <label for="jvmArgs">Arguments JVM:</label>
+                                <textarea id="jvmArgs" rows="3" placeholder="Arguments JVM personnalisés"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Configuration GitHub -->
+                        <div class="config-section">
+                            <h3>🔑 Configuration GitHub</h3>
+                            <div class="config-item">
+                                <label for="githubToken">Token d'accès personnel GitHub:</label>
+                                <div class="input-group">
+                                    <input type="password" id="githubToken" placeholder="Coller un nouveau token pour le sauvegarder">
+                                    <button id="saveTokenBtn" class="btn btn-secondary">💾 Sauvegarder</button>
+                                </div>
+                                <div id="tokenStatus" class="token-status"></div>
+                            </div>
+                        </div>
+
+                        <!-- Configuration Azure -->
+                        <div class="config-section">
+                            <h3>🔐 Configuration Azure</h3>
+                            <div class="config-item">
+                                <label for="azureClientId">ID Client Azure:</label>
+                                <input type="text" id="azureClientId" placeholder="Votre ID Client Azure">
+                                <small>Nécessaire pour la connexion Microsoft</small>
+                            </div>
+                        </div>
+
+                        <!-- Configuration Interface -->
+                        <div class="config-section">
+                            <h3>🎨 Configuration Interface</h3>
+                            <div class="config-item">
+                                <label for="themeSelect">Thème de l'application:</label>
+                                <select id="themeSelect">
+                                    <option value="dark.qss">Dark</option>
+                                    <option value="light.qss">Light</option>
+                                    <option value="cat.qss">Cat</option>
+                                    <option value="futurism.qss">Futurism</option>
+                                    <option value="kawai.qss">Kawai</option>
+                                    <option value="vintage.qss">Vintage</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label for="languageSelect">Langue:</label>
+                                <select id="languageSelect">
+                                    <option value="fr">Français</option>
+                                    <option value="en">English</option>
+                                    <option value="es">Español</option>
+                                    <option value="de">Deutsch</option>
+                                    <option value="it">Italiano</option>
+                                    <option value="nl">Nederlands</option>
+                                    <option value="pt">Português</option>
+                                    <option value="ru">Русский</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Options -->
+                        <div class="config-section">
+                            <h3>🔄 Options</h3>
+                            <div class="config-item">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="autoCheckUpdates">
+                                    <span class="checkmark"></span>
+                                    Vérifier automatiquement les mises à jour au démarrage
+                                </label>
+                            </div>
+                            <div class="config-item">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="autoCheckLauncherUpdates">
+                                    <span class="checkmark"></span>
+                                    Vérifier automatiquement les mises à jour du launcher
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-actions">
+                        <button id="saveConfigBtn" class="btn btn-primary">
+                            <span class="btn-icon">💾</span>
+                            Sauvegarder la Configuration
+                        </button>
+                        <button id="checkLauncherUpdateBtn" class="btn btn-secondary">
+                            <span class="btn-icon">🚀</span>
+                            Vérifier les mises à jour du launcher
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modales -->
+    <div id="modalOverlay" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Titre</h3>
+                <button class="modal-close" id="modalClose">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenu de la modale -->
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <!-- Boutons de la modale -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay de statistiques -->
+    <div id="statsOverlay" class="overlay" style="display: none;">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h3>📊 Statistiques utilisateur</h3>
+                <button class="overlay-close" id="statsClose">✕</button>
+            </div>
+            <div class="stats-content">
+                <div class="stat-item">
+                    <span class="stat-label">🕒 Dernière activité:</span>
+                    <span id="lastActivityStat" class="stat-value">Jamais</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">⏳ Temps de jeu total:</span>
+                    <span id="playtimeStat" class="stat-value">0 min</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">🚀 Nombre de lancements:</span>
+                    <span id="launchCountStat" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">🔑 Nombre de connexions:</span>
+                    <span id="loginCountStat" class="stat-value">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/modpacks.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html> 
