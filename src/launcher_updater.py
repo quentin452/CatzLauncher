@@ -2,27 +2,14 @@ import os
 import json
 import shutil
 import requests
-import hashlib
-import subprocess
 import sys
 import tempfile
-from datetime import datetime
 from zipfile import ZipFile
 from PyQt5.QtCore import QObject, pyqtSignal, QThread
-from PyQt5.QtWidgets import QMessageBox, QProgressDialog
 from packaging import version as semver
 from .utils import SAVE_DIR
-import time
 import base64
-
-# Import existing utilities
-try:
-    from .utils import (
-        _get_github_auth_headers, 
-        is_connected_to_internet,
-    )
-except ImportError:
-    from utils import _get_github_auth_headers, is_connected_to_internet
+from utils import is_connected_to_internet
 
 class LauncherUpdaterSignals(QObject):
     """Signals for launcher updater thread communication"""
