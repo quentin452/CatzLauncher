@@ -47,111 +47,75 @@ class MinecraftLauncher(QMainWindow):
     """Main launcher class using modular components."""
     
     def __init__(self):
-        try:
-            print("super().__init__()")
-            super().__init__()
-            print("os.makedirs")
-            os.makedirs(SAVE_DIR, exist_ok=True)
+        super().__init__()
+        os.makedirs(SAVE_DIR, exist_ok=True)
 
-            print("WorkerSignals")
-            self.signals = WorkerSignals()
-            print("ConfigManager")
-            self.config_manager = ConfigManager()
-            print("AuthManager")
-            self.auth_manager = AuthManager(self.config_manager.get_config(), self.signals)
-            print("ModpackManager")
-            self.modpack_manager = ModpackManager(self.config_manager.get_config(), self.signals)
-            print("StatsManager")
-            self.stats_manager = StatsManager()
-            print("UIComponents")
-            self.ui_components = UIComponents(self.config_manager)
-            print("LauncherUpdateManager")
-            self.launcher_repo_url = "https://github.com/quentin452/CatzLauncher"
-            self.launcher_version = self.config_manager.get_current_launcher_version()
-            self.launcher_updater = LauncherUpdateManager(self.launcher_repo_url, current_version=self.launcher_version)
-            self.launcher_update_thread = None
+        self.signals = WorkerSignals()
+        self.config_manager = ConfigManager()
+        self.auth_manager = AuthManager(self.config_manager.get_config(), self.signals)
+        self.modpack_manager = ModpackManager(self.config_manager.get_config(), self.signals)
+        self.stats_manager = StatsManager()
+        self.ui_components = UIComponents(self.config_manager)
+        self.launcher_repo_url = "https://github.com/quentin452/CatzLauncher"
+        self.launcher_version = self.config_manager.get_current_launcher_version()
+        self.launcher_updater = LauncherUpdateManager(self.launcher_repo_url, current_version=self.launcher_version)
+        self.launcher_update_thread = None
 
-            print("setup_ui")
-            self._setup_ui()
-            self.main_tab, self.main_ui_elements = self.ui_components.create_main_tab()
-            self.config_tab, self.config_ui_elements = self.ui_components.create_config_tab()
-            self.tabs = self.ui_components.create_main_content_widget(self.main_tab, self.config_tab)
-            self.stacked_widget.addWidget(self.tabs)
-            print("connect_signals")
-            self._connect_signals()
-            print("apply_styles")
-            self._apply_styles()
+        self._setup_ui()
+        self.main_tab, self.main_ui_elements = self.ui_components.create_main_tab()
+        self.config_tab, self.config_ui_elements = self.ui_components.create_config_tab()
+        self.tabs = self.ui_components.create_main_content_widget(self.main_tab, self.config_tab)
+        self.stacked_widget.addWidget(self.tabs)
+        self._connect_signals()
+        self._apply_styles()
 
-            print("QTimer.singleShot")
-            QTimer.singleShot(3000, self.show_main_content)
+        QTimer.singleShot(3000, self.show_main_content)
 
-            print("refresh_modpack_list")
-            self.modpack_manager.refresh_modpack_list()
-            print("try_refresh_login")
-            self.auth_manager.try_refresh_login()
-            
-            print("check updates")
-            if not is_git_repo() and self.config_manager.get_config().get("auto_check_launcher_updates", True):
-                self.check_launcher_updates(trigger_modpack_check_if_up_to_date=True)
-            elif self.config_manager.get_config().get("auto_check_updates", True):
-                self.modpack_manager.check_modpack_updates()
-            
-            print("fade_animation")
-            self.fade_animation.start()
+        self.modpack_manager.refresh_modpack_list()
+        self.auth_manager.try_refresh_login()
+        
+        if not is_git_repo() and self.config_manager.get_config().get("auto_check_launcher_updates", True):
+            self.check_launcher_updates(trigger_modpack_check_if_up_to_date=True)
+        elif self.config_manager.get_config().get("auto_check_updates", True):
+            self.modpack_manager.check_modpack_updates()
+        
+        self.fade_animation.start()
 
-            if not self.auth_manager.get_client_id():
-                self.show_client_id_error()
-            print("Fin du constructeur MinecraftLauncher")
-        except Exception as e:
-            print("Erreur dans MinecraftLauncher.__init__ :")
-            traceback.print_exc()
-            raise
+        if not self.auth_manager.get_client_id():
+            self.show_client_id_error()
 
     def _setup_ui(self):
-        print("_setup_ui: start")
         # Create central widget with gradient background
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        print("_setup_ui: central_widget OK")
         
         # Main layout
         main_layout = QVBoxLayout(central_widget)
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
-        print("_setup_ui: main_layout OK")
         
         # Header with logo and title
         self.header, self.header_spinner, self.minimize_btn, self.maximize_btn, self.close_btn = self.ui_components.create_header()
-        print("_setup_ui: header OK")
-        print("_setup_ui: avant addWidget(header)")
         main_layout.addWidget(self.header)
-        print("_setup_ui: après addWidget(header)")
         
         # QStackedWidget for switching between loading and main content
-        print("_setup_ui: avant create_loading_widget")
         loading_widget = self.ui_components.create_loading_widget()
-        print("_setup_ui: après create_loading_widget")
-        print("_setup_ui: avant setup_stacked_widget")
         self.stacked_widget = self.ui_components.setup_stacked_widget(
             loading_widget,
             None
         )
-        print("_setup_ui: après setup_stacked_widget")
         main_layout.addWidget(self.stacked_widget)
         self.stacked_widget.addWidget(self.stacked_widget.widget(0))  # Loading screen
-        print("_setup_ui: stacked_widget setCurrentWidget OK")
 
         # Animation properties
         self.fade_animation = QPropertyAnimation(self, b"windowOpacity")
         self.fade_animation.setDuration(500)
         self.fade_animation.setStartValue(0.0)
         self.fade_animation.setEndValue(1.0)
-        print("_setup_ui: fade_animation OK")
         
         # Particle system for main window
         self.particle_system = ParticleSystem(self)
         self.particle_system.raise_()
-        print("_setup_ui: particle_system OK")
 
         # Set window properties
         self.setWindowTitle(str(translations.tr("window.title")))
@@ -160,12 +124,10 @@ class MinecraftLauncher(QMainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
         self.drag_offset = None
         self.setMouseTracking(True)
-        print("_setup_ui: window properties OK")
 
         # Load saved language
         saved_language = self.config_manager.get_config().get("language", "fr")
         translations.load_language(saved_language)
-        print("_setup_ui: end")
 
     def _connect_signals(self):
         """Connect all UI signals."""
