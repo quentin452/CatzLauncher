@@ -15,6 +15,16 @@ import keyring
 import keyring.errors
 from PyQt5.QtWidgets import QMessageBox
 
+def get_minecraft_directory():
+    """Retourne le chemin du dossier Minecraft de l'utilisateur."""
+    home = os.path.expanduser("~")
+    if os.name == "nt":
+        # Windows
+        return os.path.join(home, "AppData", "Roaming", ".minecraft")
+    else:
+        # Linux/Mac
+        return os.path.join(home, ".minecraft")
+    
 def get_save_dir():
     if sys.platform == "win32":
         appdata = os.environ.get("APPDATA")

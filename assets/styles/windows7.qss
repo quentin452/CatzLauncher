@@ -153,8 +153,7 @@ QWidget#modpackInfoOverlay {
     border: 2.5px solid #5596e6; 
     color: #e6e6e6;
     font-size: 16px;
-    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
-}
+    }
 
 QWidget#statsInfoOverlay {
     background: #7eb4ea;
@@ -162,5 +161,4 @@ QWidget#statsInfoOverlay {
     border: 2.5px solid #5596e6; 
     color: #e6e6e6;
     font-size: 16px;
-    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
-} 
+    } 

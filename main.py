@@ -1,11 +1,29 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+CatzLauncher - Modular Version
+A Minecraft modpack launcher with a modern, beautiful interface.
+
+This is the modular version of the launcher, split into multiple focused modules
+for better organization and maintainability.
+"""
+
 import sys
 import os
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QIcon
-from src.launcher import MinecraftLauncher
-import requests
-from PyQt5.QtGui import QPixmap
-from PyQt5.Qt import Qt
+from PyQt5.QtCore import Qt
+
+# Add the src directory to the Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+
+print("Début du script")
+
+try:
+    from src.launcher_core import MinecraftLauncher
+    print("Import MainWindow OK")
+except Exception as e:
+    print("Erreur d'import de la fenêtre principale :", e)
+    sys.exit(1)
 
 def ensure_version_file_exists():
     """
@@ -21,29 +39,19 @@ def ensure_version_file_exists():
 
 def main():
     ensure_version_file_exists()
-    app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("assets/textures/logo.ico"))
-    window = MinecraftLauncher()
-    window.show()
-    sys.exit(app.exec_())
-
-def update_avatar(self, user_id_or_name):
-    print(f"[DEBUG] update_avatar appelé avec : {user_id_or_name}")
+    print("Dans le main")
     try:
-        url = f'https://minotar.net/armor/body/{user_id_or_name}/100.png'
-        data = requests.get(url, timeout=5).content
-        pixmap = QPixmap()
-        pixmap.loadFromData(data)
-        if pixmap.isNull():
-            print(f"[ERREUR] Impossible de charger l'avatar pour {user_id_or_name} depuis {url}")
-            default_avatar = QPixmap('assets/textures/logo.png').scaled(64, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            self.avatar_label.setPixmap(default_avatar)
-        else:
-            self.avatar_label.setPixmap(pixmap.scaled(64, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        app = QApplication(sys.argv)
+        window = MinecraftLauncher()
+        print("Instance MainWindow OK")
+        window.show()
+        print("window.show() OK")
+        sys.exit(app.exec_())
     except Exception as e:
-        print(f"[ERREUR] Exception lors du chargement de l'avatar pour {user_id_or_name} : {e}")
-        default_avatar = QPixmap('assets/textures/logo.png').scaled(64, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.avatar_label.setPixmap(default_avatar)
+        import traceback
+        print("Erreur lors de la création/affichage du launcher :")
+        traceback.print_exc()
+        sys.exit(1)
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    main() 

@@ -1,6 +1,6 @@
 /*
-  Toothless (Krokmou) - Style inspiré du film Dragons
-  Palette : noir, bleu nuit, bleu clair, orange doux, blanc cassé
+  Toothless (Krokmou) - Style inspir� du film Dragons
+  Palette : noir, bleu nuit, bleu clair, orange doux, blanc cass�
 */
 
 QWidget {
@@ -103,7 +103,7 @@ QLabel[accent="fire"] {
     font-weight: bold;
 }
 
-/* Accent bleu clair pour titres ou éléments spéciaux */
+/* Accent bleu clair pour titres ou �l�ments sp�ciaux */
 QLabel[accent="ice"] {
     color: #4a90e2;
     font-weight: bold;
@@ -475,8 +475,7 @@ QWidget#modpackInfoOverlay {
     border: 2.5px solid #4a90e2; /* bleu clair */
     color: #e6e6e6;
     font-size: 16px;
-    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
-}
+    }
 
 QWidget#statsInfoOverlay {
     background: rgba(24, 28, 36, 0.92); /* bleu nuit semi-transparent */
@@ -484,5 +483,4 @@ QWidget#statsInfoOverlay {
     border: 2.5px solid #4a90e2; /* bleu clair */
     color: #e6e6e6;
     font-size: 16px;
-    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
-} 
+    } 
