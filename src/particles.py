@@ -52,7 +52,7 @@ class ParticleSystem(QWidget):
         # Animation timer
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_particles)
-        self.timer.start(16)  # ~60 FPS
+        self.timer.start(33)  # ~30 FPS
         
     def mouse_move_event(self, pos):
         """Handle mouse movement to update particle emission position."""
