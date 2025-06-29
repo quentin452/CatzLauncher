@@ -1,1 +1,4 @@
 /node_modules
+/build
+/src/__pycache__
+catzlauncher.exe

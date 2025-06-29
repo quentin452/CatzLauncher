@@ -13,24 +13,31 @@
     "build:mac": "electron-builder --mac",
     "build:linux": "electron-builder --linux"
   },
-  "keywords": ["minecraft", "launcher", "modpacks", "electron", "webkit"],
+  "keywords": [
+    "minecraft",
+    "launcher",
+    "modpacks",
+    "electron",
+    "webkit"
+  ],
   "author": "CatzLauncher Team",
   "license": "MIT",
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "electron": "^28.0.0",
-    "electron-builder": "^24.6.4",
-    "concurrently": "^8.2.2"
+    "electron-builder": "^24.6.4"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "sqlite3": "^5.1.6",
     "axios": "^1.6.0",
-    "node-fetch": "^3.3.2",
-    "crypto-js": "^4.2.0",
-    "fs-extra": "^11.1.1",
-    "path": "^0.12.7",
     "child_process": "^1.0.2",
-    "os": "^0.1.2"
+    "crypto-js": "^4.2.0",
+    "express": "^4.18.2",
+    "fs-extra": "^11.1.1",
+    "node-fetch": "^3.3.2",
+    "os": "^0.1.2",
+    "package": "^1.0.1",
+    "path": "^0.12.7",
+    "sqlite3": "^5.1.6"
   },
   "build": {
     "appId": "com.catzlauncher.web",
@@ -56,4 +63,4 @@
       "icon": "assets/icons/app.png"
     }
   }
-} 
+}
