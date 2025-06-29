@@ -11,6 +11,7 @@ from zipfile import ZipFile
 from PyQt5.QtCore import QObject, pyqtSignal, QThread
 from PyQt5.QtWidgets import QMessageBox, QProgressDialog
 from packaging import version as semver
+from .utils import SAVE_DIR
 import time
 import base64
 
@@ -40,9 +41,7 @@ class LauncherUpdateManager:
         self.zip_url = f"{launcher_repo_url}/archive/refs/heads/main.zip"
         self.current_version = current_version or self._get_current_version()
         self.signals = LauncherUpdaterSignals()
-        self.saves_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "saves")
-        self.update_file = os.path.join(self.saves_dir, "launcher_update_info.json")
-        os.makedirs(self.saves_dir, exist_ok=True)
+        self.update_file = os.path.join(SAVE_DIR, "launcher_update_info.json")
     
     def _get_current_version(self):
         version_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "version.txt")
