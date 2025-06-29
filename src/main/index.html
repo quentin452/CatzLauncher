@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatzLauncher Web</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/themes/dark.css">
+    <link rel="stylesheet" href="styles/themes/light.css">
+    <link rel="stylesheet" href="styles/themes/cat.css">
+    <link rel="stylesheet" href="styles/themes/kawai.css">
+    <link rel="stylesheet" href="styles/themes/futurism.css">
+    <link rel="stylesheet" href="styles/components/particles.css">
+    <link rel="stylesheet" href="styles/components/animations.css">
+    <link rel="stylesheet" href="styles/components/responsive.css">
+    <link rel="icon" type="image/x-icon" href="../assets/icons/favicon.ico">
+</head>
+<body>
+    <!-- Système de particules -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Header avec contrôles de fenêtre -->
+    <header class="titlebar">
+        <div class="titlebar-content">
+            <div class="titlebar-title">
+                <img src="../assets/icons/logo.png" alt="CatzLauncher" class="logo">
+                <span>CatzLauncher Web</span>
+            </div>
+            <div class="titlebar-controls">
+                <button class="titlebar-btn minimize" id="minimize-btn">─</button>
+                <button class="titlebar-btn maximize" id="maximize-btn">□</button>
+                <button class="titlebar-btn close" id="close-btn">×</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Interface principale -->
+    <main class="main-container">
+        <!-- Sidebar avec navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile" id="user-profile">
+                    <div class="avatar-placeholder">
+                        <img id="user-avatar" src="../assets/textures/default-avatar.png" alt="Avatar">
+                    </div>
+                    <div class="user-info">
+                        <span id="username">Non connecté</span>
+                        <button id="login-btn" class="btn-login">Se connecter</button>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-tab="play">
+                    <span class="nav-icon">🚀</span>
+                    <span class="nav-text">Jouer</span>
+                </button>
+                <button class="nav-item" data-tab="config">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Configuration</span>
+                </button>
+                <button class="nav-item" data-tab="stats">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Statistiques</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="theme-selector">
+                    <label for="theme-select">Thème:</label>
+                    <select id="theme-select">
+                        <option value="dark">Sombre</option>
+                        <option value="light">Clair</option>
+                        <option value="cat">Chat</option>
+                        <option value="kawai">Kawaii</option>
+                        <option value="futurism">Futurisme</option>
+                    </select>
+                </div>
+                <div class="language-selector">
+                    <label for="language-select">Langue:</label>
+                    <select id="language-select">
+                        <option value="fr">Français</option>
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                        <option value="it">Italiano</option>
+                        <option value="nl">Nederlands</option>
+                        <option value="pt">Português</option>
+                        <option value="ru">Русский</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Contenu principal -->
+        <div class="content">
+            <!-- Onglet Jouer -->
+            <div class="tab-content active" id="play-tab">
+                <div class="tab-header">
+                    <h1>🎮 Sélectionner un Modpack</h1>
+                    <button id="refresh-modpacks" class="btn-refresh">🔄 Actualiser</button>
+                </div>
+                
+                <div class="modpack-grid" id="modpack-grid">
+                    <!-- Les modpacks seront chargés dynamiquement ici -->
+                </div>
+                
+                <div class="loading-spinner hidden" id="loading-spinner">
+                    <div class="spinner"></div>
+                    <span>Chargement des modpacks...</span>
+                </div>
+            </div>
+
+            <!-- Onglet Configuration -->
+            <div class="tab-content" id="config-tab">
+                <div class="tab-header">
+                    <h1>⚙️ Configuration</h1>
+                </div>
+                
+                <div class="config-sections">
+                    <section class="config-section">
+                        <h2>🔧 Paramètres Java</h2>
+                        <div class="config-item">
+                            <label for="java-path">Chemin Java:</label>
+                            <input type="text" id="java-path" placeholder="C:\Program Files\Java\jre1.8.0_xxx\bin\java.exe">
+                            <button class="btn-browse" id="browse-java">Parcourir</button>
+                        </div>
+                        <div class="config-item">
+                            <label for="max-memory">Mémoire maximale (MB):</label>
+                            <input type="number" id="max-memory" value="2048" min="512" max="16384">
+                        </div>
+                        <div class="config-item">
+                            <label for="jvm-args">Arguments JVM:</label>
+                            <textarea id="jvm-args" placeholder="-XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:-UseAdaptiveSizePolicy -Xmn128M"></textarea>
+                        </div>
+                    </section>
+                    
+                    <section class="config-section">
+                        <h2>🎮 Paramètres Minecraft</h2>
+                        <div class="config-item">
+                            <label for="minecraft-path">Dossier Minecraft:</label>
+                            <input type="text" id="minecraft-path" placeholder="%APPDATA%\.minecraft">
+                            <button class="btn-browse" id="browse-minecraft">Parcourir</button>
+                        </div>
+                        <div class="config-item">
+                            <label for="username">Nom d'utilisateur:</label>
+                            <input type="text" id="username-input" placeholder="Votre nom d'utilisateur">
+                        </div>
+                    </section>
+                    
+                    <section class="config-section">
+                        <h2>🔄 Mises à jour</h2>
+                        <div class="config-item">
+                            <label for="github-token">Token GitHub (optionnel):</label>
+                            <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                        </div>
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" id="auto-update" checked>
+                                Vérifier automatiquement les mises à jour
+                            </label>
+                        </div>
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" id="auto-update-launcher" checked>
+                                Mettre à jour automatiquement le launcher
+                            </label>
+                        </div>
+                    </section>
+                    
+                    <section class="config-section">
+                        <h2>💾 Sauvegarde</h2>
+                        <div class="config-buttons">
+                            <button class="btn-save" id="save-config">💾 Sauvegarder</button>
+                            <button class="btn-reset" id="reset-config">🔄 Réinitialiser</button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Onglet Statistiques -->
+            <div class="tab-content" id="stats-tab">
+                <div class="tab-header">
+                    <h1>📊 Statistiques</h1>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>⏱️ Temps de jeu</h3>
+                        <div class="stat-value" id="total-playtime">0h 0m</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>🚀 Lancements</h3>
+                        <div class="stat-value" id="total-launches">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>📦 Modpacks installés</h3>
+                        <div class="stat-value" id="installed-modpacks">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>🔄 Mises à jour</h3>
+                        <div class="stat-value" id="total-updates">0</div>
+                    </div>
+                </div>
+                
+                <div class="stats-charts">
+                    <div class="chart-container">
+                        <h3>Activité récente</h3>
+                        <canvas id="activity-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modales -->
+    <div class="modal-overlay hidden" id="modal-overlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Titre</h2>
+                <button class="modal-close" id="modal-close">×</button>
+            </div>
+            <div class="modal-content" id="modal-content">
+                <!-- Contenu de la modale -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Barre de progression globale -->
+    <div class="global-progress hidden" id="global-progress">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Progression...</div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="notifications" id="notifications"></div>
+
+    <!-- Scripts -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/modpacks.js"></script>
+    <script src="scripts/minecraft.js"></script>
+    <script src="scripts/particles.js"></script>
+    <script src="scripts/themes.js"></script>
+    <script src="scripts/translations.js"></script>
+    <script src="scripts/utils.js"></script>
+</body>
+</html> 
