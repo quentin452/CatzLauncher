@@ -51,3 +51,4 @@ venv.bak/
 Thumbs.db
 /saves
 /node_modules
+/.vs
