@@ -168,7 +168,6 @@ class StatsManager:
 
     def update_avatar(self, pseudo, avatar_label):
         """Met à jour l'avatar Minecraft du joueur à partir de minotar.net."""
-        print(f"[DEBUG] update_avatar appelé avec pseudo = {pseudo}")
         try:
             url = f'https://minotar.net/armor/body/{pseudo}/120'
             data = requests.get(url, timeout=5).content
