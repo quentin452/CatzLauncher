@@ -53,8 +53,8 @@ class MinecraftLauncher(QMainWindow):
         self.signals = WorkerSignals()
         self.config_manager = ConfigManager()
         self.auth_manager = AuthManager(self.config_manager.get_config(), self.signals)
-        self.modpack_manager = ModpackManager(self.config_manager.get_config(), self.signals)
         self.stats_manager = StatsManager()
+        self.modpack_manager = ModpackManager(self.config_manager.get_config(), self.signals, self.stats_manager)
         self.ui_components = UIComponents(self.config_manager)
         self.launcher_repo_url = "https://github.com/quentin452/CatzLauncher"
         self.launcher_version = self.config_manager.get_current_launcher_version()

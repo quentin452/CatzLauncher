@@ -35,9 +35,10 @@ def load_json_file(path, fallback=None):
 class ModpackManager:
     """Manages modpack operations for the launcher."""
     
-    def __init__(self, config, signals):
+    def __init__(self, config, signals, stats_manager):
         self.config = config
         self.signals = signals
+        self.stats_manager = stats_manager
     
     def load_modpacks(self):
         """Load modpacks from URL or local file."""
@@ -261,17 +262,12 @@ class ModpackManager:
             start_time = time.time()
             process = subprocess.Popen(minecraft_command, cwd=modpack_profile_dir)
             
-            # Update stats
-            if hasattr(self, 'update_launch_stat'):
-                self.update_launch_stat()
-            
             def update_stats_periodically():
                 last_update_time = start_time
                 while process.poll() is None:
                     current_time = time.time()
                     elapsed_increment_seconds = current_time - last_update_time  
-                    if hasattr(self, 'update_playtime_stat'):
-                        self.update_playtime_stat(elapsed_increment_seconds)
+                    self.stats_manager.update_playtime_stat(elapsed_increment_seconds)
                     last_update_time = current_time
                     time.sleep(10)
             stats_thread = threading.Thread(target=update_stats_periodically, daemon=True)

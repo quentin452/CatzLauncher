@@ -3,7 +3,7 @@ import json
 import requests
 from datetime import datetime
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QMessageBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
 from PyQt5.QtCore import Qt
 
 from .utils import STATS_FILE
@@ -11,66 +11,66 @@ from .translation_manager import translations
 
 class StatsManager:
     """Manages user statistics for the launcher."""
-    
+
     def __init__(self):
         pass
-    
+
+    # --- Internal helpers ---
+
+    def _read_stats(self) -> dict:
+        """Read stats from file, or return empty dict if not found/corrupted."""
+        if os.path.exists(STATS_FILE):
+            try:
+                with open(STATS_FILE, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"[DEBUG] Erreur lecture stats : {e}")
+        return {}
+
+    def _write_stats(self, stats: dict):
+        """Write stats to file."""
+        try:
+            with open(STATS_FILE, 'w', encoding='utf-8') as f:
+                json.dump(stats, f, indent=4)
+        except Exception as e:
+            print(f"[DEBUG] Erreur écriture stats : {e}")
+
+    def _update_stat(self, key: str, value):
+        """Update a single stat key and save."""
+        stats = self._read_stats()
+        stats[key] = value
+        self._write_stats(stats)
+
+    def _increment_stat(self, key: str, amount=1):
+        """Increment a stat key by amount and save."""
+        stats = self._read_stats()
+        stats[key] = stats.get(key, 0) + amount
+        self._write_stats(stats)
+
+    # --- Public API ---
+
     def update_last_activity_stat(self):
         """Update last activity timestamp."""
-        try:
-            stats = {}
-            if os.path.exists(STATS_FILE):
-                with open(STATS_FILE, 'r', encoding='utf-8') as f:
-                    stats = json.load(f)
-            stats['last_activity'] = datetime.now().strftime('%d/%m/%Y %H:%M')
-            with open(STATS_FILE, 'w', encoding='utf-8') as f:
-                json.dump(stats, f, indent=4)
-        except Exception as e:
-            print(f"Erreur lors de la mise à jour des stats de lancement : {e}")
+        self._update_stat('last_activity', datetime.now().strftime('%d/%m/%Y %H:%M'))
 
     def update_playtime_stat(self, playtime_seconds):
-        """Update playtime statistics."""
-        try:
-            stats = {}
-            if os.path.exists(STATS_FILE):
-                with open(STATS_FILE, 'r', encoding='utf-8') as f:
-                    stats = json.load(f)
-            stats['playtime'] = stats.get('playtime', 0) + round(playtime_seconds)  # Stocker en secondes
-            with open(STATS_FILE, 'w', encoding='utf-8') as f:
-                json.dump(stats, f, indent=4)
-        except Exception as e:
-            print(f"Erreur lors de la mise à jour des stats de lancement : {e}")
+        """Update playtime statistics (add seconds)."""
+        stats = self._read_stats()
+        stats['playtime'] = stats.get('playtime', 0) + round(playtime_seconds)
+        self._write_stats(stats)
 
     def update_launch_stat(self):
-        """Update launch count statistics."""
-        try:
-            stats = {}
-            if os.path.exists(STATS_FILE):
-                with open(STATS_FILE, 'r', encoding='utf-8') as f:
-                    stats = json.load(f)
-            stats['launch_count'] = stats.get('launch_count', 0) + 1
-            with open(STATS_FILE, 'w', encoding='utf-8') as f:
-                json.dump(stats, f, indent=4)
-        except Exception as e:
-            print(f"Erreur lors de la mise à jour des stats de lancement : {e}")
+        """Increment launch count."""
+        self._increment_stat('launch_count')
 
     def update_stats_on_login(self):
-        """Update login count statistics."""
-        try:
-            stats = {}
-            if os.path.exists(STATS_FILE):
-                with open(STATS_FILE, 'r', encoding='utf-8') as f:
-                    stats = json.load(f)
-            stats['login_count'] = stats.get('login_count', 0) + 1
-            with open(STATS_FILE, 'w', encoding='utf-8') as f:
-                json.dump(stats, f, indent=4)
-        except Exception as e:
-            print(f"Erreur lors de la mise à jour des stats de connexion : {e}")
+        """Increment login count."""
+        self._increment_stat('login_count')
 
     def format_playtime_seconds(self, seconds):
-        """Formate un nombre de secondes en chaîne lisible (ex: '1 h 30 min 45 s', '2 j 3 h 5 min 30 s')."""
+        """Format seconds as a human-readable string."""
         try:
-            total_seconds = int(round(seconds))  # Convertir en secondes entières
+            total_seconds = int(round(seconds))
             days = total_seconds // (24 * 3600)
             hours = (total_seconds % (24 * 3600)) // 3600
             mins = (total_seconds % 3600) // 60
@@ -85,13 +85,12 @@ class StatsManager:
             if secs > 0 or not parts:
                 parts.append(f"{secs} s")
             return ' '.join(parts)
-        except Exception as e:
+        except Exception:
             return f"{seconds} s"
 
     def show_stats(self, parent_widget):
-        """Affiche les statistiques utilisateur dans un overlay moderne et robuste sans ombre portée."""
-        
-        # Supprime l'overlay existant s'il y en a un
+        """Display user statistics in a modern overlay."""
+        # Remove existing overlay if present
         if hasattr(parent_widget, 'stats_overlay') and parent_widget.stats_overlay is not None:
             try:
                 parent_widget.stats_overlay.deleteLater()
@@ -106,7 +105,7 @@ class StatsManager:
         parent_widget.stats_overlay.show()
         parent_widget.stats_overlay.raise_()
 
-        # Carte centrale sans ombre ni contour
+        # Card
         card = QWidget(parent_widget.stats_overlay)
         card.setFixedSize(400, 320)
         card.move((parent_widget.width() - card.width()) // 2, (parent_widget.height() - card.height()) // 2)
@@ -122,22 +121,14 @@ class StatsManager:
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
 
-        # Lecture des stats
-        try:
-            with open(STATS_FILE, 'r', encoding='utf-8') as f:
-                stats = json.load(f)
-            last_activity = stats.get('last_activity', str(translations.tr("stats.never")))
-            playtime = stats.get('playtime', 0)
-            launch_count = stats.get('launch_count', 0)
-            login_count = stats.get('login_count', 0)
-        except Exception as e:
-            print(f"[DEBUG] Erreur lecture stats : {e}")
-            last_activity = str(translations.tr("stats.error"))
-            playtime = 0
-            launch_count = 0
-            login_count = 0
+        # Read stats
+        stats = self._read_stats()
+        last_activity = stats.get('last_activity', str(translations.tr("stats.never")))
+        playtime = stats.get('playtime', 0)
+        launch_count = stats.get('launch_count', 0)
+        login_count = stats.get('login_count', 0)
 
-        # Affichage stylé des stats
+        # Display stats
         stat_labels = [
             (str(translations.tr("stats.last_activity")), last_activity),
             (str(translations.tr("stats.playtime")), self.format_playtime_seconds(playtime)),
@@ -156,7 +147,7 @@ class StatsManager:
 
         layout.addStretch(1)
 
-        # Bouton fermer
+        # Close button
         close_btn = QPushButton(str(translations.tr("stats.close")))
         close_btn.setFixedHeight(38)
         def close_overlay():
@@ -167,7 +158,7 @@ class StatsManager:
         layout.addWidget(close_btn, alignment=Qt.AlignCenter)
 
     def update_avatar(self, pseudo, avatar_label):
-        """Met à jour l'avatar Minecraft du joueur à partir de minotar.net."""
+        """Update the player's Minecraft avatar from minotar.net."""
         try:
             url = f'https://minotar.net/armor/body/{pseudo}/120'
             data = requests.get(url, timeout=5).content
@@ -185,7 +176,7 @@ class StatsManager:
             avatar_label.setPixmap(default_avatar)
 
     def set_default_avatar(self, avatar_label):
-        """Affiche le skin de Steve par défaut comme avatar (corps entier avec armure)."""
+        """Display the default Steve skin as avatar."""
         url = "https://minotar.net/armor/body/steve/120"
         try:
             data = requests.get(url, timeout=5).content
@@ -193,6 +184,5 @@ class StatsManager:
             pixmap.loadFromData(data)
             avatar_label.setPixmap(pixmap.scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         except Exception:
-            # fallback logo si problème réseau
             default_avatar = QPixmap('assets/textures/logo.png').scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             avatar_label.setPixmap(default_avatar) 
