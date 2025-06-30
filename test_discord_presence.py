@@ -1,21 +1,16 @@
 from pypresence import Presence
 import time
 
-CLIENT_ID = "1389266601693679838"  # Ton Application ID
+CLIENT_ID = "1389266601693679838"
 
-try:
-    rpc = Presence(CLIENT_ID)
-    rpc.connect()
-    print("Connexion à Discord réussie !")
-    rpc.update(
-        details="Test Rich Presence",
-        state="Ça marche !",
-        large_image="logo",
-        large_text="CatzLauncher"
-    )
-    print("Rich Presence envoyée. Regarde Discord !")
-    time.sleep(30)  # Laisse le temps de voir sur Discord
-    rpc.close()
-    print("Déconnexion propre.")
-except Exception as e:
-    print(f"Erreur : {e}") 
+rpc = Presence(CLIENT_ID)
+rpc.connect()
+rpc.update(
+    details="Test bouton",
+    state="Test bouton GitHub",
+    large_image="logo",
+    buttons=[{"label": "Voir sur GitHub", "url": "https://github.com/Locktix/CatzLauncher"}]
+)
+print("Regarde sur ton profil Discord (grande carte) !")
+time.sleep(60)
+rpc.close() 

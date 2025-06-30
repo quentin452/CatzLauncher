@@ -28,7 +28,10 @@ class DiscordRichPresence:
                     details=details,
                     state=state,
                     large_image="logo",  # Doit être uploadé dans le portail Discord (Assets)
-                    large_text="CatzLauncher"
+                    large_text="CatzLauncher",
+                    buttons=[
+                        {"label": "Voir sur GitHub", "url": "https://github.com/Locktix/CatzLauncher"}
+                    ]
                 )
             except Exception as e:
                 print(f"Erreur lors de la mise à jour de la Rich Presence : {e}")
