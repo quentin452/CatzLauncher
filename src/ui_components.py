@@ -390,7 +390,10 @@ class UIComponents:
         # Java Path
         java_path_layout = QHBoxLayout()
         java_path_edit = QLineEdit(self.config_manager.get_config().get("java_path", ""))
-        browse_java_btn = AnimatedButton(str(translations.tr("config.browse")))
+        browse_java_btn = AnimatedButton("📂")
+        bouton_largeur = 40
+        browse_java_btn.setFixedWidth(bouton_largeur)
+        browse_java_btn.setStyleSheet("padding: 2px 2px; font-size: 20px;")
         java_path_layout.addWidget(java_path_edit)
         java_path_layout.addWidget(browse_java_btn)
         java_path_label = QLabel(str(translations.tr("config.java_path")))
@@ -402,7 +405,23 @@ class UIComponents:
         self.config_manager.populate_themes(theme_selector)
         theme_label = QLabel(str(translations.tr("config.theme")))
         theme_label.setProperty("tr_key", "config.theme")
-        form_layout.addRow(theme_label, theme_selector)
+        open_theme_folder_btn = AnimatedButton("📂")
+        open_theme_folder_btn.setFixedWidth(bouton_largeur)
+        open_theme_folder_btn.setStyleSheet("padding: 2px 2px; font-size: 20px;")
+        def open_theme_folder():
+            import os, sys, subprocess
+            styles_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/styles/"))
+            if sys.platform == "win32":
+                os.startfile(styles_dir)
+            elif sys.platform == "darwin":
+                subprocess.run(["open", styles_dir])
+            else:
+                subprocess.run(["xdg-open", styles_dir])
+        open_theme_folder_btn.clicked.connect(open_theme_folder)
+        theme_row_layout = QHBoxLayout()
+        theme_row_layout.addWidget(theme_selector)
+        theme_row_layout.addWidget(open_theme_folder_btn)
+        form_layout.addRow(theme_label, theme_row_layout)
 
         # Language Selector
         language_selector = NoScrollComboBox()

@@ -60,7 +60,7 @@
   "config": {
     "title": "⚙️ Configurazione",
     "java_path": "📁 Percorso Java:",
-    "browse": "📂 Sfoglia",
+    "browse": "📂",
     "theme": "🎨 Tema applicazione:",
     "github_token": "🔑 Token di accesso personale GitHub:",
     "token_placeholder": "Incolla un nuovo token per salvarlo",
@@ -73,7 +73,8 @@
     "check_launcher_updates": "🚀 Controlla aggiornamenti del launcher",
     "save_config": "💾 Salva Configurazione",
     "config_saved": "✅ Configurazione salvata!",
-    "language": "🌍 Lingua:"
+    "language": "🌍 Lingua:",
+    "open_theme_folder": "📂"
   },
   "launcher_updates": {
     "checking": "Controllo aggiornamenti launcher...",
@@ -165,17 +166,17 @@
     "Curiosità: Esistono oltre 3000 tipi di pesci tropicali in Minecraft!"
   ],
   "notifications": {
-    "logout_title": "Logout",
-    "logout_message": "You have been logged out.",
-    "login_title": "Login",
-    "login_success": "Microsoft login successful!",
-    "login_error_title": "Login error",
-    "config_title": "Configuration",
-    "config_saved": "Settings saved!",
-    "launch_title": "Launch",
-    "launch_start": "Launching {name}...",
-    "launch_failed": "Failed to launch modpack.",
-    "update_title": "Update",
-    "update_modpacks_available": "Modpack updates are available!"
+    "logout_title": "Disconnessione",
+    "logout_message": "Sei stato disconnesso.",
+    "login_title": "Accesso",
+    "login_success": "Accesso Microsoft riuscito!",
+    "login_error_title": "Errore di accesso",
+    "config_title": "Configurazione",
+    "config_saved": "Impostazioni salvate!",
+    "launch_title": "Avvio",
+    "launch_start": "Avvio di {name}...",
+    "launch_failed": "Avvio del modpack non riuscito.",
+    "update_title": "Aggiornamento",
+    "update_modpacks_available": "Aggiornamenti modpack disponibili!"
   }
 } 

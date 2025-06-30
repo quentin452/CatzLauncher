@@ -60,7 +60,7 @@
   "config": {
     "title": "⚙️ Настройки",
     "java_path": "📁 Путь к Java:",
-    "browse": "📂 Обзор",
+    "browse": "📂",
     "theme": "🎨 Тема приложения:",
     "github_token": "🔑 GitHub Personal Access Token:",
     "token_placeholder": "Вставьте новый токен для сохранения",
@@ -73,7 +73,8 @@
     "check_launcher_updates": "🚀 Проверить обновления лаунчера",
     "save_config": "💾 Сохранить Настройки",
     "config_saved": "✅ Настройки сохранены!",
-    "language": "🌍 Язык:"
+    "language": "🌍 Язык:",
+    "open_theme_folder": "📂"
   },
   "launcher_updates": {
     "checking": "Проверка обновлений лаунчера...",
@@ -165,17 +166,17 @@
     "Факт: В Minecraft более 3000 видов тропических рыб!"
   ],
   "notifications": {
-    "logout_title": "Logout",
-    "logout_message": "You have been logged out.",
-    "login_title": "Login",
-    "login_success": "Microsoft login successful!",
-    "login_error_title": "Login error",
-    "config_title": "Configuration",
-    "config_saved": "Settings saved!",
-    "launch_title": "Launch",
-    "launch_start": "Launching {name}...",
-    "launch_failed": "Failed to launch modpack.",
-    "update_title": "Update",
-    "update_modpacks_available": "Modpack updates are available!"
+    "logout_title": "Выход",
+    "logout_message": "Вы вышли из системы.",
+    "login_title": "Вход",
+    "login_success": "Вход в Microsoft выполнен успешно!",
+    "login_error_title": "Ошибка входа",
+    "config_title": "Настройки",
+    "config_saved": "Настройки сохранены!",
+    "launch_title": "Запуск",
+    "launch_start": "Запуск {name}...",
+    "launch_failed": "Не удалось запустить модпак.",
+    "update_title": "Обновление",
+    "update_modpacks_available": "Доступны обновления модпаков!"
   }
 } 

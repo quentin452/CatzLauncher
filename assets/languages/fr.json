@@ -60,7 +60,7 @@
   "config": {
     "title": "⚙️ Configuration",
     "java_path": "📁 Chemin Java:",
-    "browse": "📂 Parcourir",
+    "browse": "📂",
     "theme": "🎨 Thème de l'application:",
     "github_token": "🔑 Token d'accès personnel GitHub:",
     "token_placeholder": "Coller un nouveau token pour le sauvegarder",
@@ -74,7 +74,8 @@
     "save_config": "💾 Sauvegarder la Configuration",
     "config_saved": "✅ Configuration sauvegardée !",
     "language": "🌍 Langue:",
-    "discord_rich_presence": "🎮 Activer Discord Rich Presence"
+    "discord_rich_presence": "🎮 Activer Discord Rich Presence",
+    "open_theme_folder": "📂"
   },
   "launcher_updates": {
     "checking": "Checking for launcher updates...",

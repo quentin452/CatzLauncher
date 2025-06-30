@@ -60,7 +60,7 @@
   "config": {
     "title": "⚙️ Configuration",
     "java_path": "📁 Java Path:",
-    "browse": "📂 Browse",
+    "browse": "📂",
     "theme": "🎨 Application theme:",
     "github_token": "🔑 GitHub Personal Access Token:",
     "token_placeholder": "Paste a new token to save it",
@@ -73,7 +73,8 @@
     "check_launcher_updates": "🚀 Check for launcher updates",
     "save_config": "💾 Save Configuration",
     "config_saved": "✅ Configuration saved!",
-    "language": "🌍 Language:"
+    "language": "🌍 Language:",
+    "open_theme_folder": "📂"
   },
   "launcher_updates": {
     "checking": "Checking for launcher updates...",

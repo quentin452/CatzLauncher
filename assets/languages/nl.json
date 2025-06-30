@@ -60,7 +60,7 @@
   "config": {
     "title": "⚙️ Configuratie",
     "java_path": "📁 Java-pad:",
-    "browse": "📂 Bladeren",
+    "browse": "📂",
     "theme": "🎨 Applicatiethema:",
     "github_token": "🔑 GitHub Personal Access Token:",
     "token_placeholder": "Plak een nieuw token om het op te slaan",
@@ -73,7 +73,8 @@
     "check_launcher_updates": "🚀 Launcher-updates controleren",
     "save_config": "💾 Configuratie Opslaan",
     "config_saved": "✅ Configuratie opgeslagen!",
-    "language": "🌍 Taal:"
+    "language": "🌍 Taal:",
+    "open_theme_folder": "📂"
   },
   "launcher_updates": {
     "checking": "Launcher-updates controleren...",
@@ -165,17 +166,17 @@
     "Feitje: Er zijn meer dan 3000 soorten tropische vissen in Minecraft!"
   ],
   "notifications": {
-    "logout_title": "Logout",
-    "logout_message": "You have been logged out.",
-    "login_title": "Login",
-    "login_success": "Microsoft login successful!",
-    "login_error_title": "Login error",
-    "config_title": "Configuration",
-    "config_saved": "Settings saved!",
-    "launch_title": "Launch",
-    "launch_start": "Launching {name}...",
-    "launch_failed": "Failed to launch modpack.",
+    "logout_title": "Afmelden",
+    "logout_message": "Je bent afgemeld.",
+    "login_title": "Inloggen",
+    "login_success": "Microsoft-inloggen geslaagd!",
+    "login_error_title": "Inlogfout",
+    "config_title": "Configuratie",
+    "config_saved": "Instellingen opgeslagen!",
+    "launch_title": "Starten",
+    "launch_start": "{name} wordt gestart...",
+    "launch_failed": "Modpack starten mislukt.",
     "update_title": "Update",
-    "update_modpacks_available": "Modpack updates are available!"
+    "update_modpacks_available": "Modpack-updates zijn beschikbaar!"
   }
 } 

@@ -60,7 +60,7 @@
   "config": {
     "title": "⚙️ Configuración",
     "java_path": "📁 Ruta de Java:",
-    "browse": "📂 Examinar",
+    "browse": "📂",
     "theme": "🎨 Tema de la aplicación:",
     "github_token": "🔑 Token de acceso personal de GitHub:",
     "token_placeholder": "Pega un nuevo token para guardarlo",
@@ -73,7 +73,8 @@
     "check_launcher_updates": "🚀 Verificar actualizaciones del launcher",
     "save_config": "💾 Guardar Configuración",
     "config_saved": "✅ ¡Configuración guardada!",
-    "language": "🌍 Idioma:"
+    "language": "🌍 Idioma:",
+    "open_theme_folder": "📂"
   },
   "launcher_updates": {
     "checking": "Verificando actualizaciones del launcher...",
@@ -165,17 +166,17 @@
     "Dato curioso: ¡Hay más de 3000 tipos de peces tropicales en Minecraft!"
   ],
   "notifications": {
-    "logout_title": "Logout",
-    "logout_message": "You have been logged out.",
-    "login_title": "Login",
-    "login_success": "Microsoft login successful!",
-    "login_error_title": "Login error",
-    "config_title": "Configuration",
-    "config_saved": "Settings saved!",
-    "launch_title": "Launch",
-    "launch_start": "Launching {name}...",
-    "launch_failed": "Failed to launch modpack.",
-    "update_title": "Update",
-    "update_modpacks_available": "Modpack updates are available!"
+    "logout_title": "Cerrar sesión",
+    "logout_message": "Has cerrado sesión.",
+    "login_title": "Inicio de sesión",
+    "login_success": "¡Inicio de sesión en Microsoft exitoso!",
+    "login_error_title": "Error de inicio de sesión",
+    "config_title": "Configuración",
+    "config_saved": "¡Configuración guardada!",
+    "launch_title": "Lanzamiento",
+    "launch_start": "Lanzando {name}...",
+    "launch_failed": "Error al lanzar el modpack.",
+    "update_title": "Actualización",
+    "update_modpacks_available": "¡Actualizaciones de modpacks disponibles!"
   }
 } 
