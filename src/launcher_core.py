@@ -8,8 +8,9 @@ import ctypes
 import sys
 import subprocess
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QPropertyAnimation, QTimer, QPoint
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFontMetrics
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QMessageBox, QApplication,QGraphicsOpacityEffect
+from pyqttoast import Toast, ToastPreset, ToastPosition
 
 from .translation_manager import translations
 from .custom_widgets import ParticleSystem
@@ -17,7 +18,7 @@ from .auth_manager import AuthManager
 from .modpack_manager import ModpackManager
 from .stats_manager import StatsManager
 from .config_manager import ConfigManager
-from .ui_components import UIComponents
+from .ui_components import UIComponents, BannerToast
 from .launcher_updater import LauncherUpdateManager, is_git_repo
 from .utils import SAVE_DIR
 
@@ -68,6 +69,8 @@ class MinecraftLauncher(QMainWindow):
         self.stacked_widget.addWidget(self.tabs)
         self._connect_signals()
         self._apply_styles()
+
+        QTimer.singleShot(100, lambda: self.show_toast("", "", ToastPreset.INFORMATION))
 
         QTimer.singleShot(3000, self.show_main_content)
 
@@ -192,6 +195,7 @@ class MinecraftLauncher(QMainWindow):
         self.auth_manager.logout()
         self.update_login_button_states()
         self.stats_manager.set_default_avatar(self.main_ui_elements['avatar_label'])
+        self.show_toast("Déconnexion", "Vous avez été déconnecté.", ToastPreset.INFORMATION)
 
     def handle_login_complete(self, profile):
         """Handle successful login."""
@@ -201,6 +205,7 @@ class MinecraftLauncher(QMainWindow):
         self.update_login_button_states()
         self.stats_manager.update_avatar(profile['name'], self.main_ui_elements['avatar_label'])
         self.stats_manager.update_stats_on_login()
+        self.show_toast("Connexion", "Connexion Microsoft réussie !", ToastPreset.SUCCESS)
 
     def handle_login_error(self, error):
         """Handle login error."""
@@ -209,6 +214,7 @@ class MinecraftLauncher(QMainWindow):
         self.auth_manager.handle_login_error(error, self)
         self.update_login_button_states()
         self.stats_manager.set_default_avatar(self.main_ui_elements['avatar_label'])
+        self.show_toast("Erreur de connexion", str(error), ToastPreset.ERROR)
 
     def update_login_button_states(self):
         """Update login button states."""
@@ -227,6 +233,7 @@ class MinecraftLauncher(QMainWindow):
         """Save settings."""
         self.config_manager.save_settings(self, self.config_ui_elements)
         self._apply_styles()
+        self.show_toast("Configuration", "Paramètres sauvegardés !", ToastPreset.SUCCESS)
 
     def show_stats(self):
         """Show user statistics."""
@@ -236,20 +243,17 @@ class MinecraftLauncher(QMainWindow):
         """Launch the selected modpack."""
         selected_item = self.main_ui_elements['modpack_list'].currentItem()
         if not selected_item:
-            QMessageBox.warning(self, str(translations.tr("errors.selection_required")), str(translations.tr("errors.select_modpack")))
+            self.show_toast("Erreur", str(translations.tr("errors.select_modpack")), ToastPreset.WARNING)
             return
-
         # Get the custom widget from the selected item
         widget = self.main_ui_elements['modpack_list'].itemWidget(selected_item)
         if not widget:
-            QMessageBox.critical(self, str(translations.tr("errors.critical_error")), str(translations.tr("errors.modpack_data_error")))
+            self.show_toast("Erreur", str(translations.tr("errors.modpack_data_error")), ToastPreset.ERROR)
             return
-
         modpack = widget.modpack_data
         if not modpack:
-            QMessageBox.critical(self, str(translations.tr("errors.critical_error")), str(translations.tr("errors.modpack_not_found")))
+            self.show_toast("Erreur", str(translations.tr("errors.modpack_not_found")), ToastPreset.ERROR)
             return
-
         # Launch the game
         success = self.modpack_manager.launch_game(
             modpack, 
@@ -257,9 +261,11 @@ class MinecraftLauncher(QMainWindow):
             self.config_manager.get_config(), 
             self
         )
-        
         if success:
             self.stats_manager.update_launch_stat()
+            self.show_toast("Lancement", f"Lancement de {modpack.get('name', 'modpack')}...", ToastPreset.INFORMATION)
+        else:
+            self.show_toast("Erreur", "Échec du lancement du modpack.", ToastPreset.ERROR)
 
     def manual_check_updates(self):
         """Manual check for updates."""
@@ -287,6 +293,8 @@ class MinecraftLauncher(QMainWindow):
 
     def prompt_for_updates(self, updates):
         """Prompt for updates."""
+        if updates:
+            self.show_toast("Mise à jour", "Des mises à jour de modpacks sont disponibles !", ToastPreset.INFORMATION)
         self.modpack_manager.prompt_for_updates(updates, self)
 
     def handle_single_update_found(self, modpack_data):
@@ -461,4 +469,22 @@ class MinecraftLauncher(QMainWindow):
         
         # Re-populate selectors
         self.config_manager.populate_languages(self.config_ui_elements['language_selector'])
-        self.config_manager.populate_themes(self.config_ui_elements['theme_selector']) 
+        self.config_manager.populate_themes(self.config_ui_elements['theme_selector'])
+
+    def show_toast(self, title, text, preset=None):
+        if not title and not text:
+            return
+        # Détermine le type d'icône pour l'emoji
+        icon_type = 'info'
+        if preset is not None:
+            name = preset.name.lower() if hasattr(preset, 'name') else str(preset).lower()
+            if 'success' in name:
+                icon_type = 'success'
+            elif 'error' in name:
+                icon_type = 'error'
+            elif 'warning' in name:
+                icon_type = 'warning'
+            else:
+                icon_type = 'info'
+        toast = BannerToast(self, title, text, icon_type=icon_type, duration=4000)
+        toast.show() 

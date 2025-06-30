@@ -1,8 +1,8 @@
 import os
 import sys
 import subprocess
-from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve
-from PyQt5.QtGui import QPixmap, QFont, QIcon
+from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QRect
+from PyQt5.QtGui import QPixmap, QFont, QIcon, QFontMetrics, QColor, QPainter
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame,
     QStackedWidget, QSizePolicy, QFormLayout, QScrollArea, QSlider,
@@ -15,6 +15,147 @@ from .custom_widgets import (
     LoadingScreen, AnimatedButton, LoadingSpinner
 )
 from .no_scroll_combobox import NoScrollComboBox, NoScrollSlider
+
+class BannerToast(QWidget):
+    _active_toasts = []  # Liste des toasts actifs pour empilement
+
+    def __init__(self, parent, title, text, icon_type='info', duration=4000, color=QColor('#E7F4F9'), border_color=QColor('#5C5C5C')):
+        super().__init__(parent)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.SubWindow)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_ShowWithoutActivating)
+        self.duration = duration
+        self.parent = parent
+        self.bg_color = color
+        self.border_color = border_color
+        self.icon_type = icon_type
+        self.title = title
+        self.text = text
+        self.progress = 1.0
+        self._setup_ui()
+        self._start_timer()
+        self._animate_in()
+        self.main_window = self.parent.window() if hasattr(self.parent, 'window') else self.parent
+        self.main_window.installEventFilter(self)
+        BannerToast._active_toasts.append(self)
+
+    def closeEvent(self, event):
+        if self in BannerToast._active_toasts:
+            BannerToast._active_toasts.remove(self)
+        self._reposition_all()
+        super().closeEvent(event)
+
+    @classmethod
+    def _reposition_all(cls):
+        y_offset = 18
+        for toast in cls._active_toasts:
+            toast._reposition(y_offset)
+            y_offset += toast.height() + 12
+
+    def eventFilter(self, obj, event):
+        if obj == self.main_window and event.type() in [event.Move, event.Resize]:
+            self._reposition_all()
+        return super().eventFilter(obj, event)
+
+    def _reposition(self, y_offset=None):
+        x = self.main_window.width() - self.width() - 18
+        y = y_offset if y_offset is not None else 80
+        self.move(x, y)
+
+    def showEvent(self, event):
+        BannerToast._reposition_all()
+        super().showEvent(event)
+
+    def _setup_ui(self):
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(18, 8, 18, 8)
+        layout.setSpacing(12)
+
+        # Emoji icône
+        emoji = '🔵'
+        if self.icon_type == 'success':
+            emoji = '🟢'
+        elif self.icon_type == 'error':
+            emoji = '🔴'
+        elif self.icon_type == 'info':
+            emoji = '🔵'
+        elif self.icon_type == 'warning':
+            emoji = '🔵'
+        icon_label = QLabel(emoji)
+        icon_label.setFont(QFont('Arial', 18))
+        layout.addWidget(icon_label)
+
+        # Texte
+        text_layout = QVBoxLayout()
+        text_layout.setSpacing(2)
+        title_label = QLabel(self.title)
+        title_label.setFont(QFont('Arial', 11, QFont.Bold))
+        title_label.setStyleSheet('color: #222;')
+        text_label = QLabel(self.text)
+        text_label.setFont(QFont('Arial', 10))
+        text_label.setStyleSheet('color: #444;')
+        text_label.setWordWrap(False)
+        text_label.setMaximumHeight(self._get_2line_height(text_label))
+        text_layout.addWidget(title_label)
+        text_layout.addWidget(text_label)
+        layout.addLayout(text_layout)
+
+        # Close button
+        close_btn = QPushButton('✕')
+        close_btn.setFixedSize(20, 20)
+        close_btn.setStyleSheet('QPushButton { border: none; background: transparent; font-size: 16px; color: #888; } QPushButton:hover { color: #222; }')
+        close_btn.clicked.connect(self.close)
+        layout.addWidget(close_btn)
+
+        # Largeur dynamique
+        fm = QFontMetrics(text_label.font())
+        text_width = max(fm.width(self.text), fm.width(self.title))
+        min_width = 260
+        max_width = 800
+        ideal_width = min(max(text_width + 120, min_width), max_width)
+        self.setFixedWidth(ideal_width)
+        self.setFixedHeight(self._get_2line_height(text_label) + 24)
+
+    def _get_2line_height(self, label):
+        fm = QFontMetrics(label.font())
+        return fm.lineSpacing() * 2 + 4
+
+    def _start_timer(self):
+        self.timer = QTimer(self)
+        self.timer.setSingleShot(False)
+        self.timer.timeout.connect(self._update_progress)
+        self.timer.start(30)
+        self.start_time = QTimer().remainingTime()  # Not used, but for clarity
+        self.elapsed = 0
+
+    def _update_progress(self):
+        self.elapsed += 30
+        self.progress = max(0.0, 1.0 - self.elapsed / self.duration)
+        self.update()
+        if self.progress <= 0.0:
+            self.close()
+
+    def _animate_in(self):
+        self.setWindowOpacity(0.0)
+        self.anim = QPropertyAnimation(self, b'windowOpacity')
+        self.anim.setDuration(250)
+        self.anim.setStartValue(0.0)
+        self.anim.setEndValue(1.0)
+        self.anim.start()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        rect = self.rect()
+        painter.setBrush(self.bg_color)
+        painter.setPen(self.border_color)
+        painter.drawRoundedRect(rect, 8, 8)
+        # Barre de progression en bas
+        if self.progress < 1.0:
+            bar_rect = QRect(8, self.height() - 8, int((self.width() - 16) * self.progress), 4)
+            painter.setBrush(QColor('#3E9141'))
+            painter.setPen(Qt.NoPen)
+            painter.drawRect(bar_rect)
 
 class UIComponents:
     """Manages UI component creation for the launcher."""
