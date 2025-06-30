@@ -73,7 +73,8 @@
     "check_launcher_updates": "🚀 Vérifier les mises à jour du launcher",
     "save_config": "💾 Sauvegarder la Configuration",
     "config_saved": "✅ Configuration sauvegardée !",
-    "language": "🌍 Langue:"
+    "language": "🌍 Langue:",
+    "discord_rich_presence": "🎮 Activer Discord Rich Presence"
   },
   "launcher_updates": {
     "checking": "Checking for launcher updates...",

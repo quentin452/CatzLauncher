@@ -57,6 +57,7 @@ class ConfigManager:
         self.config["auto_check_launcher_updates"] = ui_elements['auto_check_launcher_cb'].isChecked()
         self.config["theme"] = ui_elements['theme_selector'].currentText()
         self.config["max_memory"] = ui_elements['max_memory_slider'].value()
+        self.config["discord_rich_presence"] = ui_elements['discord_rich_presence_cb'].isChecked()
         
         # Sauvegarder et appliquer la nouvelle langue
         new_language = ui_elements['language_selector'].currentText()

@@ -45,6 +45,12 @@ class DiscordRichPresence:
             time.sleep(15)
 
     def disconnect(self):
+        # Envoyer une présence vide pour retirer l'affichage côté Discord
+        try:
+            if self.connected:
+                self.rpc.clear()
+        except Exception as e:
+            print(f"Erreur lors de la suppression de la présence Discord : {e}")
         self.connected = False
         try:
             self.rpc.close()

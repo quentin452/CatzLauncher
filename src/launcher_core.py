@@ -62,6 +62,12 @@ class MinecraftLauncher(QMainWindow):
         self.launcher_updater = LauncherUpdateManager(self.launcher_repo_url, current_version=self.launcher_version)
         self.launcher_update_thread = None
 
+        self.discord_rich_presence = None
+        if self.config_manager.get_config().get("discord_rich_presence", True):
+            from src.discord_rich_presence import DiscordRichPresence
+            self.discord_rich_presence = DiscordRichPresence()
+            self.discord_rich_presence.connect()
+
         self._setup_ui()
         self.main_tab, self.main_ui_elements = self.ui_components.create_main_tab()
         self.config_tab, self.config_ui_elements = self.ui_components.create_config_tab()
@@ -241,6 +247,15 @@ class MinecraftLauncher(QMainWindow):
         """Save settings."""
         self.config_manager.save_settings(self, self.config_ui_elements)
         self._apply_styles()
+        # Discord Rich Presence dynamique
+        discord_enabled = self.config_manager.get_config().get("discord_rich_presence", True)
+        if discord_enabled and self.discord_rich_presence is None:
+            from src.discord_rich_presence import DiscordRichPresence
+            self.discord_rich_presence = DiscordRichPresence()
+            self.discord_rich_presence.connect()
+        elif not discord_enabled and self.discord_rich_presence is not None:
+            self.discord_rich_presence.disconnect()
+            self.discord_rich_presence = None
         self.show_toast(
             str(translations.tr("notifications.config_title")),
             str(translations.tr("notifications.config_saved")),
