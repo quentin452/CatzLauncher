@@ -163,5 +163,19 @@
     "Curiosità: Il primo nome di Minecraft era 'Cave Game'.",
     "Suggerimento: Puoi cambiare skin sul sito ufficiale di Minecraft.",
     "Curiosità: Esistono oltre 3000 tipi di pesci tropicali in Minecraft!"
-  ]
+  ],
+  "notifications": {
+    "logout_title": "Logout",
+    "logout_message": "You have been logged out.",
+    "login_title": "Login",
+    "login_success": "Microsoft login successful!",
+    "login_error_title": "Login error",
+    "config_title": "Configuration",
+    "config_saved": "Settings saved!",
+    "launch_title": "Launch",
+    "launch_start": "Launching {name}...",
+    "launch_failed": "Failed to launch modpack.",
+    "update_title": "Update",
+    "update_modpacks_available": "Modpack updates are available!"
+  }
 } 

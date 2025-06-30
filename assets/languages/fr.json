@@ -163,5 +163,19 @@
     "Fun fact : Le premier nom de Minecraft était 'Cave Game'.",
     "Astuce : Tu peux changer de skin sur le site officiel Minecraft.",
     "Fun fact : Il existe plus de 3000 types de poissons tropicaux dans Minecraft !"
-  ]
-} 
+  ],
+  "notifications": {
+    "logout_title": "Déconnexion",
+    "logout_message": "Vous avez été déconnecté.",
+    "login_title": "Connexion",
+    "login_success": "Connexion Microsoft réussie !",
+    "login_error_title": "Erreur de connexion",
+    "config_title": "Configuration",
+    "config_saved": "Paramètres sauvegardés !",
+    "launch_title": "Lancement",
+    "launch_start": "Lancement de {name}...",
+    "launch_failed": "Échec du lancement du modpack.",
+    "update_title": "Mise à jour",
+    "update_modpacks_available": "Des mises à jour de modpacks sont disponibles !"
+  }
+}

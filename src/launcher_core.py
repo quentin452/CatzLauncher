@@ -195,7 +195,11 @@ class MinecraftLauncher(QMainWindow):
         self.auth_manager.logout()
         self.update_login_button_states()
         self.stats_manager.set_default_avatar(self.main_ui_elements['avatar_label'])
-        self.show_toast("Déconnexion", "Vous avez été déconnecté.", ToastPreset.INFORMATION)
+        self.show_toast(
+            str(translations.tr("notifications.logout_title")),
+            str(translations.tr("notifications.logout_message")),
+            ToastPreset.INFORMATION
+        )
 
     def handle_login_complete(self, profile):
         """Handle successful login."""
@@ -205,7 +209,11 @@ class MinecraftLauncher(QMainWindow):
         self.update_login_button_states()
         self.stats_manager.update_avatar(profile['name'], self.main_ui_elements['avatar_label'])
         self.stats_manager.update_stats_on_login()
-        self.show_toast("Connexion", "Connexion Microsoft réussie !", ToastPreset.SUCCESS)
+        self.show_toast(
+            str(translations.tr("notifications.login_title")),
+            str(translations.tr("login.login_success", name=profile['name'])),
+            ToastPreset.SUCCESS
+        )
 
     def handle_login_error(self, error):
         """Handle login error."""
@@ -233,7 +241,11 @@ class MinecraftLauncher(QMainWindow):
         """Save settings."""
         self.config_manager.save_settings(self, self.config_ui_elements)
         self._apply_styles()
-        self.show_toast("Configuration", "Paramètres sauvegardés !", ToastPreset.SUCCESS)
+        self.show_toast(
+            str(translations.tr("notifications.config_title")),
+            str(translations.tr("notifications.config_saved")),
+            ToastPreset.SUCCESS
+        )
 
     def show_stats(self):
         """Show user statistics."""
@@ -263,9 +275,17 @@ class MinecraftLauncher(QMainWindow):
         )
         if success:
             self.stats_manager.update_launch_stat()
-            self.show_toast("Lancement", f"Lancement de {modpack.get('name', 'modpack')}...", ToastPreset.INFORMATION)
+            self.show_toast(
+                str(translations.tr("notifications.launch_title")),
+                str(translations.tr("notifications.launch_start", name=modpack.get('name', 'modpack'))),
+                ToastPreset.INFORMATION
+            )
         else:
-            self.show_toast("Erreur", "Échec du lancement du modpack.", ToastPreset.ERROR)
+            self.show_toast(
+                str(translations.tr("notifications.launch_title")),
+                str(translations.tr("notifications.launch_failed")),
+                ToastPreset.ERROR
+            )
 
     def manual_check_updates(self):
         """Manual check for updates."""
@@ -294,7 +314,11 @@ class MinecraftLauncher(QMainWindow):
     def prompt_for_updates(self, updates):
         """Prompt for updates."""
         if updates:
-            self.show_toast("Mise à jour", "Des mises à jour de modpacks sont disponibles !", ToastPreset.INFORMATION)
+            self.show_toast(
+                str(translations.tr("notifications.update_title")),
+                str(translations.tr("notifications.update_modpacks_available")),
+                ToastPreset.INFORMATION
+            )
         self.modpack_manager.prompt_for_updates(updates, self)
 
     def handle_single_update_found(self, modpack_data):

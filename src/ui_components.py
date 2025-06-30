@@ -630,6 +630,4 @@ class UIComponents:
                 parent_widget.modpack_info_overlay.deleteLater()
                 parent_widget.modpack_info_overlay = None
         close_btn.clicked.connect(close_overlay)
-        layout.addWidget(close_btn, alignment=Qt.AlignCenter)
-
-        ui_elements['status_label'].setText(str(translations.tr("config.config_saved"))) 
+        layout.addWidget(close_btn, alignment=Qt.AlignCenter) 
