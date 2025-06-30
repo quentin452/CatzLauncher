@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 from src.launcher_core import MinecraftLauncher
+from src.discord_rich_presence import DiscordRichPresence
 
 def ensure_version_file_exists():
     """
@@ -24,8 +25,14 @@ def main():
     ensure_version_file_exists()
     app = QApplication(sys.argv)
     window = MinecraftLauncher()
+    # Initialiser Discord Rich Presence
+    drp = DiscordRichPresence()
+    drp.connect()
     window.show()
-    sys.exit(app.exec_())
+    try:
+        sys.exit(app.exec_())
+    finally:
+        drp.disconnect()
 
 if __name__ == "__main__":
     main() 
