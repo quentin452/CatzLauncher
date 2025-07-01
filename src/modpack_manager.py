@@ -109,8 +109,8 @@ class ModpackManager:
                     self.check_single_modpack_update(modpack_data, modpack_list)
                 return click_handler
             
-            # Connecter le signal du bouton directement à la méthode de vérification
-            item_widget.check_update_btn.clicked.connect(create_click_handler(pack))
+            # SUPPRIMER la connexion au bouton check_update_btn (il n'existe plus)
+            # item_widget.check_update_btn.clicked.connect(create_click_handler(pack))
 
     def check_single_modpack_update(self, modpack_data, modpack_list):
         """Vérifie les mises à jour pour un seul modpack."""
