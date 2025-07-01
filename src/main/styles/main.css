@@ -318,9 +318,12 @@ body {
 /* Grille de modpacks */
 .modpack-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
     gap: 20px;
-    flex: 1;
+    width: 100%;
+    margin: 0;
+    padding: 0 0 0 32px;
+    box-sizing: border-box;
 }
 
 .modpack-item {
@@ -393,6 +396,7 @@ body {
 
 .btn-play,
 .btn-update,
+.btn-info,
 .btn-install {
     flex: 1;
     padding: 10px 16px;
@@ -402,6 +406,16 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: all var(--transition-speed);
+}
+
+.btn-info {
+    background: #525252;
+    color: white;
+}
+
+.btn-info:hover {
+    background: #525252;
+    transform: translateY(-1px);
 }
 
 .btn-play {
@@ -837,3 +851,79 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-hover);
 } 
+
+.modpack-card {
+    background: #23243a;
+    border-radius: 14px;
+    border: 1.5px solid #333;
+    margin: 32px auto;
+    max-width: 600px;
+    min-width: 420px;
+    width: 90%;
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.modpack-card-inner {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 24px;
+}
+
+.modpack-logo {
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+    background: #222;
+    object-fit: cover;
+    border: 1.5px solid #ffd70055;
+}
+
+.modpack-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modpack-title {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #ffd700;
+    margin-bottom: 2px;
+}
+
+.modpack-meta {
+    color: #e0e0e0;
+    font-size: 1em;
+    display: flex;
+    gap: 18px;
+    font-weight: 500;
+}
+
+.modpack-card-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.modpack-card-actions button {
+    font-size: 1.1em;
+    padding: 7px 14px;
+    border-radius: 7px;
+    border: none;
+    background: #353657;
+    color: #ffd700;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    outline: none;
+    font-weight: 600;
+}
+
+.modpack-card-actions button:hover {
+    background: #ffd700;
+    color: #23243a;
+}

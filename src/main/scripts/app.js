@@ -521,20 +521,28 @@ class CatzLauncherApp {
         }
         this.modpacks.forEach(modpack => {
             const card = document.createElement('div');
-            card.className = 'modpack-card';
+            card.className = 'modpack-item';
+            card.style.display = 'flex';
+            card.style.flexDirection = 'row';
+            card.style.alignItems = 'center';
+            card.style.gap = '24px';
             card.innerHTML = `
-                <div class="modpack-title">${modpack.name} <span class="modpack-version">- ${modpack.version}</span></div>
-                <div class="modpack-actions">
-                    <button class="btn-play">Jouer</button>
-                    <a href="${modpack.url}" target="_blank" class="btn-download">Télécharger</a>
+                <img src="../assets/icons/logo.png" alt="Logo" class="modpack-logo" style="width:48px;height:48px;margin-right:18px;">
+                <div class="modpack-info" style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                    <div class="modpack-title" style="font-size:1.2em;font-weight:700;color:#ffd700;">${modpack.name}</div>
+                    <div class="modpack-meta" style="color:#e0e0e0;font-size:1em;display:flex;gap:18px;align-items:center;">
+                        <span>Forge <b>${modpack.forge_version}</b></span>
+                        <span>Java <b>${modpack.java_version}</b></span>
+                        <span><b>${modpack.estimated_mb}</b></span>
+                        <span class="version" style="background:#353657;color:#fff;padding:2px 10px;border-radius:8px;font-size:0.95em;margin-left:10px;">${modpack.version}</span>
+                    </div>
                 </div>
-                <div class="modpack-details">
-                    <span>Forge: ${modpack.forge_version}</span> |
-                    <span>Java: ${modpack.java_version}</span> |
-                    <span>Taille: ${modpack.estimated_mb}</span>
+                <div class="modpack-actions" style="display:flex;gap:10px;">
+                    <button class="btn-info" title="Infos">ℹ️</button>
+                    <button class="btn-update" title="Mettre à jour">🔄</button>
+                    <button class="btn-play" title="Jouer">▶️</button>
                 </div>
             `;
-            // Ajoute ici les listeners pour le bouton Jouer si besoin
             grid.appendChild(card);
         });
     }
