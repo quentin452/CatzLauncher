@@ -57,14 +57,12 @@ class ConfigManager:
         self.config["auto_check_launcher_updates"] = ui_elements['auto_check_launcher_cb'].isChecked()
         self.config["theme"] = ui_elements['theme_selector'].currentText()
         self.config["max_memory"] = ui_elements['max_memory_slider'].value()
-        self.config["discord_rich_presence"] = ui_elements['discord_rich_presence_cb'].isChecked()
         
         # Sauvegarder et appliquer la nouvelle langue
         new_language = ui_elements['language_selector'].currentText()
         if new_language != self.config.get("language", "fr"):
             self.config["language"] = new_language
             translations.load_language(new_language)
-            # Note: retranslate_ui should be called by the parent widget
         
         # Gérer la sauvegarde du token séparément et de manière sécurisée
         new_token = ui_elements['github_token_edit'].text()

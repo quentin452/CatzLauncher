@@ -480,11 +480,6 @@ class UIComponents:
         auto_check_launcher_cb.setChecked(self.config_manager.get_config().get("auto_check_launcher_updates", True))
         layout.addWidget(auto_check_launcher_cb)
 
-        # Discord Rich Presence checkbox
-        discord_rich_presence_cb = QCheckBox(str(translations.tr("config.discord_rich_presence")))
-        discord_rich_presence_cb.setChecked(self.config_manager.get_config().get("discord_rich_presence", True))
-        layout.addWidget(discord_rich_presence_cb)
-
         layout.addStretch()
         
         # Save button (outside the scroll area)
@@ -506,7 +501,6 @@ class UIComponents:
             'max_memory_slider': max_memory_slider,
             'auto_check_cb': auto_check_cb,
             'auto_check_launcher_cb': auto_check_launcher_cb,
-            'discord_rich_presence_cb': discord_rich_presence_cb,
             'save_settings_btn': save_settings_btn
         }
         ui_elements['status_label'] = status_label
