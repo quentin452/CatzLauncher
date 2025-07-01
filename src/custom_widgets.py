@@ -129,7 +129,7 @@ class AnimatedProgressBar(QProgressBar):
                               int(particle.size * 2), int(particle.size * 2))
 
 class ModpackListItem(QWidget):
-    """Widget personnalisé pour afficher un modpack avec un bouton de vérification d'update."""
+    """Widget personnalisé pour afficher un modpack avec un bouton d'info qui ouvre le menu contextuel."""
     
     def __init__(self, modpack_data, parent=None):
         super().__init__(parent)
@@ -146,30 +146,30 @@ class ModpackListItem(QWidget):
         
         layout.addStretch()
         
-        # Bouton de vérification d'update
-        self.check_update_btn = AnimatedButton("🔄")
-        self.check_update_btn.setFixedSize(16, 16)
-        self.check_update_btn.setToolTip(str(translations.tr("modpack_item.check_update_tooltip")))
-        self.check_update_btn.setProperty("class", "update-btn")
-        layout.addWidget(self.check_update_btn)
+        # Remplacer le bouton update par un bouton info (ℹ️)
+        self.info_btn = AnimatedButton("ℹ️")
+        self.info_btn.setFixedSize(24, 24)
+        self.info_btn.setToolTip("Informations et actions")
+        self.info_btn.setProperty("class", "info-btn")
+        layout.addWidget(self.info_btn)
         
-        # Activer le menu contextuel
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.show_context_menu)
+        # Connecter le bouton info à l'ouverture du menu contextuel
+        self.info_btn.clicked.connect(self.show_context_menu)
+        
+        # SUPPRIMER le menu contextuel au clic droit
+        # self.setContextMenuPolicy(Qt.CustomContextMenu)
+        # self.customContextMenuRequested.connect(self.show_context_menu)
     
     def set_checking_state(self, checking=True):
         """Change l'état du bouton pendant la vérification."""
-        if checking:
-            self.check_update_btn.setText("⏳")
-            self.check_update_btn.setEnabled(False)
-            self.check_update_btn.setToolTip(str(translations.tr("modpack_item.checking_tooltip")))
-        else:
-            self.check_update_btn.setText("🔄")
-            self.check_update_btn.setEnabled(True)
-            self.check_update_btn.setToolTip(str(translations.tr("modpack_item.check_update_tooltip")))
+        # Désactivé car plus de bouton update
+        pass
     
-    def show_context_menu(self, position):
+    def show_context_menu(self, position=None):
         """Affiche le menu contextuel pour le modpack."""
+        from PyQt5.QtCore import QPoint
+        if not isinstance(position, QPoint):
+            position = None
         context_menu = QMenu(self)
         
         # Action pour ouvrir le dossier du modpack
@@ -187,8 +187,12 @@ class ModpackListItem(QWidget):
         info_action.triggered.connect(self.show_modpack_info)
         context_menu.addAction(info_action)
         
-        # Afficher le menu à la position du clic
-        context_menu.exec_(self.mapToGlobal(position))
+        # Ouvrir le menu à côté du bouton info
+        if position is None:
+            btn_pos = self.info_btn.mapToGlobal(self.info_btn.rect().bottomRight())
+            context_menu.exec_(btn_pos)
+        else:
+            context_menu.exec_(self.mapToGlobal(position))
     
     def open_modpack_folder(self):
         """Ouvre le dossier du modpack dans l'explorateur de fichiers."""
@@ -319,8 +323,8 @@ class LoadingScreen(QWidget):
         else:
             self.tips = [str(tips)]
         self.tip_label = QLabel(random.choice(self.tips))
-        self.tip_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.tip_label, alignment=Qt.AlignCenter)
+        self.tip_label.setAlignment(QtCoreQt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.tip_label, alignment=QtCoreQt.AlignmentFlag.AlignCenter)
 
         self.tip_timer = QTimer(self)
         self.tip_timer.timeout.connect(self.show_random_tip)
