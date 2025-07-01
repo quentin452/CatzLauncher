@@ -2,7 +2,7 @@ from pypresence import Presence
 import time
 import threading
 
-CLIENT_ID = "1389266601693679838"  # Remplace par ton Application ID
+CLIENT_ID = "1389266601693679838"
 
 class DiscordRichPresence:
     def __init__(self):
@@ -42,7 +42,6 @@ class DiscordRichPresence:
                 self.rpc.update()
             except Exception:
                 pass
-            time.sleep(15)
 
     def disconnect(self):
         # Envoyer une présence vide pour retirer l'affichage côté Discord
