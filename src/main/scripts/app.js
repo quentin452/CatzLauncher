@@ -496,17 +496,47 @@ class CatzLauncherApp {
 
     loadModpacks() {
         console.log('Chargement des modpacks...');
-        // Pour l'instant, on simule le chargement
-        this.modpacks = [
-            {
-                id: 'example-modpack',
-                name: 'Example Modpack',
-                version: '1.0.0',
-                description: 'Un modpack d\'exemple',
-                image: '../assets/textures/modpack-default.png'
-            }
-        ];
-        console.log('Modpacks chargés:', this.modpacks.length);
+        // Charger dynamiquement le fichier modpacks.json
+        fetch('modpacks.json')
+            .then(response => response.json())
+            .then(data => {
+                this.modpacks = data;
+                console.log('Modpacks chargés:', this.modpacks.length);
+                this.displayModpacks();
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement des modpacks:', error);
+                this.modpacks = [];
+                this.displayModpacks();
+            });
+    }
+
+    displayModpacks() {
+        // Afficher les modpacks dans la grille de la page Jouer
+        const grid = document.getElementById('modpack-grid');
+        grid.innerHTML = '';
+        if (!this.modpacks || this.modpacks.length === 0) {
+            grid.innerHTML = '<p style="color: #fff;">Aucun modpack trouvé.</p>';
+            return;
+        }
+        this.modpacks.forEach(modpack => {
+            const card = document.createElement('div');
+            card.className = 'modpack-card';
+            card.innerHTML = `
+                <div class="modpack-title">${modpack.name} <span class="modpack-version">- ${modpack.version}</span></div>
+                <div class="modpack-actions">
+                    <button class="btn-play">Jouer</button>
+                    <a href="${modpack.url}" target="_blank" class="btn-download">Télécharger</a>
+                </div>
+                <div class="modpack-details">
+                    <span>Forge: ${modpack.forge_version}</span> |
+                    <span>Java: ${modpack.java_version}</span> |
+                    <span>Taille: ${modpack.estimated_mb}</span>
+                </div>
+            `;
+            // Ajoute ici les listeners pour le bouton Jouer si besoin
+            grid.appendChild(card);
+        });
     }
 
     setupParticles() {
