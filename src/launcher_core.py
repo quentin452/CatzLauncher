@@ -65,7 +65,9 @@ class MinecraftLauncher(QMainWindow):
         self._setup_ui()
         self.main_tab, self.main_ui_elements = self.ui_components.create_main_tab()
         self.config_tab, self.config_ui_elements = self.ui_components.create_config_tab()
-        self.tabs = self.ui_components.create_main_content_widget(self.main_tab, self.config_tab)
+        self.stats_tab = self.ui_components.create_stats_tab()
+        self.tabs = self.ui_components.create_main_content_widget(self.main_tab, self.config_tab, self.stats_tab)
+        self.stats_tab_index = 1  # Jouer = 0, Statistiques = 1, Config = 2
         self.stacked_widget.addWidget(self.tabs)
         self._connect_signals()
         self._apply_styles()
@@ -141,7 +143,6 @@ class MinecraftLauncher(QMainWindow):
         self.config_ui_elements['save_settings_btn'].clicked.connect(self.save_settings)
         self.main_ui_elements['login_btn'].clicked.connect(self.microsoft_login)
         self.main_ui_elements['logout_btn'].clicked.connect(self.logout)
-        self.main_ui_elements['stats_btn'].clicked.connect(self.show_stats)
 
         # Window controls
         self.minimize_btn.clicked.connect(self.showMinimized)
@@ -468,7 +469,8 @@ class MinecraftLauncher(QMainWindow):
         
         # Tab titles
         self.tabs.setTabText(0, str(translations.tr("tabs.play")))
-        self.tabs.setTabText(1, str(translations.tr("tabs.config")))
+        self.tabs.setTabText(1, str(translations.tr("tabs.stats")))
+        self.tabs.setTabText(2, str(translations.tr("tabs.config")))
         
         # Main tab elements
         self.main_ui_elements['status_label'].setText(str(translations.tr("main.ready_to_play")))
@@ -479,7 +481,6 @@ class MinecraftLauncher(QMainWindow):
         self.main_ui_elements['account_info_label'].setText(str(translations.tr("login.not_connected")))
         self.main_ui_elements['login_btn'].setText(str(translations.tr("login.login_microsoft")))
         self.main_ui_elements['logout_btn'].setText(str(translations.tr("login.logout")))
-        self.main_ui_elements['stats_btn'].setText(str(translations.tr("login.stats")))
         
         # Config elements
         self.config_ui_elements['browse_java_btn'].setText(str(translations.tr("config.browse")))

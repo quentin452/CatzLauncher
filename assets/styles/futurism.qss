@@ -367,3 +367,38 @@ QWidget#statsInfoOverlay {
     color: #e6e6e6;
     font-size: 16px;
     } 
+
+/* ===== STATISTIQUES - CARDS ===== */
+.stat-card {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 #10182a, stop:1 #0a0f1f);
+    border-radius: 18px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border: 2px solid #00ffff;
+    box-shadow: 0 2px 12px 0 rgba(0,255,255,0.10);
+    min-width: 140px;
+    min-height: 90px;
+    padding: 18px 10px 12px 10px;
+    margin: 0 6px;
+    color: #fff;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover {
+    border: 2.5px solid #8affff;
+    box-shadow: 0 4px 18px 0 rgba(0,255,255,0.18);
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 #0a0f1f, stop:1 #10182a);
+}
+
+/* ===== STATISTIQUES - ACTIVITÉ RÉCENTE ===== */
+.recent-activity-box {
+    background: rgba(10, 15, 31, 0.92);
+    border-radius: 16px;
+    border: 2px solid #00ffff;
+    box-shadow: 0 2px 10px 0 rgba(0,255,255,0.08);
+    color: #fff;
+    margin-top: 24px;
+    font-size: 15px;
+    padding: 18px 18px 12px 18px;
+} 

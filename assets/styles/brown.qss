@@ -391,3 +391,34 @@ QWidget#statsInfoOverlay {
     color: #e6e6e6;
     font-size: 16px;
     } 
+
+/* ===== STATISTIQUES - CARDS ===== */
+.stat-card {
+    background: rgba(237, 142, 47, 0.81);
+    border-radius: 16px;
+    border: 2px solid #AF8F6F;
+    box-shadow: 0 2px 10px 0 rgba(175,143,111,0.10);
+    min-width: 140px;
+    min-height: 90px;
+    padding: 18px 10px 12px 10px;
+    margin: 0 6px;
+    color: #3E2723;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover {
+    border: 2.5px solid #e65100;
+    box-shadow: 0 4px 18px 0 rgba(230,81,0,0.10);
+    background: rgba(230, 81, 0, 0.18);
+}
+
+/* ===== STATISTIQUES - ACTIVITÉ RÉCENTE ===== */
+.recent-activity-box {
+    background: rgba(237, 142, 47, 0.81);
+    border-radius: 14px;
+    border: 2px solid #AF8F6F;
+    box-shadow: 0 2px 8px 0 rgba(175,143,111,0.08);
+    color: #3E2723;
+    margin-top: 24px;
+    font-size: 15px;
+    padding: 18px 18px 12px 18px;
+} 

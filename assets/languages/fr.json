@@ -5,7 +5,8 @@
   },
   "tabs": {
     "play": "Jouer",
-    "config": "Config"
+    "config": "Config",
+    "stats": "Statistiques"
   },
   "main": {
     "modpacks_title": "🎯 Modpacks Disponibles",
@@ -48,10 +49,13 @@
   },
   "stats": {
     "title": "📊 Statistiques utilisateur",
-    "last_activity": "🕒 Dernière activité",
-    "playtime": "⏳ Temps de jeu total",
-    "launch_count": "🚀 Nombre de lancements",
-    "login_count": "🔑 Nombre de connexions",
+    "last_activity": "Dernière activité",
+    "playtime": "Temps de jeu total",
+    "launch_count": "Nombre de lancements",
+    "login_count": "Nombre de connexions",
+    "modpacks_installed": "Modpacks installés",
+    "updates": "Mises à jour",
+    "recent_activity": "Activité récente",
     "close": "Fermer",
     "never": "Jamais",
     "minutes": "min",

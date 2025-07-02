@@ -278,23 +278,18 @@ class UIComponents:
         logout_btn.setFixedHeight(40)
         logout_btn.setMinimumWidth(200)
         logout_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        stats_btn = AnimatedButton(str(translations.tr("login.stats")))
-        stats_btn.setFixedHeight(40)
-        stats_btn.setMinimumWidth(100)
-        stats_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-        # Layout horizontal pour les boutons déconnexion+stats
+        # Layout horizontal pour le bouton déconnexion seul
         btn_row = QHBoxLayout()
         btn_row.setSpacing(16)
         btn_row.setContentsMargins(0, 0, 0, 0)
         btn_row.addWidget(logout_btn)
-        btn_row.addWidget(stats_btn)
 
         # Widget conteneur pour le layout horizontal
         logout_stats_widget = QWidget()
         logout_stats_widget.setLayout(btn_row)
 
-        # Ajouter les widgets de boutons (login OU logout+stats)
+        # Ajouter les widgets de boutons (login OU logout)
         login_layout.addWidget(login_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         login_layout.addWidget(logout_stats_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -338,7 +333,6 @@ class UIComponents:
             'account_info_label': account_info_label,
             'login_btn': login_btn,
             'logout_btn': logout_btn,
-            'stats_btn': stats_btn,
             'logout_stats_widget': logout_stats_widget,
             'progress': progress,
             'status_label': status_label,
@@ -506,10 +500,85 @@ class UIComponents:
         ui_elements['status_label'] = status_label
         return tab, ui_elements
 
-    def create_main_content_widget(self, main_tab, config_tab):
-        """Create the main content widget with tabs."""
+    def create_stats_tab(self):
+        """Crée le tab Statistiques avec les infos utilisateur et l'activité récente."""
+        from .stats_manager import StatsManager
+        stats_manager = StatsManager()
+        tab = QWidget()
+        main_layout = QVBoxLayout(tab)
+        main_layout.setContentsMargins(30, 30, 30, 30)
+        main_layout.setSpacing(20)
+
+        # Titre
+        title = QLabel(str(translations.tr("stats.title")))
+        title.setAlignment(Qt.AlignLeft)
+        title_font = QFont()
+        title_font.setPointSize(18)
+        title_font.setBold(True)
+        title.setFont(title_font)
+        title.setProperty("class", "title")
+        main_layout.addWidget(title)
+
+        # Lecture des stats
+        stats = stats_manager._read_stats()
+        playtime = stats.get('playtime', 0)
+        launch_count = stats.get('launch_count', 0)
+        modpacks_installed = stats.get('modpacks_installed', 0)
+        updates = stats.get('updates', 0)
+
+        # Cartes de stats (ligne)
+        cards_layout = QHBoxLayout()
+        cards_layout.setSpacing(18)
+
+        def stat_card(icon, label, value):
+            card = QFrame()
+            card.setFrameShape(QFrame.StyledPanel)
+            card.setProperty("class", "stat-card")
+            card_layout = QVBoxLayout(card)
+            card_layout.setAlignment(Qt.AlignCenter)
+            icon_label = QLabel(icon)
+            icon_label.setAlignment(Qt.AlignCenter)
+            icon_label.setStyleSheet("font-size: 22px;")
+            card_layout.addWidget(icon_label)
+            label_widget = QLabel(label)
+            label_widget.setAlignment(Qt.AlignCenter)
+            label_widget.setStyleSheet("font-weight: bold;")
+            card_layout.addWidget(label_widget)
+            value_widget = QLabel(value)
+            value_widget.setAlignment(Qt.AlignCenter)
+            value_widget.setStyleSheet("font-size: 18px;")
+            card_layout.addWidget(value_widget)
+            return card
+
+        cards_layout.addWidget(stat_card("⏱️", str(translations.tr("stats.playtime")), stats_manager.format_playtime_seconds(playtime)))
+        cards_layout.addWidget(stat_card("🚀", str(translations.tr("stats.launch_count")), str(launch_count)))
+        cards_layout.addWidget(stat_card("📦", str(translations.tr("stats.modpacks_installed")), str(modpacks_installed)))
+        cards_layout.addWidget(stat_card("🟦", str(translations.tr("stats.updates")), str(updates)))
+        main_layout.addLayout(cards_layout)
+
+        # Activité récente
+        recent_box = QFrame()
+        recent_box.setFrameShape(QFrame.StyledPanel)
+        recent_box.setProperty("class", "recent-activity-box")
+        recent_layout = QVBoxLayout(recent_box)
+        recent_layout.setContentsMargins(16, 16, 16, 16)
+        recent_title = QLabel(str(translations.tr("stats.recent_activity")))
+        recent_title.setStyleSheet("font-weight: bold; font-size: 15px;")
+        recent_layout.addWidget(recent_title)
+        last_activity = stats.get('last_activity', str(translations.tr("stats.never")))
+        last_activity_label = QLabel(last_activity)
+        last_activity_label.setStyleSheet("font-size: 14px;")
+        recent_layout.addWidget(last_activity_label)
+        recent_layout.addStretch(1)
+        main_layout.addWidget(recent_box)
+        main_layout.addStretch(1)
+        return tab
+
+    def create_main_content_widget(self, main_tab, config_tab, stats_tab):
+        """Crée le widget principal avec les tabs Jouer, Statistiques, Configuration."""
         tabs = AnimatedTabWidget()
         tabs.addTab(main_tab, str(translations.tr("tabs.play")))
+        tabs.addTab(stats_tab, str(translations.tr("tabs.stats")))
         tabs.addTab(config_tab, str(translations.tr("tabs.config")))
         return tabs
 
