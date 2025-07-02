@@ -269,7 +269,7 @@ class ModpackManager:
                     elapsed_increment_seconds = current_time - last_update_time  
                     self.stats_manager.update_playtime_stat(elapsed_increment_seconds)
                     last_update_time = current_time
-                    time.sleep(10)
+                    time.sleep(1)
             stats_thread = threading.Thread(target=update_stats_periodically, daemon=True)
             stats_thread.start()
             process.wait()

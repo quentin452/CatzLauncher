@@ -503,6 +503,7 @@ class UIComponents:
     def create_stats_tab(self):
         """Crée le tab Statistiques avec les infos utilisateur et l'activité récente."""
         from .stats_manager import StatsManager
+        from PyQt5.QtCore import QTimer
         stats_manager = StatsManager()
         tab = QWidget()
         main_layout = QVBoxLayout(tab)
@@ -529,8 +530,8 @@ class UIComponents:
         # Cartes de stats (ligne)
         cards_layout = QHBoxLayout()
         cards_layout.setSpacing(18)
-
-        def stat_card(icon, label, value):
+        stat_labels = {}
+        def stat_card(icon, label, value, key=None):
             card = QFrame()
             card.setFrameShape(QFrame.StyledPanel)
             card.setProperty("class", "stat-card")
@@ -548,12 +549,19 @@ class UIComponents:
             value_widget.setAlignment(Qt.AlignCenter)
             value_widget.setStyleSheet("font-size: 18px;")
             card_layout.addWidget(value_widget)
+            if key:
+                stat_labels[key] = value_widget
             return card
 
-        cards_layout.addWidget(stat_card("⏱️", str(translations.tr("stats.playtime")), stats_manager.format_playtime_seconds(playtime)))
-        cards_layout.addWidget(stat_card("🚀", str(translations.tr("stats.launch_count")), str(launch_count)))
-        cards_layout.addWidget(stat_card("📦", str(translations.tr("stats.modpacks_installed")), str(modpacks_installed)))
-        cards_layout.addWidget(stat_card("🟦", str(translations.tr("stats.updates")), str(updates)))
+        # Stats principales
+        cards_layout.addWidget(stat_card("⏱️", str(translations.tr("stats.playtime")), stats_manager.format_playtime_seconds(playtime), key="playtime"))
+        cards_layout.addWidget(stat_card("🚀", str(translations.tr("stats.launch_count")), str(launch_count), key="launch_count"))
+        # Temps de jeu moyen par session
+        avg_playtime = stats_manager.get_average_playtime_per_session()
+        cards_layout.addWidget(stat_card("📊", "Moyenne/session", stats_manager.format_playtime_seconds(avg_playtime), key="avg_playtime"))
+        # Streak
+        streak_actuel, best_streak = stats_manager.get_streaks()
+        cards_layout.addWidget(stat_card("🔥", "Streak (meilleur)", f"{streak_actuel} / {best_streak} jours", key="streak"))
         main_layout.addLayout(cards_layout)
 
         # Activité récente
@@ -572,13 +580,98 @@ class UIComponents:
         recent_layout.addStretch(1)
         main_layout.addWidget(recent_box)
         main_layout.addStretch(1)
+
+        # Timer pour mise à jour temps de jeu
+        def refresh_stats():
+            stats = stats_manager._read_stats()
+            playtime = stats.get('playtime', 0)
+            launch_count = stats.get('launch_count', 0)
+            stat_labels["playtime"].setText(stats_manager.format_playtime_seconds(playtime))
+            stat_labels["launch_count"].setText(str(launch_count))
+        timer = QTimer(tab)
+        timer.timeout.connect(refresh_stats)
+        timer.start(1000)
+
+        # Après les stats principales
+        # Affichage temps de jeu moyen par session
+        avg_playtime = stats_manager.get_average_playtime_per_session()
+        avg_label = QLabel(f"Temps de jeu moyen/session : {stats_manager.format_playtime_seconds(avg_playtime)}")
+        avg_label.setAlignment(Qt.AlignCenter)
+        avg_label.setStyleSheet("font-size: 15px; color: #888;")
+        main_layout.addWidget(avg_label)
+        # Affichage streak
+        streak_actuel, best_streak = stats_manager.get_streaks()
+        streak_label = QLabel(f"Streak actuel : {streak_actuel} jours   |   Meilleur streak : {best_streak} jours")
+        streak_label.setAlignment(Qt.AlignCenter)
+        streak_label.setStyleSheet("font-size: 15px; color: #888;")
+        main_layout.addWidget(streak_label)
+
+        # Retourne aussi les labels pour mise à jour externe
+        return tab, stat_labels
+
+    def create_success_tab(self, parent_launcher=None):
+        from .stats_manager import StatsManager
+        stats_manager = StatsManager()
+        from .custom_widgets import AnimatedButton
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(18)
+        title = QLabel("🏆 Succès / Trophées")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 20px; font-weight: bold;")
+        layout.addWidget(title)
+        # Liste des succès possibles (id, nom, description)
+        all_successes = [
+            ("first_launch", "Premier lancement", "Lancer Minecraft pour la première fois"),
+            ("10_sessions", "10 sessions", "Jouer 10 sessions différentes"),
+            ("10h_play", "10 heures de jeu", "Atteindre 10 heures de jeu cumulées"),
+            ("3_streak", "3 jours de streak", "Jouer 3 jours d'affilée"),
+            ("7_streak", "7 jours de streak", "Jouer 7 jours d'affilée"),
+            ("new_year", "Jour de l'an", "Jouer un 1er janvier"),
+        ]
+        unlocked = {s['id']: s for s in stats_manager.get_successes()}
+        for sid, name, desc in all_successes:
+            box = QFrame()
+            box.setFrameShape(QFrame.StyledPanel)
+            box.setProperty("class", "success-card")
+            box_layout = QHBoxLayout(box)
+            box_layout.setAlignment(Qt.AlignLeft)
+            icon = QLabel("✅" if sid in unlocked else "⬜")
+            icon.setStyleSheet("font-size: 22px;")
+            box_layout.addWidget(icon)
+            text = QLabel(f"<b>{name}</b><br><span style='font-size:12px;'>{desc}</span>")
+            box_layout.addWidget(text)
+            if sid in unlocked:
+                date = unlocked[sid]['date']
+                date_label = QLabel(f"Débloqué le {date}")
+                date_label.setStyleSheet("color: #4caf50; font-size: 12px;")
+                box_layout.addWidget(date_label)
+            layout.addWidget(box)
+        # Bouton de réinitialisation stylé
+        reset_btn = AnimatedButton("Réinitialiser les succès")
+        reset_btn.setFixedHeight(40)
+        reset_btn.setMinimumWidth(220)
+        reset_btn.setSizePolicy(reset_btn.sizePolicy().Expanding, reset_btn.sizePolicy().Fixed)
+        reset_btn.setStyleSheet("")  # Laisse le style par défaut du launcher
+        from PyQt5.QtWidgets import QMessageBox
+        def reset_success():
+            stats_manager.reset_successes()
+            QMessageBox.information(tab, "Succès réinitialisés", "Tous les succès ont été réinitialisés !")
+            # Rafraîchir le tab succès en temps réel
+            if parent_launcher and hasattr(parent_launcher, 'refresh_success_tab'):
+                parent_launcher.refresh_success_tab()
+        reset_btn.clicked.connect(reset_success)
+        layout.addWidget(reset_btn, alignment=Qt.AlignCenter)
+        layout.addStretch(1)
         return tab
 
-    def create_main_content_widget(self, main_tab, config_tab, stats_tab):
+    def create_main_content_widget(self, main_tab, config_tab, stats_tab, success_tab):
         """Crée le widget principal avec les tabs Jouer, Statistiques, Configuration."""
         tabs = AnimatedTabWidget()
         tabs.addTab(main_tab, str(translations.tr("tabs.play")))
         tabs.addTab(stats_tab, str(translations.tr("tabs.stats")))
+        tabs.addTab(success_tab, "Succès")
         tabs.addTab(config_tab, str(translations.tr("tabs.config")))
         return tabs
 

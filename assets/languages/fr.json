@@ -128,9 +128,9 @@
     "check_update_tooltip": "Vérifier les mises à jour pour ce modpack",
     "checking_tooltip": "Vérification en cours...",
     "context_menu": {
-      "open_folder": "📁 Ouvrir le dossier du modpack",
-      "check_updates": "🔄 Vérifier les mises à jour",
-      "show_info": "ℹ️ Informations du modpack"
+      "open_folder": "Ouvrir le dossier du modpack",
+      "check_updates": "Vérifier les mises à jour",
+      "show_info": "Informations du modpack"
     },
     "info": {
       "title": "Informations du modpack",

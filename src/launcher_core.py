@@ -65,8 +65,9 @@ class MinecraftLauncher(QMainWindow):
         self._setup_ui()
         self.main_tab, self.main_ui_elements = self.ui_components.create_main_tab()
         self.config_tab, self.config_ui_elements = self.ui_components.create_config_tab()
-        self.stats_tab = self.ui_components.create_stats_tab()
-        self.tabs = self.ui_components.create_main_content_widget(self.main_tab, self.config_tab, self.stats_tab)
+        self.stats_tab, self.stats_labels = self.ui_components.create_stats_tab()
+        self.success_tab = self.ui_components.create_success_tab()
+        self.tabs = self.ui_components.create_main_content_widget(self.main_tab, self.config_tab, self.stats_tab, self.success_tab)
         self.stats_tab_index = 1  # Jouer = 0, Statistiques = 1, Config = 2
         self.stacked_widget.addWidget(self.tabs)
         self._connect_signals()
@@ -276,6 +277,41 @@ class MinecraftLauncher(QMainWindow):
         )
         if success:
             self.stats_manager.update_launch_stat()
+            self.refresh_stats_labels()
+            # Succès : premier lancement
+            self.stats_manager.unlock_success("first_launch", "Premier lancement", "Lancer Minecraft pour la première fois")
+            # Succès : 10 sessions
+            stats = self.stats_manager._read_stats()
+            if stats.get('launch_count', 0) >= 10:
+                self.stats_manager.unlock_success("10_sessions", "10 sessions", "Jouer 10 sessions différentes")
+            # Succès : 10h de jeu
+            if stats.get('playtime', 0) >= 36000:
+                self.stats_manager.unlock_success("10h_play", "10 heures de jeu", "Atteindre 10 heures de jeu cumulées")
+            # Succès streaks
+            streak_actuel, best_streak = self.stats_manager.get_streaks()
+            if best_streak >= 3:
+                self.stats_manager.unlock_success("3_streak", "3 jours de streak", "Jouer 3 jours d'affilée")
+            if best_streak >= 7:
+                self.stats_manager.unlock_success("7_streak", "7 jours de streak", "Jouer 7 jours d'affilée")
+            # Succès : jouer un 1er janvier
+            from datetime import datetime
+            now = datetime.now()
+            if now.month == 1 and now.day == 1:
+                self.stats_manager.unlock_success("new_year", "Jour de l'an", "Jouer un 1er janvier")
+            # Notification pour chaque succès débloqué
+            for sid in ["first_launch", "10_sessions", "10h_play", "3_streak", "7_streak", "new_year"]:
+                unlocked = [s for s in self.stats_manager.get_successes() if s['id'] == sid]
+                if unlocked and unlocked[-1].get('date'):
+                    # On notifie seulement si le succès vient d'être débloqué (date très récente)
+                    from datetime import datetime, timedelta
+                    try:
+                        date_succes = datetime.strptime(unlocked[-1]['date'], '%Y-%m-%d %H:%M')
+                        if (datetime.now() - date_succes) < timedelta(seconds=5):
+                            self.notify_success(unlocked[-1])
+                    except Exception:
+                        pass
+            # Rafraîchir l'affichage des succès en temps réel
+            self.refresh_success_tab()
             self.show_toast(
                 str(translations.tr("notifications.launch_title")),
                 str(translations.tr("notifications.launch_start", name=modpack.get('name', 'modpack'))),
@@ -512,4 +548,37 @@ class MinecraftLauncher(QMainWindow):
             else:
                 icon_type = 'info'
         toast = BannerToast(self, title, text, icon_type=icon_type, duration=4000)
-        toast.show() 
+        toast.show()
+
+    def refresh_stats_labels(self):
+        """Rafraîchit les labels de stats (lancements, temps de jeu) dans l'onglet stats."""
+        stats = self.stats_manager._read_stats()
+        playtime = stats.get('playtime', 0)
+        launch_count = stats.get('launch_count', 0)
+        if hasattr(self, 'stats_labels'):
+            if 'playtime' in self.stats_labels:
+                self.stats_labels['playtime'].setText(self.stats_manager.format_playtime_seconds(playtime))
+            if 'launch_count' in self.stats_labels:
+                self.stats_labels['launch_count'].setText(str(launch_count)) 
+
+    def notify_success(self, success):
+        """Affiche une notification toast et une notification système pour un succès."""
+        try:
+            from plyer import notification
+            notification.notify(
+                title=f"Succès débloqué : {success['name']}",
+                message=success['description'],
+                app_name="CatzLauncher"
+            )
+        except Exception:
+            pass
+        self.show_toast(f"🏆 Succès débloqué !", f"{success['name']}\n{success['description']}") 
+
+    def refresh_success_tab(self):
+        """Rafraîchit le tab Succès en temps réel après reset."""
+        # On recrée le widget et on le remplace dans les tabs
+        from .ui_components import UIComponents
+        new_tab = self.ui_components.create_success_tab(parent_launcher=self)
+        self.tabs.removeTab(2)  # L'index du tab Succès (après Jouer, Stats)
+        self.tabs.insertTab(2, new_tab, "Succès")
+        self.success_tab = new_tab 

@@ -60,8 +60,15 @@ class StatsManager:
         self._write_stats(stats)
 
     def update_launch_stat(self):
-        """Increment launch count."""
-        self._increment_stat('launch_count')
+        """Increment launch count et enregistre le jour de jeu pour le streak."""
+        stats = self._read_stats()
+        stats['launch_count'] = stats.get('launch_count', 0) + 1
+        # Ajout du jour de jeu (format YYYY-MM-DD)
+        today = datetime.now().strftime('%Y-%m-%d')
+        days = set(stats.get('days_played', []))
+        days.add(today)
+        stats['days_played'] = list(days)
+        self._write_stats(stats)
 
     def update_stats_on_login(self):
         """Increment login count."""
@@ -185,4 +192,64 @@ class StatsManager:
             avatar_label.setPixmap(pixmap.scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         except Exception:
             default_avatar = QPixmap('assets/textures/logo.png').scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            avatar_label.setPixmap(default_avatar) 
+            avatar_label.setPixmap(default_avatar)
+
+    def get_average_playtime_per_session(self):
+        """Retourne le temps de jeu moyen par session en secondes."""
+        stats = self._read_stats()
+        playtime = stats.get('playtime', 0)
+        launches = stats.get('launch_count', 1)
+        return playtime / launches if launches > 0 else 0
+
+    def get_streaks(self):
+        """Retourne (streak_actuel, meilleur_streak) en jours."""
+        stats = self._read_stats()
+        days = sorted(set(stats.get('days_played', [])))
+        if not days:
+            return 0, 0
+        days_dt = [datetime.strptime(d, '%Y-%m-%d') for d in days]
+        days_dt.sort()
+        best = cur = 1
+        streaks = []
+        for i in range(1, len(days_dt)):
+            if (days_dt[i] - days_dt[i-1]).days == 1:
+                cur += 1
+            else:
+                streaks.append(cur)
+                cur = 1
+        streaks.append(cur)
+        best = max(streaks)
+        # Streak actuel = nombre de jours consécutifs jusqu'à aujourd'hui
+        today = datetime.now().date()
+        streak_actuel = 0
+        for i in range(len(days_dt)-1, -1, -1):
+            if (today - days_dt[i].date()).days == streak_actuel:
+                streak_actuel += 1
+            else:
+                break
+        return streak_actuel, best
+
+    def get_successes(self):
+        """Retourne la liste des succès débloqués (dict: id, nom, description, date)."""
+        stats = self._read_stats()
+        return stats.get('successes', [])
+
+    def unlock_success(self, success_id, name, description):
+        """Débloque un succès si pas déjà fait."""
+        stats = self._read_stats()
+        successes = stats.get('successes', [])
+        if not any(s['id'] == success_id for s in successes):
+            successes.append({
+                'id': success_id,
+                'name': name,
+                'description': description,
+                'date': datetime.now().strftime('%Y-%m-%d %H:%M')
+            })
+            stats['successes'] = successes
+            self._write_stats(stats)
+
+    def reset_successes(self):
+        """Réinitialise tous les succès (vide la liste dans le fichier de stats)."""
+        stats = self._read_stats()
+        stats['successes'] = []
+        self._write_stats(stats) 
