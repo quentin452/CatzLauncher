@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 from src.launcher_core import MinecraftLauncher
 
+
 def ensure_version_file_exists():
     """
     Ensures version.txt exists. If not, creates it with a default "0.0.0".

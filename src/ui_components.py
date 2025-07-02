@@ -539,15 +539,15 @@ class UIComponents:
             card_layout.setAlignment(Qt.AlignCenter)
             icon_label = QLabel(icon)
             icon_label.setAlignment(Qt.AlignCenter)
-            icon_label.setStyleSheet("font-size: 22px;")
+            icon_label.setStyleSheet("font-size: 22px; color: #fff;")
             card_layout.addWidget(icon_label)
             label_widget = QLabel(label)
             label_widget.setAlignment(Qt.AlignCenter)
-            label_widget.setStyleSheet("font-weight: bold;")
+            label_widget.setStyleSheet("font-weight: bold; color: #fff;")
             card_layout.addWidget(label_widget)
             value_widget = QLabel(value)
             value_widget.setAlignment(Qt.AlignCenter)
-            value_widget.setStyleSheet("font-size: 18px;")
+            value_widget.setStyleSheet("font-size: 18px; color: #fff;")
             card_layout.addWidget(value_widget)
             if key:
                 stat_labels[key] = value_widget
@@ -562,7 +562,6 @@ class UIComponents:
         # Streak
         streak_actuel, best_streak = stats_manager.get_streaks()
         cards_layout.addWidget(stat_card("🔥", "Streak (meilleur)", f"{streak_actuel} / {best_streak} jours", key="streak"))
-        main_layout.addLayout(cards_layout)
 
         # Activité récente
         recent_box = QFrame()
@@ -571,42 +570,42 @@ class UIComponents:
         recent_layout = QVBoxLayout(recent_box)
         recent_layout.setContentsMargins(16, 16, 16, 16)
         recent_title = QLabel(str(translations.tr("stats.recent_activity")))
-        recent_title.setStyleSheet("font-weight: bold; font-size: 15px;")
+        recent_title.setStyleSheet("font-weight: bold; font-size: 15px; color: #fff;")
         recent_layout.addWidget(recent_title)
         last_activity = stats.get('last_activity', str(translations.tr("stats.never")))
         last_activity_label = QLabel(last_activity)
-        last_activity_label.setStyleSheet("font-size: 14px;")
+        last_activity_label.setStyleSheet("font-size: 14px; color: #fff;")
         recent_layout.addWidget(last_activity_label)
         recent_layout.addStretch(1)
-        main_layout.addWidget(recent_box)
-        main_layout.addStretch(1)
-
-        # Timer pour mise à jour temps de jeu
-        def refresh_stats():
-            stats = stats_manager._read_stats()
-            playtime = stats.get('playtime', 0)
-            launch_count = stats.get('launch_count', 0)
-            stat_labels["playtime"].setText(stats_manager.format_playtime_seconds(playtime))
-            stat_labels["launch_count"].setText(str(launch_count))
-        timer = QTimer(tab)
-        timer.timeout.connect(refresh_stats)
-        timer.start(1000)
 
         # Après les stats principales
         # Affichage temps de jeu moyen par session
         avg_playtime = stats_manager.get_average_playtime_per_session()
         avg_label = QLabel(f"Temps de jeu moyen/session : {stats_manager.format_playtime_seconds(avg_playtime)}")
         avg_label.setAlignment(Qt.AlignCenter)
-        avg_label.setStyleSheet("font-size: 15px; color: #888;")
+        avg_label.setStyleSheet("font-size: 15px; color: #fff;")
         main_layout.addWidget(avg_label)
         # Affichage streak
         streak_actuel, best_streak = stats_manager.get_streaks()
         streak_label = QLabel(f"Streak actuel : {streak_actuel} jours   |   Meilleur streak : {best_streak} jours")
         streak_label.setAlignment(Qt.AlignCenter)
-        streak_label.setStyleSheet("font-size: 15px; color: #888;")
+        streak_label.setStyleSheet("font-size: 15px; color: #fff;")
         main_layout.addWidget(streak_label)
 
-        # Retourne aussi les labels pour mise à jour externe
+        # Crée un QFrame de fond harmonisé
+        bg_frame = QFrame()
+        bg_frame.setProperty("class", "success-bg")
+        bg_layout = QVBoxLayout(bg_frame)
+        bg_layout.setContentsMargins(0, 0, 0, 0)
+        bg_layout.setSpacing(20)
+        # Ajoute les widgets dans ce layout au lieu de main_layout
+        bg_layout.addLayout(cards_layout)
+        bg_layout.addWidget(recent_box)
+        bg_layout.addWidget(avg_label)
+        bg_layout.addWidget(streak_label)
+        bg_layout.addStretch(1)
+        main_layout.addWidget(bg_frame)
+        # (on ne met plus main_layout.addLayout(cards_layout), etc. directement)
         return tab, stat_labels
 
     def create_success_tab(self, parent_launcher=None):
@@ -620,7 +619,7 @@ class UIComponents:
         layout.setSpacing(18)
         title = QLabel("🏆 Succès / Trophées")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 20px; font-weight: bold;")
+        title.setStyleSheet("font-size: 20px; font-weight: bold; color: #fff;")
         layout.addWidget(title)
         # Scroll area pour la liste des succès
         scroll = QScrollArea()
@@ -652,8 +651,10 @@ class UIComponents:
             text_col = QVBoxLayout()
             name_label = QLabel(name)
             name_label.setProperty("class", "success-name")
+            name_label.setStyleSheet("color: #fff; font-weight: bold;")
             desc_label = QLabel(desc)
             desc_label.setProperty("class", "success-desc")
+            desc_label.setStyleSheet("color: #fff;")
             text_col.addWidget(name_label)
             text_col.addWidget(desc_label)
             box_layout.addLayout(text_col)
@@ -661,14 +662,21 @@ class UIComponents:
                 date = unlocked[sid]['date']
                 date_label = QLabel(f"Débloqué le {date}")
                 date_label.setProperty("class", "success-date")
+                date_label.setStyleSheet("color: #4caf50;")
                 box_layout.addWidget(date_label)
-            box.setStyleSheet("margin-bottom: 18px;")
             scroll_layout.addWidget(box)
         scroll_layout.addStretch(1)
         scroll_content.setLayout(scroll_layout)
         scroll.setWidget(scroll_content)
         scroll.setMaximumHeight(16777215)  # Pas de limite de hauteur
-        layout.addWidget(scroll, stretch=1)
+        # Ajout d'un fond semi-transparent autour de la liste des succès
+        bg_frame = QFrame()
+        bg_frame.setProperty("class", "success-bg")
+        bg_layout = QVBoxLayout(bg_frame)
+        bg_layout.setContentsMargins(0, 0, 0, 0)
+        bg_layout.setSpacing(0)
+        bg_layout.addWidget(scroll)
+        layout.addWidget(bg_frame, stretch=1)
         return tab
 
     def create_main_content_widget(self, main_tab, config_tab, stats_tab, success_tab):
