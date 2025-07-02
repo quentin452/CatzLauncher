@@ -192,7 +192,7 @@ class StatsManager:
             avatar_label.setPixmap(pixmap.scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         except Exception:
             default_avatar = QPixmap('assets/textures/logo.png').scaled(120, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            avatar_label.setPixmap(default_avatar)
+            avatar_label.setPixmap(default_avatar) 
 
     def get_average_playtime_per_session(self):
         """Retourne le temps de jeu moyen par session en secondes."""

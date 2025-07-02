@@ -548,7 +548,7 @@ class MinecraftLauncher(QMainWindow):
             else:
                 icon_type = 'info'
         toast = BannerToast(self, title, text, icon_type=icon_type, duration=4000)
-        toast.show()
+        toast.show() 
 
     def refresh_stats_labels(self):
         """Rafraîchit les labels de stats (lancements, temps de jeu) dans l'onglet stats."""

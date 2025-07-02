@@ -171,7 +171,7 @@ class ModpackListItem(QWidget):
         if not isinstance(position, QPoint):
             position = None
         context_menu = QMenu(self)
-
+        
         def emoji_icon(emoji):
             pixmap = QPixmap(32, 32)
             pixmap.fill(QColor(0, 0, 0, 0))
@@ -188,19 +188,19 @@ class ModpackListItem(QWidget):
         open_folder_action.setIcon(emoji_icon("📁"))
         open_folder_action.triggered.connect(self.open_modpack_folder)
         context_menu.addAction(open_folder_action)
-
+        
         # Action pour vérifier les mises à jour
         check_update_action = QAction(str(translations.tr("modpack_item.context_menu.check_updates")), self)
         check_update_action.setIcon(emoji_icon("🔄"))
         check_update_action.triggered.connect(self.trigger_update_check)
         context_menu.addAction(check_update_action)
-
+        
         # Action pour afficher les informations du modpack
         info_action = QAction(str(translations.tr("modpack_item.context_menu.show_info")), self)
         info_action.setIcon(emoji_icon("ℹ️"))
         info_action.triggered.connect(self.show_modpack_info)
         context_menu.addAction(info_action)
-
+        
         # Ouvrir le menu à côté du bouton info
         if position is None:
             btn_pos = self.info_btn.mapToGlobal(self.info_btn.rect().bottomRight())
