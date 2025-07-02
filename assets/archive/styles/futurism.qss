@@ -1,0 +1,3 @@
+QScrollArea, QScrollArea > QWidget, QScrollArea > QViewport {
+    background: transparent;
+} 

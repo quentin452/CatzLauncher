@@ -613,6 +613,7 @@ class UIComponents:
         from .stats_manager import StatsManager
         stats_manager = StatsManager()
         from .custom_widgets import AnimatedButton
+        from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout
         tab = QWidget()
         layout = QVBoxLayout(tab)
         layout.setContentsMargins(30, 30, 30, 30)
@@ -621,7 +622,15 @@ class UIComponents:
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 20px; font-weight: bold;")
         layout.addWidget(title)
-        # Liste des succès possibles (id, nom, description)
+        # Scroll area pour la liste des succès
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setStyleSheet("border: none;")
+        scroll_content = QWidget()
+        scroll_layout = QVBoxLayout(scroll_content)
+        scroll_layout.setContentsMargins(0, 0, 0, 0)
+        scroll_layout.setSpacing(0)
         all_successes = [
             ("first_launch", "Premier lancement", "Lancer Minecraft pour la première fois"),
             ("10_sessions", "10 sessions", "Jouer 10 sessions différentes"),
@@ -631,39 +640,35 @@ class UIComponents:
             ("new_year", "Jour de l'an", "Jouer un 1er janvier"),
         ]
         unlocked = {s['id']: s for s in stats_manager.get_successes()}
-        for sid, name, desc in all_successes:
+        for i, (sid, name, desc) in enumerate(all_successes):
             box = QFrame()
             box.setFrameShape(QFrame.StyledPanel)
             box.setProperty("class", "success-card")
             box_layout = QHBoxLayout(box)
             box_layout.setAlignment(Qt.AlignLeft)
             icon = QLabel("✅" if sid in unlocked else "⬜")
-            icon.setStyleSheet("font-size: 22px;")
+            icon.setProperty("class", "success-icon")
             box_layout.addWidget(icon)
-            text = QLabel(f"<b>{name}</b><br><span style='font-size:12px;'>{desc}</span>")
-            box_layout.addWidget(text)
+            text_col = QVBoxLayout()
+            name_label = QLabel(name)
+            name_label.setProperty("class", "success-name")
+            desc_label = QLabel(desc)
+            desc_label.setProperty("class", "success-desc")
+            text_col.addWidget(name_label)
+            text_col.addWidget(desc_label)
+            box_layout.addLayout(text_col)
             if sid in unlocked:
                 date = unlocked[sid]['date']
                 date_label = QLabel(f"Débloqué le {date}")
-                date_label.setStyleSheet("color: #4caf50; font-size: 12px;")
+                date_label.setProperty("class", "success-date")
                 box_layout.addWidget(date_label)
-            layout.addWidget(box)
-        # Bouton de réinitialisation stylé
-        reset_btn = AnimatedButton("Réinitialiser les succès")
-        reset_btn.setFixedHeight(40)
-        reset_btn.setMinimumWidth(220)
-        reset_btn.setSizePolicy(reset_btn.sizePolicy().Expanding, reset_btn.sizePolicy().Fixed)
-        reset_btn.setStyleSheet("")  # Laisse le style par défaut du launcher
-        from PyQt5.QtWidgets import QMessageBox
-        def reset_success():
-            stats_manager.reset_successes()
-            QMessageBox.information(tab, "Succès réinitialisés", "Tous les succès ont été réinitialisés !")
-            # Rafraîchir le tab succès en temps réel
-            if parent_launcher and hasattr(parent_launcher, 'refresh_success_tab'):
-                parent_launcher.refresh_success_tab()
-        reset_btn.clicked.connect(reset_success)
-        layout.addWidget(reset_btn, alignment=Qt.AlignCenter)
-        layout.addStretch(1)
+            box.setStyleSheet("margin-bottom: 18px;")
+            scroll_layout.addWidget(box)
+        scroll_layout.addStretch(1)
+        scroll_content.setLayout(scroll_layout)
+        scroll.setWidget(scroll_content)
+        scroll.setMaximumHeight(16777215)  # Pas de limite de hauteur
+        layout.addWidget(scroll, stretch=1)
         return tab
 
     def create_main_content_widget(self, main_tab, config_tab, stats_tab, success_tab):
