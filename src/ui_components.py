@@ -2,12 +2,14 @@ import os
 import sys
 import subprocess
 from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QRect
-from PyQt5.QtGui import QPixmap, QFont, QIcon, QFontMetrics, QColor, QPainter
+from PyQt5.QtGui import QPixmap, QFont, QIcon, QFontMetrics, QColor, QPainter, QPen
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame,
     QStackedWidget, QSizePolicy, QFormLayout, QScrollArea, QSlider,
     QLineEdit, QCheckBox, QComboBox, QMessageBox, QGraphicsOpacityEffect
 )
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt as QtCoreQt
 
 from .translation_manager import translations
 from .custom_widgets import (
@@ -21,7 +23,8 @@ class BannerToast(QWidget):
 
     def __init__(self, parent, title, text, icon_type='info', duration=4000, color=QColor('#E7F4F9'), border_color=QColor('#5C5C5C')):
         super().__init__(parent)
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.SubWindow)
+        window_flags = getattr(Qt, 'FramelessWindowHint', 0x00000800) | getattr(Qt, 'SubWindow', 0x00000008)
+        self.setWindowFlags(Qt.WindowFlags(window_flags))  # type: ignore
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
         self.duration = duration
@@ -91,9 +94,11 @@ class BannerToast(QWidget):
         title_label = QLabel(self.title)
         title_label.setFont(QFont('Arial', 11, QFont.Bold))
         title_label.setProperty("class", "toast-title")
+        title_label.setStyleSheet("color: #222;")
         text_label = QLabel(self.text)
         text_label.setFont(QFont('Arial', 10))
         text_label.setProperty("class", "toast-text")
+        text_label.setStyleSheet("color: #222;")
         text_label.setWordWrap(False)
         text_label.setMaximumHeight(self._get_2line_height(text_label))
         text_layout.addWidget(title_label)
@@ -104,7 +109,7 @@ class BannerToast(QWidget):
         close_btn = QPushButton('✕')
         close_btn.setFixedSize(20, 20)
         close_btn.setProperty("class", "window-control-btn close-btn")
-        close_btn.clicked.connect(self.close)
+        close_btn.clicked.connect(self._close_toast)
         layout.addWidget(close_btn)
 
         # Largeur dynamique
@@ -143,18 +148,21 @@ class BannerToast(QWidget):
         self.anim.setEndValue(1.0)
         self.anim.start()
 
+    def _close_toast(self):
+        self.close()
+
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         rect = self.rect()
         painter.setBrush(self.bg_color)
-        painter.setPen(self.border_color)
+        painter.setPen(QPen(QColor(0, 0, 0, 0), 0, Qt.PenStyle.SolidLine))
         painter.drawRoundedRect(rect, 8, 8)
         # Barre de progression en bas
         if self.progress < 1.0:
             bar_rect = QRect(8, self.height() - 8, int((self.width() - 16) * self.progress), 4)
             painter.setBrush(QColor('#3E9141'))
-            painter.setPen(Qt.NoPen)
+            painter.setPen(QPen(QColor(0, 0, 0, 0), 0, Qt.PenStyle.SolidLine))
             painter.drawRect(bar_rect)
 
 class UIComponents:
@@ -176,12 +184,12 @@ class UIComponents:
         logo_label = QLabel()
         logo_pixmap = QPixmap('assets/textures/logo.png')
         if not logo_pixmap.isNull():
-            logo_pixmap = logo_pixmap.scaled(60, 60, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            logo_pixmap = logo_pixmap.scaled(60, 60, QtCoreQt.AspectRatioMode.KeepAspectRatio, QtCoreQt.TransformationMode.SmoothTransformation)
             logo_label.setPixmap(logo_pixmap)
         layout.addWidget(logo_label)
         
         # Title
-        title_label = QLabel(translations.tr("window.header_title"))
+        title_label = QLabel(str(translations.tr("window.header_title")))
         title_font = QFont()
         title_font.setPointSize(24)
         title_font.setBold(True)
@@ -377,7 +385,6 @@ class UIComponents:
         form_layout = QFormLayout(form_container)
         form_layout.setSpacing(15)
         form_layout.setContentsMargins(15, 15, 15, 15)
-        form_layout.setRowWrapPolicy(QFormLayout.WrapAllRows)
         
         # --- Form Rows ---
         
@@ -512,7 +519,7 @@ class UIComponents:
 
         # Titre
         title = QLabel(str(translations.tr("stats.title")))
-        title.setAlignment(Qt.AlignLeft)
+        title.setAlignment(Qt.AlignmentFlag.AlignLeft)
         title_font = QFont()
         title_font.setPointSize(18)
         title_font.setBold(True)
@@ -536,17 +543,17 @@ class UIComponents:
             card.setFrameShape(QFrame.StyledPanel)
             card.setProperty("class", "stat-card")
             card_layout = QVBoxLayout(card)
-            card_layout.setAlignment(Qt.AlignCenter)
+            card_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
             icon_label = QLabel(icon)
-            icon_label.setAlignment(Qt.AlignCenter)
+            icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             icon_label.setProperty("class", "stat-icon")
             card_layout.addWidget(icon_label)
             label_widget = QLabel(label)
-            label_widget.setAlignment(Qt.AlignCenter)
+            label_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
             label_widget.setProperty("class", "stat-title")
             card_layout.addWidget(label_widget)
             value_widget = QLabel(value)
-            value_widget.setAlignment(Qt.AlignCenter)
+            value_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
             value_widget.setProperty("class", "stat-value")
             card_layout.addWidget(value_widget)
             if key:
@@ -582,13 +589,13 @@ class UIComponents:
         # Affichage temps de jeu moyen par session
         avg_playtime = stats_manager.get_average_playtime_per_session()
         avg_label = QLabel(f"Temps de jeu moyen/session : {stats_manager.format_playtime_seconds(avg_playtime)}")
-        avg_label.setAlignment(Qt.AlignCenter)
+        avg_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         avg_label.setProperty("class", "stat-desc")
         main_layout.addWidget(avg_label)
         # Affichage streak
         streak_actuel, best_streak = stats_manager.get_streaks()
         streak_label = QLabel(f"Streak actuel : {streak_actuel} jours   |   Meilleur streak : {best_streak} jours")
-        streak_label.setAlignment(Qt.AlignCenter)
+        streak_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         streak_label.setProperty("class", "stat-desc")
         main_layout.addWidget(streak_label)
 
@@ -623,7 +630,6 @@ class UIComponents:
         # Scroll area pour la liste des succès
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setStyleSheet("border: none;")
         scroll_content = QWidget()
         scroll_layout = QVBoxLayout(scroll_content)
@@ -643,7 +649,7 @@ class UIComponents:
             box.setFrameShape(QFrame.StyledPanel)
             box.setProperty("class", "success-card")
             box_layout = QHBoxLayout(box)
-            box_layout.setAlignment(Qt.AlignLeft)
+            box_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
             icon = QLabel("✅" if sid in unlocked else "⬜")
             icon.setProperty("class", "success-icon")
             box_layout.addWidget(icon)
@@ -735,7 +741,6 @@ class UIComponents:
         # Overlay semi-transparent
         parent_widget.modpack_info_overlay = QWidget(parent_widget)
         parent_widget.modpack_info_overlay.setGeometry(parent_widget.rect())
-        parent_widget.modpack_info_overlay.setAttribute(Qt.WA_StyledBackground, True)
         parent_widget.modpack_info_overlay.show()
         parent_widget.modpack_info_overlay.raise_()
 
@@ -753,7 +758,7 @@ class UIComponents:
 
         # Titre
         title = QLabel(f"<b>{str(translations.tr('modpack_item.info.title'))}</b>")
-        title.setAlignment(Qt.AlignCenter)
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
 
         def html_row(label, value):
@@ -789,7 +794,7 @@ class UIComponents:
         ])
 
         info_label = QLabel(info_html)
-        info_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        info_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         info_label.setOpenExternalLinks(True)
         info_label.setWordWrap(True)
         info_label.setMaximumWidth(340)  # ou une valeur légèrement inférieure à la largeur du card
@@ -820,4 +825,4 @@ class UIComponents:
                 parent_widget.modpack_info_overlay.deleteLater()
                 parent_widget.modpack_info_overlay = None
         close_btn.clicked.connect(close_overlay)
-        layout.addWidget(close_btn, alignment=Qt.AlignCenter) 
+        layout.addWidget(close_btn, alignment=Qt.AlignmentFlag.AlignCenter) 
