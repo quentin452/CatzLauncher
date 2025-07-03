@@ -611,27 +611,4 @@ QLabel[class="success-date"] {
     border: 2px solid rgba(80, 100, 140, 0.8);
     border-radius: 18px;
     padding: 24px 12px;
-}
-
-/* Harmonisation fine des stats et succès */
-.stat-title, .success-title, .stat-card QLabel.title, .success-card QLabel.title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #e0e0e0;
-}
-.stat-value, .success-value {
-    font-size: 16px;
-    color: #e0e0e0;
-}
-.stat-desc, .success-desc {
-    font-size: 13px;
-    color: #b0b0b0;
-}
-.stat-date, .success-date {
-    font-size: 12px;
-    color: #4caf50;
-}
-.stat-icon, .success-icon {
-    font-size: 22px;
-    color: #e0e0e0;
 } 

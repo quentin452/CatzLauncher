@@ -90,10 +90,10 @@ class BannerToast(QWidget):
         text_layout.setSpacing(2)
         title_label = QLabel(self.title)
         title_label.setFont(QFont('Arial', 11, QFont.Bold))
-        title_label.setStyleSheet('color: #222;')
+        title_label.setProperty("class", "toast-title")
         text_label = QLabel(self.text)
         text_label.setFont(QFont('Arial', 10))
-        text_label.setStyleSheet('color: #444;')
+        text_label.setProperty("class", "toast-text")
         text_label.setWordWrap(False)
         text_label.setMaximumHeight(self._get_2line_height(text_label))
         text_layout.addWidget(title_label)
@@ -103,7 +103,7 @@ class BannerToast(QWidget):
         # Close button
         close_btn = QPushButton('✕')
         close_btn.setFixedSize(20, 20)
-        close_btn.setStyleSheet('QPushButton { border: none; background: transparent; font-size: 16px; color: #888; } QPushButton:hover { color: #222; }')
+        close_btn.setProperty("class", "window-control-btn close-btn")
         close_btn.clicked.connect(self.close)
         layout.addWidget(close_btn)
 
@@ -387,7 +387,7 @@ class UIComponents:
         browse_java_btn = AnimatedButton("📂")
         bouton_largeur = 40
         browse_java_btn.setFixedWidth(bouton_largeur)
-        browse_java_btn.setStyleSheet("padding: 2px 2px; font-size: 20px;")
+        browse_java_btn.setProperty("class", "browse-btn")
         java_path_layout.addWidget(java_path_edit)
         java_path_layout.addWidget(browse_java_btn)
         java_path_label = QLabel(str(translations.tr("config.java_path")))
@@ -401,7 +401,7 @@ class UIComponents:
         theme_label.setProperty("tr_key", "config.theme")
         open_theme_folder_btn = AnimatedButton("📂")
         open_theme_folder_btn.setFixedWidth(bouton_largeur)
-        open_theme_folder_btn.setStyleSheet("padding: 2px 2px; font-size: 20px;")
+        open_theme_folder_btn.setProperty("class", "browse-btn")
         def open_theme_folder():
             import os, sys, subprocess
             styles_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/styles/"))
