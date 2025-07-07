@@ -25,8 +25,14 @@
                         "aoa3:vox_ponds",
                         "twilightforest:twilightforest",
                         "twilightforest:skylight_forest",
-                        "levinide:lantern"
-
+                        "levinide:lantern",
+                        "shadowlands:forgotten_desert_dimension",
+                        "shadowlands:glowshroom_caves",
+                        "shadowlands:shadowbraxis",
+                        "shadowlands:sparkpolia",
+                        "shadowlands:the_red_castle",
+                        "shadowlands:thebloodbath",
+                        "shadowlands:vellium"
                     ],
                     "result": "deny"
     }
